@@ -14,3 +14,18 @@ frog = animals[6:] # From the seventh character to the end
 
 #### Q: Explain what's happening here.
 ####    - How we're using [:end] [3:6] (why it's end-1) and [start:] without the end+1
+
+
+
+## Search for item, insert item
+###############################
+
+animals = ["aardvark", "badger", "duck", "emu", "fennec fox"]
+duck_index = animals.index("duck")  # Use index() to find "duck"
+animals.insert(duck_index,"cobra")
+
+print animals # Observe what prints after the insert operation
+
+#### Q: Explain what .index() is doing
+#### Q: Explain what .insert() does, and at what index we're inserting it
+####	e.g: animals.insert(1, "dog")
