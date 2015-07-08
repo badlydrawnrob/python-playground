@@ -2,7 +2,7 @@
 # Indexes: functions
 #
 
-## Append: .append()
+## .append() method
 ####################
 
 ### 1

@@ -29,3 +29,6 @@ print animals # Observe what prints after the insert operation
 #### Q: Explain what .index() is doing
 #### Q: Explain what .insert() does, and at what index we're inserting it
 ####	e.g: animals.insert(1, "dog")
+####	- Note you're not replacing the current string, but **inserting** at that index!
+#### Q: Explain what `print animals` will return
+####	- It prints out the full list array `[1,2,3,4]` etc
