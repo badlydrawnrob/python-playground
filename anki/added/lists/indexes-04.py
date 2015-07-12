@@ -8,9 +8,9 @@
 ### 1
 
 animals = "catdogfrog"
-cat  = animals[:3]   # The first three characters of animals
-dog  = animals[3:6]  # The fourth through sixth characters
-frog = animals[6:] # From the seventh character to the end
+cat  = animals[:3]  # 1
+dog  = animals[3:6] # 2
+frog = animals[6:]  # 3
 
 #### Q: Explain what's happening here.
 ####    - How we're using [:end] [3:6] (why it's end-1) and [start:] without the end+1
@@ -21,7 +21,7 @@ frog = animals[6:] # From the seventh character to the end
 ###############################
 
 animals = ["aardvark", "badger", "duck", "emu", "fennec fox"]
-duck_index = animals.index("duck")  # Use index() to find "duck"
+duck_index = animals.index("duck")
 animals.insert(duck_index,"cobra")
 
 print animals # Observe what prints after the insert operation
