@@ -2,7 +2,7 @@
 # Indexes: functions
 #
 
-## Append: .append()
+## .append() method
 ####################
 
 ### 1
@@ -18,19 +18,19 @@ print letters
 
 ### 2
 
-suitcase = [] 
+suitcase = [] # What does this do? 
 suitcase.append("sunglasses")
 
-# Your code here!
+# What are we doing here?
 suitcase.append("suncream")
 suitcase.append("swimming costume")
 suitcase.append("book")
 
-# list_length = ________ # Set this to the length of suitcase
+list_length = ________ # How do we set the list length?
 
 print "There are %d items in the suitcase." % (list_length)
 print suitcase
 
 #### Q: How do you set an empty list (array)
-#### Q: How do we set the `list_length`?
+#### Q: How do we set the `list_length`? 
 #### Q: What does %d print out?
