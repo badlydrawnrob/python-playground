@@ -1,0 +1,70 @@
+
+#keystyles {
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:100px;
+    height:100px;
+    z-index: 10;
+}
+
+/*The movement buttons*/
+.btn_move {
+    display: inline-block;
+    width: 200px;
+    height:75px;
+    background-color: #CC99FF;
+    color:white;
+    text-align: center;
+    line-height: 75px;
+    transition: all 0.2s ease;
+}
+
+.btn_move:hover{
+    background-color: #A67CCF ;
+    color:#a0a0a0;
+    transition: all 0.2s ease;
+}
+
+/* Stop the links from underlining any whitespace or text*/
+.no_underline{
+    text-decoration: none;
+}
+
+/* The bit between the buttons*/
+.divider{
+    display: inline-block;
+    height:15px;
+    width:20px;
+    background-color:#ffffaa;
+}
+
+/*The main body of the document*/
+.body_style{
+    background-color: #000044;
+    font-family: Arial;
+}
+
+.rounded_edges{
+    border-radius: 25px;
+    -moz-border-radius: 25px;
+    -webkit-border-radius: 25px;
+}
+
+.text_block{
+    border: 5px solid;
+    border-color: #66E0FF;
+    color:#000044;
+    width:650px;
+    background-color:#F6FCFF ;
+}
+
+.heading {
+    border: 5px solid;
+    border-color: #66E0FF;
+    height:50px;
+    line-height: 50px;
+    color:#000044;
+    width:450px;
+    background-color:#F6FCFF ;
+}
