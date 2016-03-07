@@ -1,18 +1,3 @@
-# Floor #
-#########
-
-# Everything is a float in Python 3
-# - To return an integer, use floor()
-# - A simple way to do this is '//'
-positive = 4 // 4
-
-# Be aware of negative numbers
-# - They use floor, so a lower number than you'd expect
-negative = -3 // 2
-
-print(str(positive))  # 1
-print(str(negative))  # -2
-
 # Modulo #
 ##########
 
@@ -20,7 +5,6 @@ print(str(negative))  # -2
 
 modulo = 9 % 2
 print(modulo)
-
 # Exponent #
 ###############
 
@@ -41,3 +25,13 @@ print(bigDeal)
 
 smallDeal = 1 / 10 ** 3
 print(smallDeal)
+
+# PEMDAS #
+##########
+# The order of calculation:
+# 1. parentheses,
+# 2. exponents,
+# 3. multiplication,
+# 4. division,
+# 5. addition,
+# 6. subtraction
