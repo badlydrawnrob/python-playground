@@ -11,10 +11,7 @@
 	"folders":
 	[
 		{
-			"path": "./anki/"
-		},
-		{
-			"path": "./personal/"
+			"path": "/Users/Rob/Sites/_/Learning/python-playground/flask-mega-tutorial"
 		}
 	]
 }

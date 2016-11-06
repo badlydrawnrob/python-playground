@@ -11,10 +11,11 @@
 	"folders":
 	[
 		{
-			"path": "./anki/"
-		},
-		{
-			"path": "./personal/"
+			"path": "."
 		}
-	]
+	],
+	"settings": {
+		// Setup Anaconda to use PyTest:
+        // "test_command": "python -m pytest"
+    }
 }
