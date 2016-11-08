@@ -69,6 +69,19 @@
 		"oAP": "\/app\/forms.py",
 		"oF": 0
 		},
+	"\/app\/static\/main.styl": {
+		"aP": 0,
+		"bl": 0,
+		"dS": 0,
+		"ft": 8,
+		"iC": 0,
+		"ma": 0,
+		"oA": 0,
+		"oAP": "\/app\/static\/main.css",
+		"oF": 0,
+		"oS": 0,
+		"rrU": 0
+		},
 	"\/app\/templates\/base.html": {
 		"ft": 8192,
 		"oA": 2,
@@ -86,6 +99,19 @@
 		"oA": 2,
 		"oAP": "\/app\/templates\/login.html",
 		"oF": 0
+		},
+	"\/app\/templates\/login.styl": {
+		"aP": 0,
+		"bl": 0,
+		"dS": 0,
+		"ft": 8,
+		"iC": 0,
+		"ma": 0,
+		"oA": 1,
+		"oAP": "\/app\/templates\/login.css",
+		"oF": 0,
+		"oS": 0,
+		"rrU": 0
 		},
 	"\/app\/views.py": {
 		"ft": 8192,

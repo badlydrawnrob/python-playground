@@ -1,5 +1,6 @@
 <html>
   <head>
+    <link rel="stylesheet" href="/static/main.css">
     {% if title %}
       <title>{{ title }} - microblog</title>
     {% else %}
@@ -10,7 +11,18 @@
     <ul>
       <li>Microblog:</li>
       <li><a href="/">Home</a></li>
+      <li><a href="/login">Login</a></li>
     </ul>
+    <hr>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+      <ul>
+        {% for message in messages %}
+          <li>{{ messages }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    {% endwith %}
     {% block content %}{% endblock %}
   </body>
 </html>
