@@ -10,10 +10,16 @@
   <body>
     <ul>
       <li>Microblog:</li>
-      <li><a href="/">Home</a></li>
-      <li><a href="/login">Login</a></li>
+      <li><a href="{{ url_for('index') }}">Home</a></li>
+      {% if g.user.is_authenticated %}
+        <li><a href="{{ url_for('login') }}">Login</a></li>
+        <li><a href="{{ url_for('user', nickname=g.user.nickname) }}">Your profile</a></li>
+        <li><a href="{{ url_for('logout') }}">Logout</a></li>
+      {% endif %}
     </ul>
+
     <hr>
+
     {% with messages = get_flashed_messages() %}
       {% if messages %}
       <ul>

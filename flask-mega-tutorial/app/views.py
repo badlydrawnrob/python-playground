@@ -1,12 +1,17 @@
-from flask import render_template, flash, redirect
+from flask import render_template, url_for, flash, redirect, g
 from app import app
-# from .forms import LoginForm
-from flask_security import login_required
+from flask_security import login_required, current_user
+from .models import User
+
+
+@app.before_request
+def before_request():
+    g.user = current_user
 
 
 @app.route('/')
 @app.route('/index')
-@login_required
+# @login_required
 def index():
     user = {'nickname': 'Miguel'}  # fake user
     posts = [  # fake array of posts
@@ -28,19 +33,19 @@ def index():
     )
 
 
-# @app.route('/login', methods=['GET', 'POST'])
-# def login():
-#     form = LoginForm()
-#     if form.validate_on_submit():
-#         flash(
-#             '''
-#             Login requested for OPENID={}, remember_me={}
-#             '''.format(form.openid.data, str(form.remember_me.data))
-#         )
-#         return redirect('/index')
-#     return render_template(
-#         'login.html',
-#         title='Sign In',
-#         form=form,
-#         providers=app.config['OPENID_PROVIDERS']
-#     )
+@app.route('/user/<nickname>')
+@login_required
+def user(nickname):
+    user = User.query.filter_by(nickname=nickname).first()
+    if user is None:
+        flash('User {} not found.'.format(nickname))
+        return redirect(url_for('index'))
+    posts = [
+        {'author': user, 'body': 'Test post #1'},
+        {'author': user, 'body': 'Test post #2'}
+    ]
+    return render_template(
+        'user.html',
+        user=user,
+        posts=posts
+    )
