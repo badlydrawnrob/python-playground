@@ -4,100 +4,64 @@
 	{
 		"name": "Process All Remaining Files and Folders",
 		"stepType": 1,
-		"uuidString": "99B35C23-66D9-4EFE-A5BB-9FF6AAC8610A"
+		"uuidString": "8B8E0AB9-A41B-41FF-BD08-BAECD2232A08"
 		}
 	],
 "creatorBuild": "25444",
 "files": {
-	"\/.editorconfig": {
-		"ft": 8192,
-		"oA": 2,
-		"oAP": "\/.editorconfig",
-		"oF": 0
-		},
 	"\/.python-version": {
 		"ft": 8192,
 		"oA": 2,
 		"oAP": "\/.python-version",
 		"oF": 0
 		},
-	"\/_\/flask-mega-tutorial.sublime-project": {
+	"\/__pycache__\/flaskr.cpython-35.pyc": {
 		"ft": 8192,
 		"oA": 2,
-		"oAP": "\/_\/flask-mega-tutorial.sublime-project",
+		"oAP": "\/__pycache__\/flaskr.cpython-35.pyc",
 		"oF": 0
 		},
-	"\/_\/flask-mega-tutorial.sublime-workspace": {
+	"\/__pycache__\/views.cpython-35.pyc": {
 		"ft": 8192,
 		"oA": 2,
-		"oAP": "\/_\/flask-mega-tutorial.sublime-workspace",
+		"oAP": "\/__pycache__\/views.cpython-35.pyc",
 		"oF": 0
 		},
-	"\/__pycache__\/config.cpython-35.pyc": {
+	"\/flaskr.db": {
 		"ft": 8192,
 		"oA": 2,
-		"oAP": "\/__pycache__\/config.cpython-35.pyc",
+		"oAP": "\/flaskr.db",
 		"oF": 0
 		},
-	"\/app.db": {
+	"\/flaskr.py": {
 		"ft": 8192,
 		"oA": 2,
-		"oAP": "\/app.db",
+		"oAP": "\/flaskr.py",
 		"oF": 0
 		},
-	"\/app\/__init__.py": {
-		"ft": 8192,
-		"oA": 1,
-		"oAP": "\/app\/__init__.py",
-		"oF": 0
-		},
-	"\/app\/__pycache__\/__init__.cpython-35.pyc": {
-		"ft": 8192,
-		"oA": 1,
-		"oAP": "\/app\/__pycache__\/__init__.cpython-35.pyc",
-		"oF": 0
-		},
-	"\/app\/__pycache__\/forms.cpython-35.pyc": {
+	"\/flaskr_tests.py": {
 		"ft": 8192,
 		"oA": 2,
-		"oAP": "\/app\/__pycache__\/forms.cpython-35.pyc",
+		"oAP": "\/flaskr_tests.py",
 		"oF": 0
 		},
-	"\/app\/__pycache__\/models.cpython-35.pyc": {
+	"\/schema.sql": {
 		"ft": 8192,
 		"oA": 2,
-		"oAP": "\/app\/__pycache__\/models.cpython-35.pyc",
+		"oAP": "\/schema.sql",
 		"oF": 0
 		},
-	"\/app\/__pycache__\/views.cpython-35.pyc": {
-		"ft": 8192,
-		"oA": 2,
-		"oAP": "\/app\/__pycache__\/views.cpython-35.pyc",
-		"oF": 0
-		},
-	"\/app\/forms.py": {
-		"ft": 8192,
-		"oA": 2,
-		"oAP": "\/app\/forms.py",
-		"oF": 0
-		},
-	"\/app\/models.py": {
-		"ft": 8192,
-		"oA": 2,
-		"oAP": "\/app\/models.py",
-		"oF": 0
-		},
-	"\/app\/static\/main.css": {
+	"\/static\/main.css": {
 		"aP": 0,
 		"bl": 0,
 		"ft": 16,
 		"ma": 0,
 		"oA": 2,
-		"oAP": "\/app\/static\/main-min.css",
+		"oAP": "\/static\/main-min.css",
 		"oF": 0,
 		"oS": 0
 		},
-	"\/app\/static\/main.styl": {
+	"\/static\/main.styl": {
 		"aP": 0,
 		"bl": 0,
 		"dS": 0,
@@ -105,125 +69,54 @@
 		"iC": 0,
 		"ma": 0,
 		"oA": 0,
-		"oAP": "\/app\/static\/main.css",
+		"oAP": "\/static\/main.css",
 		"oF": 0,
 		"oS": 0,
 		"rrU": 0
 		},
-	"\/app\/templates\/_\/login.html": {
+	"\/templates\/layout.html": {
 		"ft": 8192,
 		"oA": 2,
-		"oAP": "\/app\/templates\/_\/login.html",
+		"oAP": "\/templates\/layout.html",
 		"oF": 0
 		},
-	"\/app\/templates\/_\/login.styl": {
+	"\/templates\/layout.styl": {
 		"aP": 0,
 		"bl": 0,
 		"dS": 0,
 		"ft": 8,
 		"iC": 0,
 		"ma": 0,
-		"oA": 0,
-		"oAP": "\/app\/templates\/_\/login.css",
+		"oA": 1,
+		"oAP": "\/templates\/layout.css",
 		"oF": 0,
 		"oS": 0,
 		"rrU": 0
 		},
-	"\/app\/templates\/base.html": {
+	"\/templates\/login.html": {
 		"ft": 8192,
 		"oA": 2,
-		"oAP": "\/app\/templates\/base.html",
+		"oAP": "\/templates\/login.html",
 		"oF": 0
 		},
-	"\/app\/templates\/index.html": {
+	"\/templates\/show_entries.html": {
 		"ft": 8192,
 		"oA": 2,
-		"oAP": "\/app\/templates\/index.html",
+		"oAP": "\/templates\/show_entries.html",
 		"oF": 0
 		},
-	"\/app\/templates\/user.html": {
-		"ft": 8192,
-		"oA": 2,
-		"oAP": "\/app\/templates\/user.html",
-		"oF": 0
-		},
-	"\/app\/views.py": {
-		"ft": 8192,
-		"oA": 2,
-		"oAP": "\/app\/views.py",
-		"oF": 0
-		},
-	"\/config.py": {
-		"ft": 8192,
-		"oA": 2,
-		"oAP": "\/config.py",
-		"oF": 0
-		},
-	"\/db_create.py": {
-		"ft": 8192,
-		"oA": 2,
-		"oAP": "\/db_create.py",
-		"oF": 0
-		},
-	"\/db_downgrade.py": {
-		"ft": 8192,
-		"oA": 2,
-		"oAP": "\/db_downgrade.py",
-		"oF": 0
-		},
-	"\/db_migrate.py": {
-		"ft": 8192,
-		"oA": 2,
-		"oAP": "\/db_migrate.py",
-		"oF": 0
-		},
-	"\/db_repository\/__init__.py": {
-		"ft": 8192,
+	"\/templates\/show_entries.styl": {
+		"aP": 0,
+		"bl": 0,
+		"dS": 0,
+		"ft": 8,
+		"iC": 0,
+		"ma": 0,
 		"oA": 1,
-		"oAP": "\/db_repository\/__init__.py",
-		"oF": 0
-		},
-	"\/db_repository\/__pycache__\/__init__.cpython-35.pyc": {
-		"ft": 8192,
-		"oA": 1,
-		"oAP": "\/db_repository\/__pycache__\/__init__.cpython-35.pyc",
-		"oF": 0
-		},
-	"\/db_repository\/manage.py": {
-		"ft": 8192,
-		"oA": 2,
-		"oAP": "\/db_repository\/manage.py",
-		"oF": 0
-		},
-	"\/db_repository\/migrate.cfg": {
-		"ft": 8192,
-		"oA": 2,
-		"oAP": "\/db_repository\/migrate.cfg",
-		"oF": 0
-		},
-	"\/db_repository\/README": {
-		"ft": 8192,
-		"oA": 2,
-		"oAP": "\/db_repository\/README",
-		"oF": 0
-		},
-	"\/db_repository\/versions\/__init__.py": {
-		"ft": 8192,
-		"oA": 1,
-		"oAP": "\/db_repository\/versions\/__init__.py",
-		"oF": 0
-		},
-	"\/db_repository\/versions\/__pycache__\/__init__.cpython-35.pyc": {
-		"ft": 8192,
-		"oA": 1,
-		"oAP": "\/db_repository\/versions\/__pycache__\/__init__.cpython-35.pyc",
-		"oF": 0
-		},
-	"\/db_upgrade.py": {
-		"ft": 8192,
-		"oA": 2,
-		"oAP": "\/db_upgrade.py",
-		"oF": 0
+		"oAP": "\/templates\/show_entries.css",
+		"oF": 0,
+		"oS": 0,
+		"rrU": 0
 		}
 	},
 "hooks": [
@@ -231,10 +124,10 @@
 "manualImportLinks": {
 	},
 "projectAttributes": {
-	"creationDate": 500228269,
-	"displayValue": "Flask",
-	"displayValueWasSetByUser": 1,
-	"iconImageName": "meme-ive"
+	"creationDate": 501612441,
+	"displayValue": "flaskr",
+	"displayValueWasSetByUser": 0,
+	"iconImageName": "meme-ron"
 	},
 "projectSettings": {
 	"abortBuildOnError": 1,
@@ -1544,7 +1437,7 @@
 			}
 		},
 	"esLintSourceType": 0,
-	"externalServerAddress": "http:\/\/localhost:5000\/",
+	"externalServerAddress": "http:\/\/127.0.0.1:5000",
 	"gitIgnoreBuildFolder": 1,
 	"hideConfigFile": 0,
 	"jsCheckerReservedNamesString": "",
