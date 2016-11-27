@@ -4,40 +4,18 @@
 	{
 		"name": "Process All Remaining Files and Folders",
 		"stepType": 1,
-		"uuidString": "8B8E0AB9-A41B-41FF-BD08-BAECD2232A08"
+		"uuidString": "1C5240DA-C3FB-4EBC-ACB5-923FDA10C92D"
 		}
 	],
 "creatorBuild": "25444",
 "files": {
-	"\/.python-version": {
+	"\/headlines.py": {
 		"ft": 8192,
 		"oA": 2,
-		"oAP": "\/.python-version",
+		"oAP": "\/headlines.py",
 		"oF": 0
 		},
-	"\/flaskr\/flaskr.py": {
-		"ft": 8192,
-		"oA": 2,
-		"oAP": "\/flaskr\/flaskr.py",
-		"oF": 0
-		},
-	"\/flaskr\/schema.sql": {
-		"ft": 8192,
-		"oA": 2,
-		"oAP": "\/flaskr\/schema.sql",
-		"oF": 0
-		},
-	"\/flaskr\/static\/main.css": {
-		"aP": 0,
-		"bl": 0,
-		"ft": 16,
-		"ma": 0,
-		"oA": 2,
-		"oAP": "\/flaskr\/static\/main-min.css",
-		"oF": 0,
-		"oS": 0
-		},
-	"\/flaskr\/static\/main.styl": {
+	"\/static\/main.styl": {
 		"aP": 0,
 		"bl": 0,
 		"dS": 0,
@@ -45,18 +23,18 @@
 		"iC": 0,
 		"ma": 0,
 		"oA": 0,
-		"oAP": "\/flaskr\/static\/main.css",
+		"oAP": "\/static\/main.css",
 		"oF": 0,
 		"oS": 0,
 		"rrU": 0
 		},
-	"\/flaskr\/templates\/layout.html": {
+	"\/templates\/home.html": {
 		"ft": 8192,
 		"oA": 2,
-		"oAP": "\/flaskr\/templates\/layout.html",
+		"oAP": "\/templates\/home.html",
 		"oF": 0
 		},
-	"\/flaskr\/templates\/layout.styl": {
+	"\/templates\/home.styl": {
 		"aP": 0,
 		"bl": 0,
 		"dS": 0,
@@ -64,41 +42,10 @@
 		"iC": 0,
 		"ma": 0,
 		"oA": 1,
-		"oAP": "\/flaskr\/templates\/layout.css",
+		"oAP": "\/templates\/home.css",
 		"oF": 0,
 		"oS": 0,
 		"rrU": 0
-		},
-	"\/flaskr\/templates\/login.html": {
-		"ft": 8192,
-		"oA": 2,
-		"oAP": "\/flaskr\/templates\/login.html",
-		"oF": 0
-		},
-	"\/flaskr\/templates\/show_entries.html": {
-		"ft": 8192,
-		"oA": 2,
-		"oAP": "\/flaskr\/templates\/show_entries.html",
-		"oF": 0
-		},
-	"\/flaskr\/templates\/show_entries.styl": {
-		"aP": 0,
-		"bl": 0,
-		"dS": 0,
-		"ft": 8,
-		"iC": 0,
-		"ma": 0,
-		"oA": 1,
-		"oAP": "\/flaskr\/templates\/show_entries.css",
-		"oF": 0,
-		"oS": 0,
-		"rrU": 0
-		},
-	"\/flaskr_tests.py": {
-		"ft": 8192,
-		"oA": 2,
-		"oAP": "\/flaskr_tests.py",
-		"oF": 0
 		}
 	},
 "hooks": [
@@ -106,14 +53,14 @@
 "manualImportLinks": {
 	},
 "projectAttributes": {
-	"creationDate": 501612441,
-	"displayValue": "flaskr",
+	"creationDate": 501957647,
+	"displayValue": "headlines",
 	"displayValueWasSetByUser": 0,
-	"iconImageName": "meme-ron"
+	"iconImageName": "brackets_purple"
 	},
 "projectSettings": {
 	"abortBuildOnError": 1,
-	"alwaysUseExternalServer": 1,
+	"alwaysUseExternalServer": 0,
 	"animateCSSInjections": 1,
 	"autoBuildNewItems": 1,
 	"autoprefixerBrowserString": "> 1%, last 2 versions, Firefox ESR, Opera 12.1",
@@ -1419,7 +1366,7 @@
 			}
 		},
 	"esLintSourceType": 0,
-	"externalServerAddress": "http:\/\/127.0.0.1:5000",
+	"externalServerAddress": "http:\/\/localhost:8888",
 	"gitIgnoreBuildFolder": 1,
 	"hideConfigFile": 0,
 	"jsCheckerReservedNamesString": "",
