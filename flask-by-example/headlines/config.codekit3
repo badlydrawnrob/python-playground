@@ -15,6 +15,16 @@
 		"oAP": "\/headlines.py",
 		"oF": 0
 		},
+	"\/static\/main.css": {
+		"aP": 0,
+		"bl": 0,
+		"ft": 16,
+		"ma": 0,
+		"oA": 2,
+		"oAP": "\/static\/main-min.css",
+		"oF": 0,
+		"oS": 0
+		},
 	"\/static\/main.styl": {
 		"aP": 0,
 		"bl": 0,
