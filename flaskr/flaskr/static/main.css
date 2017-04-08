@@ -1,0 +1,53 @@
+body {
+  font-family: sans-serif;
+  background: #eee;
+}
+a,
+h1,
+h2 {
+  color: #377ba8;
+}
+h1,
+h2 {
+  font-family: 'Georgia', serif;
+  margin: 0;
+}
+h1 {
+  border-bottom: 2px solid #eee;
+}
+h2 {
+  font-size: 1.2em;
+}
+.gl-Page {
+  margin: 2em auto;
+  width: 35em;
+  border: 5px solid #ccc;
+  padding: 0.8em;
+  background: #fff;
+}
+.flash {
+  background: #cee5f5;
+  padding: 0.5em;
+}
+.error {
+  background: #f0d6d6;
+  padding: 0.5em;
+}
+.se-List {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.se-List_Item {
+  margin: 0.8em 1.2em;
+}
+.se-List_ItemHeader {
+  margin-left: -1em;
+}
+.se-AddEntry {
+  font-size: 0.9em;
+  border-bottom: 1px solid #ccc;
+}
+.se-AddEntry_List {
+  font-weight: bold;
+}

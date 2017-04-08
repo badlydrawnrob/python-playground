@@ -11,8 +11,7 @@
 	"folders":
 	[
 		{
-			"path": "/Users/Rob/Sites/python-playground/flask-mega-tutorial",
-			"folder_exclude_patterns": ["_", "__pycache__"]
+			"path": "/Users/Rob/Sites/python-playground/flask-by-example"
 		}
 	]
 }
