@@ -17,11 +17,12 @@ class Item(Resource):
         # 400: bad request
         if next(filter(lambda x: x['name'] == name, items), None):
             return {'message': 'An item with name {} already exists.'.format(name)}, 400
-        else:
-            data = request.get_json()
-            item = {'name': name, 'price': data['price']}
-            items.append(item)
-            return item, 201  # Created code
+
+        # This section only returns if above is `False`:
+        data = request.get_json()
+        item = {'name': name, 'price': data['price']}
+        items.append(item)
+        return item, 201  # 'Created' browser code
 
 
 class ItemList(Resource):
