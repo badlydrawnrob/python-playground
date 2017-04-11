@@ -15,7 +15,7 @@ class Item(Resource):
     def post(self, name):
         # The client should really check if name exists before, so use
         # 400: bad request
-        if next(filter(lambda x: x['name'] == name, items), None) is not None:
+        if next(filter(lambda x: x['name'] == name, items), None):
             return {'message': 'An item with name {} already exists.'.format(name)}, 400
         else:
             data = request.get_json()
