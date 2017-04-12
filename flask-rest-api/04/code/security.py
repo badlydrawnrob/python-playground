@@ -8,6 +8,9 @@ username_mapping = {u.username: u for u in users}
 userid_mapping = {u.id: u for u in users}
 
 
+# != Be careful of == with strings.
+# you can use safe_str_cmp() in older systems
+
 def authenticate(username, password):
     user = username_mapping.get(username, None)
     if user and user.password == password:
