@@ -30,6 +30,27 @@ class Item(Resource):
         items.append(item)
         return item, 201  # 'Created' browser code
 
+    def delete(self, name):
+        # return a new list without the one we're deleting:
+        global items
+        items = list(filter(lambda x: x['name'] != name, items))
+        return {'message': 'Item deleted'}
+
+    # PUT output should never change:
+    # i.e: it should only create, or modify
+    #      multiple objects should not be created
+    def put(self, name):
+        data = request.get_json()
+        item = next(filter(lambda x: x['name'] == name, items), None)
+        # Create the item if it doesn't exist ...
+        if item is None:
+            item = {'name': name, 'price': data['price']}
+            items.append(item)
+        # Or, update the item if it does
+        else:
+            item.update(data)
+        return item, 201
+
 
 class ItemList(Resource):
     def get(self):
