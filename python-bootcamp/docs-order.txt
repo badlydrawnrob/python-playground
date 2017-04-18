@@ -1,0 +1,25 @@
+
+# PYTHON BOOTCAMP
+
+13. Numbers 14:59
+14. Numbers - FAQ 0:00
+Quiz 1: Numbers Quiz 0:00
+15. Strings 21:13
+16. Strings -FAQ 0:00
+Quiz 2: Strings Quiz 0:00
+17. Print Formatting 13:14
+18. Print Formatting FAQs 0:00
+19. Lists 19:48
+20. Lists - FAQ 0:00
+Quiz 3: Lists Quiz 0:00
+21. Dictionaries 16:11
+22. Dictionaries - FAQ 0:00
+Quiz 4: Dictionaries Quiz 0:00
+23. Tuples 6:29
+Quiz 5: Tuples Quiz 0:00
+24. Files 7:02
+25. Sets and Booleans 6:06
+Quiz 6: Sets and Booleans Quiz 0:00
+26. Resources for More Basic Practice 0:00
+27. Objects and Data Structures Assessment Test 5:13
+28. Objects and Data Structures Assessment - Solutions 6:09
