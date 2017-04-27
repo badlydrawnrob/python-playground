@@ -1,25 +1,62 @@
 
 # PYTHON BOOTCAMP
 
-13. Numbers 14:59
-14. Numbers - FAQ 0:00
-Quiz 1: Numbers Quiz 0:00
-15. Strings 21:13
-16. Strings -FAQ 0:00
-Quiz 2: Strings Quiz 0:00
-17. Print Formatting 13:14
-18. Print Formatting FAQs 0:00
-19. Lists 19:48
-20. Lists - FAQ 0:00
-Quiz 3: Lists Quiz 0:00
-21. Dictionaries 16:11
-22. Dictionaries - FAQ 0:00
-Quiz 4: Dictionaries Quiz 0:00
-23. Tuples 6:29
-Quiz 5: Tuples Quiz 0:00
-24. Files 7:02
-25. Sets and Booleans 6:06
-Quiz 6: Sets and Booleans Quiz 0:00
-26. Resources for More Basic Practice 0:00
-27. Objects and Data Structures Assessment Test 5:13
-28. Objects and Data Structures Assessment - Solutions 6:09
+[x] 13. Numbers 14:59
+[x] 14. Numbers - FAQ 0:00
+[x] Quiz 1: Numbers Quiz 0:00
+[x] 15. Strings 21:13
+[x] 16. Strings -FAQ 0:00
+[x] Quiz 2: Strings Quiz 0:00
+[x] 17. Print Formatting 13:14
+[x] 18. Print Formatting FAQs 0:00
+[x] 19. Lists 19:48
+[x] 20. Lists - FAQ 0:00
+[x] Quiz 3: Lists Quiz 0:00
+[x] 21. Dictionaries 16:11
+[x] 22. Dictionaries - FAQ 0:00
+[x] Quiz 4: Dictionaries Quiz 0:00
+[x] 23. Tuples 6:29
+[x] Quiz 5: Tuples Quiz 0:00
+[x] 24. Files 7:02
+[x] 25. Sets and Booleans 6:06
+[x] Quiz 6: Sets and Booleans Quiz 0:00
+[x] 26. Resources for More Basic Practice 0:00
+[x] 27. Objects and Data Structures Assessment Test 5:13
+[x] 28. Objects and Data Structures Assessment - Solutions 6:09
+
+
+[x] 29. Comparison Operators 4:59
+[x] 30. Chained Comparison Operators 4:02
+[x] Quiz 7: Comparison Operators Quiz
+
+
+[x] 31. Introduction to Python Statements 4:29
+[x] 32. if, elif, and else Statements 10:29
+[x] 33. for Loops 20:03
+[x] 34. while Loops 11:59
+[x] 35. range() 11:25
+[x] 36. List Comprehensions 13:10
+[x] 37. Statements Assessment Test 1:50
+[x] 38. Statements Assessment Solutions
+
+[x] 39. Methods 6:14
+[x] 40. Functions 20:37
+[x] 41. lambda expressions 14:17
+[x] 42. Nested Statements and Scope 11:19
+[x] 43. Functions and Methods - Homework Assignment 3:32
+[x] 44. Hints and Tips for Functions and Methods Assignment 0:00
+[x] 45. Functions and Methods Homework - Solutions 
+
+[x] 46. Milestone Project 1 Section 0:00
+[x] 47. Milestone Project 1 -Assignment Overview 5:11
+48. Milestone Project Help 0:00
+49. Milestone Project 1 - Solution Walkthrough - Part 1 18:33
+50. Milestone Project 1 - Solution Walkthrough - Part 2 10:47
+51. Milestone Project 1 - Solution Walkthrough - Part 3 13:51
+52. Advanced Project Solution Overview
+
+    - This Assignment Notebook
+    - A "Walk-through Steps Workbook" Notebook
+    - A "Walk-through Solution" Notebook
+    - An "Advanced Solution" Notebook
+
