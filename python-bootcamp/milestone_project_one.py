@@ -1,64 +1,36 @@
-# class BoardStatus(object):
-#     def __init__(self, positions, columns=3, rows=3):
-#         self.positions = positions
-#         self.columns = columns
-#         self.rows = rows
-#         self.board = generate_board()
-#         self.plot =
-#
-#     def plot_board(self, x, y):
-#         board = self.board
-#
-#
-#
-#     def generate_board(self):
-#         columns = range(self.columns)
-#         rows = [0] * self.rows
-#         board = [[x for x in rows] for x in columns]
-#
-#         return board
-#
-#     def mark_board(self, x, y):
-#
-#
-#     def print_board(self):
-#         for row in generate_board():
-#             print(row)
+list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+board = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-columns = 3
-columns_range = range(columns)
-rows = 3
-rows_list = [0] * rows
-
-input_keys = [x for x in range(1, (columns * rows +1))]
-player_one = 1
-player_two = 2
-
-board = []
-
-
-def generate_board():
-    global columns
-    global rows
-    rows = [0] * rows
-    board = [[x for x in rows] for x in columns]
-
+def plot_board(board):
+    board = [board[i:i + 3] for i in range(0, len(board), 3)]
     return board
 
+def print_board(board):
+    for row in plot_board(board):
+        print(row)
 
-# def print_board(self):
-#     for row in plot_board():
-#         print(row)
-
-
-def mark_board(position):
-    return plot_board(position)
-
-
-def plot_board():
+def mark_board(player, position):
     global board
-    board = generate_board()
+    board[int(position) -1] = player
 
+    return print_board(board)
 
-print(plot_board())
+def check_winner(board):
+    for row in board:
+        if row == ['x', 'x', 'x']:
+            return True, 'Player 1 wins!'
+        elif row == ['o', 'o', 'o']:
+            return True, 'Player 2 wins!'
+    else:
+        return False
 
+def user_input():
+    player = input('Enter your player name: ')
+    position = input('Enter your position: ')
+
+    mark_board(player, position)
+
+    if check_winner(board):
+        return check_winner(board)[1]
+    else:
+        return user_input()
