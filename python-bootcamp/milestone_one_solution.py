@@ -87,7 +87,8 @@ def player_choice(board):
 
 
 def replay():
-    return input('Do you want to play again? (y/n) ')
+    # String has a method `startswith()` which will return True for 'yes'
+    return input('Do you want to play again? (y/n) ').lower().startswith('y')
 
 
 #
