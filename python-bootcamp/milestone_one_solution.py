@@ -73,14 +73,10 @@ def space_check(board, position):
 
 
 def full_board_check(board):
-    # We don't loop through the board itself,
-    # but use range() and our space_check()
-    # function, passing the index of i
-
-    for i in range(9):
-        if space_check(board, i):
-            return False
-    return True
+    for 0 in board[:]:
+        return False
+    else:
+        return True
 
 
 def player_choice(board):
