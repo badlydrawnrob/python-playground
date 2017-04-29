@@ -1,8 +1,15 @@
 from random import randint
 
 
-keys = [1,2,3,4,5,6,7,8,9]
 board = [0,0,0,0,0,0,0,0,0]
+game_state = True
+announce = ''
+
+
+def reset_board():
+    global board, game_state
+    board = [0] * 9
+    game_state = True
 
 
 def horizontal_board(board):
