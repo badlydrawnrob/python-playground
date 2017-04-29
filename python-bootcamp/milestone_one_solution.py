@@ -12,23 +12,27 @@ def reset_board():
     game_state = True
 
 
-def horizontal_board(board):
+def horizontal_board():
+    global board
     board = [board[i:i + 3] for i in range(0, len(board), 3)]
     return board
 
 
-def vertical_board(board):
+def vertical_board():
+    global board
     board = [list(i) for i in zip(*horizontal_board(board))]
     return board
 
-def diagonal_board(board):
+def diagonal_board():
+    global board
     ltr = [board[0], board[4], board[8]]
     rtl = [board[2], board[4], board[6]]
     board = [ltr, rtl]
     return board
 
 
-def print_board(board):
+def print_board():
+    global board
     for row in horizontal_board(board):
         print(row)
 
@@ -45,11 +49,13 @@ def player_input():
         return ('O', 'X')
 
 
-def place_marker(board, marker, position):
+def place_marker(marker, position):
+    global board
     board[position - 1] = marker
 
 
-def win_check(board, marker):
+def win_check(marker):
+    global board
     marker_list = [marker, marker, marker]
 
     if marker_list in horizontal_board(board):
@@ -68,7 +74,8 @@ def choose_first():
         return 'Player 1'
 
 
-def space_check(board, position):
+def space_check(position):
+    global board
     return board[position -1] == 0
 
 
@@ -79,14 +86,63 @@ def full_board_check(board):
         return True
 
 
-def player_choice(board):
-    # Assign variable before conditional checks
-    position = 0
-    positions_allowed = [str(n) for n in range(1,10)]
+def ask_player(mark):
+    ''' Asks player where to place X or O mark, check validity '''
+    global board
+    req = f'Choose where to place your: {mark}'
 
-    while position not in positions_allowed or not space_check(board, int(position)):
-        position = input('Choose your next position: (1-9) ')
-    return int(position)
+    while True:
+        try:
+            choice = int(input(req))
+        except ValueError:
+            print('Sorry, please input a number between 1-9')
+            continue
+
+        if board[choice] = 0:
+            board[choice] = mark
+            break
+        else:
+            print('Please choose another position!')
+            continue
+
+
+def player_choice(mark):
+    ''' Function that takes a player's choice and returns the game_state '''
+    global board, game_state, announce
+    # Set blank game announcement:
+    announce = ''
+    # Get player input
+    mark = str(mark)
+    # Validate input
+    ask_player(mark)
+
+    # Check for player win
+    if win_check(board, mark):
+        print_board(board)
+        announce = f'{mark} wins! Nice job :)'
+        game_state = False
+
+    # Show board
+    print_board(board)
+
+    # Check for a tie
+    if full_board_check(board):
+        announce = "Tie!"
+        game_state = False
+
+    return game_state, announce
+
+
+def play_game():
+    reset_board()
+    global announce
+
+    # Set marks
+    X = 'X'
+    O = 'O'
+
+    while True:
+        print_board()
 
 
 def replay():
