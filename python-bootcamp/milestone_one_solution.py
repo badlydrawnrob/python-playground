@@ -1,8 +1,15 @@
 from random import randint
 
 
-keys = [1,2,3,4,5,6,7,8,9]
 board = [0,0,0,0,0,0,0,0,0]
+game_state = True
+announce = ''
+
+
+def reset_board():
+    global board, game_state
+    board = [0] * 9
+    game_state = True
 
 
 def horizontal_board(board):
@@ -13,6 +20,7 @@ def horizontal_board(board):
 def vertical_board(board):
     board = [list(i) for i in zip(*horizontal_board(board))]
     return board
+
 
 def diagonal_board(board):
     ltr = [board[0], board[4], board[8]]
@@ -26,20 +34,21 @@ def print_board(board):
         print(row)
 
 
-def player_input():
-    marker = ''
+# def player_input():
+#     marker = ''
+#
+#     while not (marker == 'O' or marker == 'X'):
+#         marker = input('Do you want to be X or O? ').upper()
+#
+#     if marker == 'X':
+#         return ('X', 'O')
+#     else:
+#         return ('O', 'X')
 
-    while not (marker == 'O' or marker == 'X'):
-        marker = input('Do you want to be X or O? ').upper()
 
-    if marker == 'X':
-        return ('X', 'O')
-    else:
-        return ('O', 'X')
-
-
-def place_marker(board, marker, position):
-    board[position - 1] = marker
+# def place_marker(marker, position):
+#     global board
+#     board[position - 1] = marker
 
 
 def win_check(board, marker):
@@ -54,97 +63,100 @@ def win_check(board, marker):
     return False
 
 
-def choose_first():
-    if randint(0, 1) == 0:
-        return 'Player 2'
-    else:
-        return 'Player 1'
-
-
-def space_check(board, position):
-    return board[position -1] == 0
+# def choose_first():
+#     if randint(0, 1) == 0:
+#         return 'Player 2'
+#     else:
+#         return 'Player 1'
 
 
 def full_board_check(board):
-    # We don't loop through the board itself,
-    # but use range() and our space_check()
-    # function, passing the index of i
-
-    for i in range(9):
-        if space_check(board, i):
-            return False
-    return True
+    if 0 in board[:]:
+        return False
+    else:
+        return True
 
 
-def player_choice(board):
-    # Assign variable before conditional checks
-    position = 0
-    positions_allowed = [str(n) for n in range(1,10)]
+def ask_player(mark):
+    ''' Asks player where to place X or O mark, check validity '''
+    global board
+    req = f'Choose where to place your: {mark} '
 
-    while position not in positions_allowed or not space_check(board, int(position)):
-        position = input('Choose your next position: (1-9) ')
-    return int(position)
+    while True:
+        try:
+            choice = int(input(req))
+        except ValueError:
+            print('Sorry, please input a number between 1-9')
+            continue
+
+        if board[choice -1] == 0:
+            board[choice -1] = mark
+            break
+        else:
+            print('Please choose another position!')
+            continue
 
 
-def replay():
-    return input('Do you want to play again? (y/n) ')
+def player_choice(mark):
+    ''' Function that takes a player's choice and returns the game_state '''
+    global board, game_state, announce
+    # Set blank game announcement:
+    announce = ''
+    # Get player input
+    mark = str(mark)
+    # Validate input
+    ask_player(mark)
+
+    # Check for player win
+    if win_check(board, mark):
+        print_board(board)
+        announce = f'{mark} wins! Nice job :)'
+        game_state = False
+    else:
+        # Show board
+        print_board(board)
+
+    # Check for a tie
+    if full_board_check(board):
+        announce = "Tie!"
+        game_state = False
+
+    return game_state, announce
+
+
+def play_game():
+    reset_board()
+    global announce
+
+    # Set marks
+    X = 'X'
+    O = 'O'
+
+    while True:
+        print_board(board)
+
+        # Player X turn
+        game_state, announce = player_choice(X)
+        print(announce)
+        if game_state == False:
+            break
+
+        # Player O turn
+        game_state, announce = player_choice(O)
+        print(announce)
+        if game_state == False:
+            break
+
+    # Ask player for a rematch:
+    rematch = input('Would you like to play again? (y/n) ')
+    if rematch.lower().startswith('y'):
+        play_game()
+    else:
+        print('Thanks for playing!')
 
 
 #
 # Start the game!
 #
 
-print('Welcome to Tic Tac Toe!')
-
-while True:
-    # Reset the board
-    board = [0] * 9
-    player1_marker, player2_marker = player_input()
-    turn = choose_first()
-    print(f'{turn} will go first.')
-    game_on = True
-
-    while game_on:
-        if turn == 'Player 1':
-            # Player 1 turn
-            print('>>> Player 1')
-
-            print_board(board)
-            position = player_choice(board)
-            place_marker(board, player1_marker, position)
-
-            if win_check(board, player1_marker):
-                print_board(board)
-                print('Player 1 wins!')
-                game_on = False
-            else:
-                if full_board_check(board):
-                    display_board(board)
-                    print('The game is a draw!')
-                    break
-                else:
-                    turn = 'Player 2'
-        else:
-            # Player 2 turn
-            print('>>> Player 2')
-
-            print_board(board)
-            position = player_choice(board)
-            place_marker(board, player2_marker, position)
-
-            if win_check(board, player2_marker):
-                print_board(board)
-                print('Player 2 wins!')
-                game_on = False
-            else:
-                if full_board_check(board):
-                    display_board(board)
-                    print('The game is a draw!')
-                    break
-                else:
-                    turn = 'Player 1'
-
-
-    if not replay():
-        break
-
+play_game()
