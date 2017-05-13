@@ -1,7 +1,13 @@
 from flask import Flask, request
 from flask_restful import Resource, Api
+from flask_jwt import
+
+# We're adding a token here with flask_jwt
+# - The user sends us their details,
+# - We send them a token to use for their session
 
 app = Flask(__name__)
+app.secret_key = 'asdf' # This should be secure
 api = Api(app)
 
 items = []
