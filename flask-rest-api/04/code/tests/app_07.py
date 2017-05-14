@@ -31,15 +31,32 @@ class Item(Resource):
         items = list(filter(lambda x: x['name'] != name, items))
         return {'message': 'Item deleted'}
 
+    # You can call this method lots of times
+    # the output won't change (i.e, you'll
+    # only get ONE item, not multiple).
+    #
+    # So, you can:
+    # 1. Create items
+    # 2. Update items
     def put(self, name):
+        # Get the request
         data = request.get_json()
+        # Check if item exists
         item = next(filter(lambda x: x['name'] == name, items), None)
+        # 1. If it DOES NOT exist, create it
+        #
+        # 2. If it DOES exist, use the dictionary
+        # `.update()` method:
+        #    - adds `key: values`,
+        #    - or update if they exist
         if item is None:
             item = {'name': name, 'price': data['price']}
             items.append(item)
         else:
             item.update(data)
-
+        # Make sure you return the item to
+        # get a result on Postman/Insomnia!
+        # - otherwise you'll get `null`
         return item
 
 

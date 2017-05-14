@@ -19,28 +19,26 @@ class Item(Resource):
 
     def post(self, name):
         if next(filter(lambda x: x['name'] == name, items), None):
-            return {'{} already exists'.format(name)}, 400
+            return {'message': '{} already exists'.format(name)}, 400
         data = request.get_json()
         item = {'name': name, 'price': data['price']}
         items.append(item)
         return item, 201
 
+    # Add a delete method
     def delete(self, name):
+        # Set a list of all items that are NOT
+        # the `name` passed as an argument
+        # - Make sure you add a `global` variable
+        #   or else, you'll get a "cannot assign
+        #   variable" error
+        #
+        # issues:
+        # 1. It doesn't check if the item exists
+        # 2. Is there a better way to do this?
         global items
-
         items = list(filter(lambda x: x['name'] != name, items))
         return {'message': 'Item deleted'}
-
-    def put(self, name):
-        data = request.get_json()
-        item = next(filter(lambda x: x['name'] == name, items), None)
-        if item is None:
-            item = {'name': name, 'price': data['price']}
-            items.append(item)
-        else:
-            item.update(data)
-
-        return item
 
 
 class ItemsList(Resource):
