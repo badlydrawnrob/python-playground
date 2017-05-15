@@ -15,6 +15,7 @@ jwt = JWT(app, authenticate, identity)
 items = []
 
 class Item(Resource):
+    # Move the parser to class level
     parser = reqparse.RequestParser()
     parser.add_argument(
         'price',
@@ -31,7 +32,12 @@ class Item(Resource):
     def put(self, name):
         if next(filter(lambda x: x['name'] == name, items), None):
             return {'{} already exists'.format(name)}
-
+        # You also need to add `Item` here
+        # as it's a class variable/function
+        #
+        # - we put data here, below the error
+        #   check. That way it's not wasteful
+        #   (data won't load if item exists)
         data = Item.parser.parse_args()
         item = {'name': name, 'price': data['price']}
         items.append(item)
@@ -45,8 +51,6 @@ class Item(Resource):
 
     def put(self, name):
         data = Item.parser.parse_args()
-        item = next(filter(lambda x: x['name'] == name, items), None)
-
         if item is None:
             item = {'name': name, 'price': data['price']}
             items.append(item)
