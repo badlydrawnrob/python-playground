@@ -1,5 +1,8 @@
 '''
+We add in checks to only allow certain json
 
+- reqparse will be deprecated,
+  so we need to find an alternative
 '''
 
 from flask import Flask, request
@@ -14,31 +17,17 @@ jwt = JWT(app, authenticate, identity)
 
 items = []
 
-class Item(Resource):
-    # Move the parser to class level
-    parser = reqparse.RequestParser()
-    parser.add_argument(
-        'price',
-        type=float,
-        required=True,
-        help="This field cannot be blank!"
-    )
 
+class Item(Resource):
     @jwt_required()
     def get(self, name):
         item = next(filter(lambda x: x['name'] == name, items), None)
         return {'item': item}, 200 if item else 404
 
-    def put(self, name):
+    def post(self, name):
         if next(filter(lambda x: x['name'] == name, items), None):
-            return {'{} already exists'.format(name)}
-        # You also need to add `Item` here
-        # as it's a class variable/function
-        #
-        # - we put data here, below the error
-        #   check. That way it's not wasteful
-        #   (data won't load if item exists)
-        data = Item.parser.parse_args()
+            return {'{} already exists'.format(name)}, 400
+        data = request.get_json()
         item = {'name': name, 'price': data['price']}
         items.append(item)
         return item, 201
@@ -50,7 +39,30 @@ class Item(Resource):
         return {'message': 'Item deleted'}
 
     def put(self, name):
-        data = Item.parser.parse_args()
+        # Instantiate the object
+        # which we use to parse request
+        # - run request through this method
+        # - see which arguments match
+        parser = reqparse.RequestParser()
+        # This can check json payloads
+        # AND form payloads
+        # - any other json elements will be ignored
+        parser.add_argument(
+            'price', type=float,
+            required=True,
+            help="This field cannot be left blank!"
+        )
+        # Instead of request.get_json()
+        # we run the request through the
+        # parser!
+        data = parser.parse_args()
+        # Add another argument, that won't
+        # get parsed by reqparse and will
+        # throw a `KeyError`.
+        # - just to prove it is getting erased
+        print(data['another'])
+
+        item = next(filter(lambda x: x['name'] == name, items), None)
         if item is None:
             item = {'name': name, 'price': data['price']}
             items.append(item)

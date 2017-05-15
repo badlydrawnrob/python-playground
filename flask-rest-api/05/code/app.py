@@ -1,80 +1,71 @@
+'''
+
+'''
+
 from flask import Flask, request
 from flask_restful import Resource, Api, reqparse
 from flask_jwt import JWT, jwt_required
-
 from security import authenticate, identity
 
 app = Flask(__name__)
-app.secret_key = 'jose'
+app.secret_key = 'asdf'
 api = Api(app)
-
-jwt = JWT(app, authenticate, identity) # /auth
+jwt = JWT(app, authenticate, identity)
 
 items = []
 
-
 class Item(Resource):
-    # Only allow certain elements to be modified.
-    # - DEPRECATED soon: http://bit.ly/2o63bXb
-    # - If any fields other than the ones
-    #   declared are passed, they will be ignored (erased)
+    # Move the parser to class level
     parser = reqparse.RequestParser()
     parser.add_argument(
         'price',
         type=float,
         required=True,
-        help="This field cannot be left blank!"
+        help="This field cannot be blank!"
     )
-
 
     @jwt_required()
     def get(self, name):
         item = next(filter(lambda x: x['name'] == name, items), None)
         return {'item': item}, 200 if item else 404
 
-    def post(self, name):
-        # The client should really check if name exists before
+    def put(self, name):
         if next(filter(lambda x: x['name'] == name, items), None):
-            return {'message': 'An item with name {} already exists.'.format(name)}, 400
-
+            return {'{} already exists'.format(name)}
+        # You also need to add `Item` here
+        # as it's a class variable/function
+        #
+        # - we put data here, below the error
+        #   check. That way it's not wasteful
+        #   (data won't load if item exists)
         data = Item.parser.parse_args()
-
-        # This section only returns if above is `False`:
         item = {'name': name, 'price': data['price']}
         items.append(item)
-        return item, 201  # 'Created' browser code
+        return item, 201
 
     def delete(self, name):
-        # return a new list without the one we're deleting:
         global items
+
         items = list(filter(lambda x: x['name'] != name, items))
         return {'message': 'Item deleted'}
 
-    # PUT output should never change:
-    # i.e: it should only create, or modify
-    #      multiple objects should not be created
     def put(self, name):
         data = Item.parser.parse_args()
-
-        print(data['another'])
-        item = next(filter(lambda x: x['name'] == name, items), None)
-
-        # Create the item if it doesn't exist ...
         if item is None:
             item = {'name': name, 'price': data['price']}
             items.append(item)
-        # Or, update the item if it does
         else:
             item.update(data)
-        return item, 201
+
+        return item
 
 
-class ItemList(Resource):
+class ItemsList(Resource):
     def get(self):
-        return {'items': items}, 200
+        return {'items': items}
 
 
 api.add_resource(Item, '/item/<string:name>')
-api.add_resource(ItemList, '/items')
+api.add_resource(ItemsList, '/items')
 
-app.run(debug=True)
+app.run(port=5000, debug=True)
