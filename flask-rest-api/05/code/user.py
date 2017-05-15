@@ -1,6 +1,13 @@
+'''
+We're allowing the user class to interact
+with sqlite, creating user mappings (similar
+to the functions we created in `security.py`
+`usename_mapping`, `userid_mapping`)
+'''
+
 import sqlite3
 
-# Allow user class to interact with sqlite
+
 class User(object):
     def __init__(self, _id, username, password):
         self.id = _id
@@ -28,10 +35,33 @@ class User(object):
         # `row` will return `None` if no `result`
         # so we need to check if exists
         if row:
-            # Instead of hardcoding the Class
-            # - User(row[0] ...
-            # use `cls`
-            user = cls(row[0], row[1], row[2])
+            # 1. Instead of hardcoding the Class
+            #    - User(row[0] ...
+            # We can use `cls` (Python convention)
+            #
+            # 2. Instead of row[0], row[1], row[2]
+            # - we can unpack the tuple `*row`
+            user = cls(*row)
+        else:
+            user = None
+
+        connection.close()
+        return user
+
+    # Create a class method exactly the same
+    # as the one above, but for the ID
+    # - Remember, we're using `_id` with an
+    # underscore to avoid naming conflicts with Python
+    @classmethod
+    def find_by_id(cls, _id):
+        connection = sqlite3.connect('data.db')
+        cursor = connection.cursor()
+
+        query = "SELECT * FROM users WHERE id=?"
+        result = cursor.execute(query, (_id,))
+        row = result.fetchone()
+        if row:
+            user = cls(*row)
         else:
             user = None
 
