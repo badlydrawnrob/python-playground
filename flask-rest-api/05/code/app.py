@@ -2,68 +2,34 @@
 Our launchable app file
 '''
 
-from flask import Flask, request
-from flask_restful import Resource, Api, reqparse
-from flask_jwt import JWT, jwt_required
+# Removed `request, `Resource`, `jwt_required`, `reqparse`
+# - we'll import them in `items_04.py`
+
+from flask import Flask
+from flask_restful import Api
+from flask_jwt import JWT
+
 from security import authenticate, identity
 from user import UserRegister
+from items import Item, ItemsList
 
 app = Flask(__name__)
 app.secret_key = 'asdf'
 api = Api(app)
 jwt = JWT(app, authenticate, identity)
 
-items = []
-
-class Item(Resource):
-    parser = reqparse.RequestParser()
-    parser.add_argument(
-        'price',
-        type=float,
-        required=True,
-        help="This field cannot be blank!"
-    )
-
-    @jwt_required()
-    def get(self, name):
-        item = next(filter(lambda x: x['name'] == name, items), None)
-        return {'item': item}, 200 if item else 404
-
-    def post(self, name):
-        if next(filter(lambda x: x['name'] == name, items), None):
-            return {'{} already exists'.format(name)}
-
-        data = Item.parser.parse_args()
-        item = {'name': name, 'price': data['price']}
-        items.append(item)
-        return item, 201
-
-    def delete(self, name):
-        global items
-
-        items = list(filter(lambda x: x['name'] != name, items))
-        return {'message': 'Item deleted'}
-
-    def put(self, name):
-        data = Item.parser.parse_args()
-        item = next(filter(lambda x: x['name'] == name, items), None)
-
-        if item is None:
-            item = {'name': name, 'price': data['price']}
-            items.append(item)
-        else:
-            item.update(data)
-
-        return item
-
-
-class ItemsList(Resource):
-    def get(self):
-        return {'items': items}
-
+##
+# REMOVE items functions, and empty list
+# - moved to own file and will store in database!
+##
 
 api.add_resource(Item, '/item/<string:name>')
 api.add_resource(ItemsList, '/items')
 api.add_resource(UserRegister, '/register')
 
-app.run(port=5000, debug=True)
+# Make sure we only run the app if
+# callling the file via `python app.py`
+# - `__main__` is the file you "run"
+
+if __name__ == '__main__':
+    app.run(port=5000, debug=True)
