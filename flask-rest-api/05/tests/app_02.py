@@ -1,6 +1,8 @@
 '''
-Our launchable app file
+Users and items
 '''
+
+# Import the user module as we're now registering with the api
 
 from flask import Flask, request
 from flask_restful import Resource, Api, reqparse
@@ -64,6 +66,7 @@ class ItemsList(Resource):
 
 api.add_resource(Item, '/item/<string:name>')
 api.add_resource(ItemsList, '/items')
+# Add the User register endpoint
 api.add_resource(UserRegister, '/register')
 
 app.run(port=5000, debug=True)

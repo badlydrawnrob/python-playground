@@ -1,5 +1,6 @@
 '''
-Removed safe string compare
+Authentication functions
+- without safe string compare
 '''
 
 from user import User

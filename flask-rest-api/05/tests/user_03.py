@@ -1,3 +1,7 @@
+'''
+Uses `*_02.py` files
+'''
+
 import sqlite3
 from flask_restful import Resource, reqparse
 
@@ -55,15 +59,24 @@ class UserRegister(Resource):
         'password',
         type=str,
         required=True,
-        help="This field cannot be blank"
+        help="This field cannot be blank!"
     )
 
     def post(self):
+        # Use __class__ for name?
         data = UserRegister.parser.parse_args()
 
+        # Check if a user already exists
+        # - (by username, not user id)
+        # - Remember that if we `return` the following code
+        #   will not run
         if User.find_by_username(data['username']):
-            return {'message': 'A user with that username already exists'}
+            return {'message': 'A user with that username already exists'}, 400
 
+        # The connection must come AFTER the above check,
+        # otherwise the connection will never close:
+        # - Everything after a `return` statement (if True)
+        #   would be ignored
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
@@ -73,4 +86,4 @@ class UserRegister(Resource):
         connection.commit()
         connection.close()
 
-        return {'message': 'User created successfully'}, 201
+        return {'message': 'User created successfully'}
