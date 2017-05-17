@@ -20,10 +20,14 @@ class Item(Resource):
 
     @jwt_required()
     def get(self, name):
-        # You could also use try/except block here
+        # Item now returns an OBJECT
+        # - not a dictionary
         item = ItemModel.find_by_name(name)
         if item:
-            return item
+            # So we have to pull the variables
+            # from the object, and create a dict
+            # using our ItemModel.json() method :)
+            return item.json()
         return {'message': 'Item not found'}, 404
 
     def post(self, name):
@@ -31,14 +35,21 @@ class Item(Resource):
             return {'message': '{} already exists'.format(name)}, 400
 
         data = self.parser.parse_args()
-        item = {'name': name, 'price': data['price']}
+        # We can now create an item object,
+        # instead of a manual dictionary
+        item = ItemModel(name, data['price'])
 
         try:
-            ItemModel.insert(item)
+            # And instead of calling the class
+            # again (as with a @classmethod),
+            # we use a regular method on the
+            # new `item` object
+            item.insert()
         except:
             return {'message': 'An error occurred inserting the item'}, 500
 
-        return item, 201
+        # Return the dictionary, not the object
+        return item.json(), 201
 
     def delete(self, name):
         connection = sqlite3.connect('data.db')
@@ -55,19 +66,29 @@ class Item(Resource):
     def put(self, name):
         data = self.parser.parse_args()
         item = ItemModel.find_by_name(name)
-        updated_item = {'name': name, 'price': data['price']}
+        updated_item = ItemModel(name, data['price'])
 
+        # We use `updated_item` object,
+        # NOT `item` object, as we want to load
+        # the database with NEW data. Otherwise,
+        # we'd retrieve the `item` object (with the
+        # data from the database, and it wouldn't do
+        # anything.
+        # - The data we're storing is the `put` request
+        #   we've received!
         if item is None:
             try:
-                ItemModel.insert(updated_item)
+                updated_item.insert()
             except:
                 return {'message': 'An error occurred inserting the item'}, 500
         else:
             try:
-                ItemModel.update(updated_item)
+                updated_item.update()
             except:
                 return {'message': 'An error occurred updating the item'}, 500
-        return updated_item
+        # Use the json function, as updated_item
+        # is now an object
+        return updated_item.json()
 
 
 class ItemsList(Resource):

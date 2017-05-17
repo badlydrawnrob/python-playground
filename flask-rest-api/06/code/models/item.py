@@ -32,6 +32,12 @@ class ItemModel(object):
     # resources, that are interacting directly
     # with our database (i.e, those that the api
     # doesn't care about ... and add them here
+
+
+    ##
+    # We change find_by_name() to return an object
+    # of type ItemModel, instead of a dictionary
+    # - It remains an @classmethod, however
     @classmethod
     def find_by_name(cls, name):
         connection = sqlite3.connect('data.db')
@@ -42,27 +48,45 @@ class ItemModel(object):
         row = result.fetchone()
         connection.close()
 
-        if row:
-            return {'item': {'name': row[0], 'price': row[1]}}
+        # Can be called by
+        # - ItemModel.name
+        # - ItemModel.price
 
-    @classmethod
-    def insert(cls, item):
+        if row:
+            # Eqivalent of cls(row[0], row[1])
+            # - returns ('piano', 17.99)
+            # - So .. ItemModel('piano', 17.99)
+            return cls(*row)
+
+    ##
+    # As each ItemModel is a self contained object
+    # that we're creating ... it doesn't make sense for it to
+    # be a @classmethod.
+    # - It's inserting ITSELF!
+    # -- A class method acts independently from the instance
+    #    of an object, and as there'll only ever be a single
+    #    object we're interested in, we can use a regular function
+    ##
+
+    def insert(self):
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
+        # Self is now an object, not a dictionary
+        # - We'll pass it with the `data` from the
+        #   api json
         query = "INSERT INTO items VALUES (?, ?)"
-        cursor.execute(query, (item['name'], item['price']))
+        cursor.execute(query, (self.name, self.price))
 
         connection.commit()
         connection.close()
 
-    @classmethod
-    def update(cls, item):
+    def update(self):
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
         query = "UPDATE items SET price=? WHERE name=?"
-        cursor.execute(query, (item['price'], item['name']))
+        cursor.execute(query, (self.price, self.name))
 
         connection.commit()
         connection.close()
