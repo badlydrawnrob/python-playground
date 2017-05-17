@@ -16,6 +16,13 @@ class Item(Resource):
         help="This field cannot be blank!"
     )
 
+    ##
+    # Split out the database calls for the
+    # - searching for item
+    # - adding item
+    # - updating item
+    ##
+
     @classmethod
     def find_by_name(cls, name):
         connection = sqlite3.connect('data.db')
@@ -45,11 +52,14 @@ class Item(Resource):
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
+        # remember the WHERE clause
         query = "UPDATE items SET price=? WHERE name=?"
+        # order is important, same as query
         cursor.execute(query, (item['price'], item['name']))
 
         connection.commit()
         connection.close()
+
 
     @jwt_required()
     def get(self, name):
@@ -59,6 +69,7 @@ class Item(Resource):
             return item
         return {'message': 'Item not found'}, 404
 
+
     def post(self, name):
         if self.find_by_name(name):
             return {'message': '{} already exists'.format(name)}, 400
@@ -66,17 +77,32 @@ class Item(Resource):
         data = self.parser.parse_args()
         item = {'name': name, 'price': data['price']}
 
+        # As there's no way to allow `put()`
+        # method to use the `post()` method to create
+        # a new item, we'll remove the database
+        # connection into a separate class method
+
+        # We also need to make sure if there's an
+        # error adding to the database, we catch it.
+        # - you could do this anywhere the
+        #   database might fail (i.e. `Item.get()`)
         try:
             self.insert(item)
         except:
+            # Return a 500 internal server error
+            # - 400 = user error
+            # - 500 = server error
             return {'message': 'An error occurred inserting the item'}, 500
 
         return item, 201
+
 
     def delete(self, name):
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
+        # REMEMBER to add the `WHERE` clause
+        # otherwise it will delete all items
         query = "DELETE FROM items WHERE name=?"
         cursor.execute(query, (name,))
 
@@ -85,17 +111,24 @@ class Item(Resource):
 
         return {'message': 'Item deleted'}
 
+
     def put(self, name):
+        # Check for correct data
         data = self.parser.parse_args()
+        # Use our new class method
         item = self.find_by_name(name)
+        # Set the updated method
         updated_item = {'name': name, 'price': data['price']}
 
+        # Try to insert the item,
+        # if it doesn't exist
         if item is None:
             try:
                 self.insert(updated_item)
             except:
                 return {'message': 'An error occurred inserting the item'}, 500
         else:
+            # Or else, update the item if it does
             try:
                 self.update(updated_item)
             except:
@@ -103,27 +136,10 @@ class Item(Resource):
         return updated_item
 
 
-##
-# Finally, we implement our full items search
-##
-
 class ItemsList(Resource):
     def get(self):
-        # setup db
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
-        # select all
-        query = "SELECT * FROM items"
-        result = cursor.execute(query)
-        # empty list to store results
-        items = []
-        # loop through and add to items list
-        for row in result:
-            items.append({
-                'name': row[0],
-                'price': row[1]
-            })
-        # close connection
-        connection.close()
-        # return all items, as in `/04`
-        return {'items': items}
+        pass
+        # connection = sqlite3.connect('data.db')
+        # cursor = connection.cursor()
+        # query = "SELECT * from items"
+        # result = cursor.execute(query, )
