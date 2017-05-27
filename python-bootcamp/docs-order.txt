@@ -49,11 +49,11 @@
 
 [x] 46. Milestone Project 1 Section 0:00
 [x] 47. Milestone Project 1 -Assignment Overview 5:11
-48. Milestone Project Help 0:00
-49. Milestone Project 1 - Solution Walkthrough - Part 1 18:33
-50. Milestone Project 1 - Solution Walkthrough - Part 2 10:47
-51. Milestone Project 1 - Solution Walkthrough - Part 3 13:51
-52. Advanced Project Solution Overview
+[x] 48. Milestone Project Help 0:00
+[x] 49. Milestone Project 1 - Solution Walkthrough - Part 1 18:33
+[x] 50. Milestone Project 1 - Solution Walkthrough - Part 2 10:47
+[x] 51. Milestone Project 1 - Solution Walkthrough - Part 3 13:51
+[x] 52. Advanced Project Solution Overview
 
     - This Assignment Notebook
     - A "Walk-through Steps Workbook" Notebook
