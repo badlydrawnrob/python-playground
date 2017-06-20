@@ -14,6 +14,7 @@ from resources.user import UserRegister
 from resources.item import Item, ItemsList
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db' # root folder of project
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'asdf'
 api = Api(app)
