@@ -5,9 +5,19 @@ Models are helpers to store data
 '''
 
 import sqlite3
+from db import db
 
-class UserModel(object):
+# Extend db.model
+
+class UserModel(db.Model):
+    # SQLAlchemy variables
+    __tablename__ = "users"
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80))
+    password = db.Column(db.String(80))
+
     def __init__(self, _id, username, password):
+        # Variable names must match SQLAlchemy ones
         self.id = _id
         self.username = username
         self.password = password
