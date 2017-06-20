@@ -2,7 +2,6 @@
 Add in the UserModel
 '''
 
-import sqlite3
 from flask_restful import Resource, reqparse
 from models.user import UserModel
 
@@ -28,13 +27,10 @@ class UserRegister(Resource):
         if UserModel.find_by_username(data['username']):
             return {'message': 'A user with that username already exists'}
 
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
-
-        query = "INSERT INTO users VALUES (NULL, ?, ?)"
-        cursor.execute(query, (data['username'], data['password']))
-
-        connection.commit()
-        connection.close()
+        # You can remove `data['username'], data['password']`
+        # and unpack data instead: http://bit.ly/2rzVCdz
+        # - this is safe to do as we're using `parser`
+        user = UserModel(**data)
+        user.save_to_db()
 
         return {'message': 'User created successfully'}, 201
