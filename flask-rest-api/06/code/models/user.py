@@ -32,4 +32,4 @@ class UserModel(db.Model):
 
     @classmethod
     def find_by_id(cls, _id):
-        return cls.query.filter_by(id=id).first()
+        return cls.query.filter_by(id=_id).first()
