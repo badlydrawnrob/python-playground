@@ -26,6 +26,7 @@ class Store(Resource):
     def delete(self, name):
         store = StoreModel.find_by_name(name)
         if store:
+            # This doesn't check if the store actually exists
             store.delete_from_db()
 
         return {'message': 'Store deleted'}
