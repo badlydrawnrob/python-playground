@@ -7,7 +7,7 @@
 		"uuidString": "1C5240DA-C3FB-4EBC-ACB5-923FDA10C92D"
 		}
 	],
-"creatorBuild": "25813",
+"creatorBuild": "25849",
 "files": {
 	"\/__pycache__\/headlines.cpython-35.pyc": {
 		"ft": 8192,
@@ -2008,6 +2008,7 @@
 		},
 	"languageDefaultsUserDefined": [
 		],
+	"overrideExternalServerCSS": 0,
 	"previewPathAddition": "",
 	"skippedFoldersString": "log, _logs, logs, _cache, cache, \/storage\/framework\/sessions, node_modules",
 	"sourceFolderName": "source",
