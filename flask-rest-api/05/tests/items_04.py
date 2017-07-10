@@ -1,21 +1,14 @@
 '''
-
+We're now adding/loading items from the database
+- uses previous versions of files
 '''
 
-from flask import Flask, request
-from flask_restful import Resource, Api, reqparse
-from flask_jwt import JWT, jwt_required
-from security import authenticate, identity
+import sqlite3
+from flask_restful import Resource, reqparse
+from flask_jwt import jwt_required
 
-app = Flask(__name__)
-app.secret_key = 'asdf'
-api = Api(app)
-jwt = JWT(app, authenticate, identity)
-
-items = []
 
 class Item(Resource):
-    # Move the parser to class level
     parser = reqparse.RequestParser()
     parser.add_argument(
         'price',
@@ -26,22 +19,32 @@ class Item(Resource):
 
     @jwt_required()
     def get(self, name):
-        item = next(filter(lambda x: x['name'] == name, items), None)
-        return {'item': item}, 200 if item else 404
+        # Set up the connection
+        connection = sqlite3.connect('data.db')
+        cursor = connection.cursor()
+        # Set up the query and find the result
+        query = "SELECT * FROM items WHERE name=?"
+        result = cursor.execute(query, (name,))
+        # Store the result in `row`
+        row = result.fetchone()
+        # Close the db connection
+        connection.close()
 
-    def put(self, name):
+        # Check if `row` contains a result
+        if row:
+            return {'item': {'name': row[0], 'price': row[1]}}, 200
+        return {'message': 'Item not found'}, 404
+
+
+    def post(self, name):
         if next(filter(lambda x: x['name'] == name, items), None):
             return {'{} already exists'.format(name)}
-        # You also need to add `Item` here
-        # as it's a class variable/function
-        #
-        # - we put data here, below the error
-        #   check. That way it's not wasteful
-        #   (data won't load if item exists)
+
         data = Item.parser.parse_args()
         item = {'name': name, 'price': data['price']}
         items.append(item)
         return item, 201
+
 
     def delete(self, name):
         global items
@@ -49,8 +52,11 @@ class Item(Resource):
         items = list(filter(lambda x: x['name'] != name, items))
         return {'message': 'Item deleted'}
 
+
     def put(self, name):
         data = Item.parser.parse_args()
+        item = next(filter(lambda x: x['name'] == name, items), None)
+
         if item is None:
             item = {'name': name, 'price': data['price']}
             items.append(item)
@@ -63,9 +69,3 @@ class Item(Resource):
 class ItemsList(Resource):
     def get(self):
         return {'items': items}
-
-
-api.add_resource(Item, '/item/<string:name>')
-api.add_resource(ItemsList, '/items')
-
-app.run(port=5000, debug=True)

@@ -1,3 +1,7 @@
+'''
+Tic Tac Toe game
+'''
+
 from random import randint
 
 

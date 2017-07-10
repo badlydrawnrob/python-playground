@@ -1,11 +1,14 @@
 '''
-
+Users and items
 '''
+
+# Import the user module as we're now registering with the api
 
 from flask import Flask, request
 from flask_restful import Resource, Api, reqparse
 from flask_jwt import JWT, jwt_required
 from security import authenticate, identity
+from user import UserRegister
 
 app = Flask(__name__)
 app.secret_key = 'asdf'
@@ -15,7 +18,6 @@ jwt = JWT(app, authenticate, identity)
 items = []
 
 class Item(Resource):
-    # Move the parser to class level
     parser = reqparse.RequestParser()
     parser.add_argument(
         'price',
@@ -29,15 +31,10 @@ class Item(Resource):
         item = next(filter(lambda x: x['name'] == name, items), None)
         return {'item': item}, 200 if item else 404
 
-    def put(self, name):
+    def post(self, name):
         if next(filter(lambda x: x['name'] == name, items), None):
             return {'{} already exists'.format(name)}
-        # You also need to add `Item` here
-        # as it's a class variable/function
-        #
-        # - we put data here, below the error
-        #   check. That way it's not wasteful
-        #   (data won't load if item exists)
+
         data = Item.parser.parse_args()
         item = {'name': name, 'price': data['price']}
         items.append(item)
@@ -51,6 +48,8 @@ class Item(Resource):
 
     def put(self, name):
         data = Item.parser.parse_args()
+        item = next(filter(lambda x: x['name'] == name, items), None)
+
         if item is None:
             item = {'name': name, 'price': data['price']}
             items.append(item)
@@ -67,5 +66,7 @@ class ItemsList(Resource):
 
 api.add_resource(Item, '/item/<string:name>')
 api.add_resource(ItemsList, '/items')
+# Add the User register endpoint
+api.add_resource(UserRegister, '/register')
 
 app.run(port=5000, debug=True)
