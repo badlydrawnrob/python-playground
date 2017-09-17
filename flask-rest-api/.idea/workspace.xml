@@ -18,8 +18,8 @@
       <file leaf-file-name="item.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/06/code/resources/item.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="208">
-              <caret line="72" column="19" lean-forward="false" selection-start-line="72" selection-start-column="19" selection-end-line="72" selection-end-column="19" />
+            <state relative-caret-position="1827">
+              <caret line="87" column="18" lean-forward="false" selection-start-line="87" selection-start-column="18" selection-end-line="87" selection-end-column="18" />
               <folding>
                 <element signature="e#50#94#0" expanded="true" />
               </folding>
@@ -30,7 +30,7 @@
       <file leaf-file-name="app.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/06/code/app.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-317">
+            <state relative-caret-position="189">
               <caret line="9" column="0" lean-forward="false" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
               <folding />
             </state>
@@ -107,16 +107,16 @@
         <option value="$PROJECT_DIR$/06/code/resources/user.py" />
         <option value="$PROJECT_DIR$/06/code/app.py" />
         <option value="$PROJECT_DIR$/06/code/models/item.py" />
-        <option value="$PROJECT_DIR$/06/code/resources/item.py" />
         <option value="$PROJECT_DIR$/06/code/models/user.py" />
         <option value="$PROJECT_DIR$/06/code/models/store.py" />
         <option value="$PROJECT_DIR$/06/code/resources/store.py" />
+        <option value="$PROJECT_DIR$/06/code/resources/item.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="776" />
-    <option name="y" value="27" />
+    <option name="x" value="572" />
+    <option name="y" value="23" />
     <option name="width" value="708" />
     <option name="height" value="773" />
   </component>
@@ -255,7 +255,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="776" y="27" width="708" height="773" extended-state="0" />
+    <frame x="572" y="23" width="708" height="773" extended-state="1" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30564263" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -590,7 +590,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/06/code/app.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-317">
+        <state relative-caret-position="189">
           <caret line="9" column="0" lean-forward="false" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
           <folding />
         </state>
@@ -598,8 +598,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/06/code/resources/item.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="208">
-          <caret line="72" column="19" lean-forward="false" selection-start-line="72" selection-start-column="19" selection-end-line="72" selection-end-column="19" />
+        <state relative-caret-position="1827">
+          <caret line="87" column="18" lean-forward="false" selection-start-line="87" selection-start-column="18" selection-end-line="87" selection-end-column="18" />
           <folding>
             <element signature="e#50#94#0" expanded="true" />
           </folding>
