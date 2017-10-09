@@ -5,7 +5,7 @@
         <p><strong>{{ error_message }}</strong></p>
     {% endif %}
 
-    <form action="{% url 'polls:vote' question.id" method="post">
+    <form action="{% url 'polls:vote' question.id %}" method="post">
         {% csrf_token %}
         {% for choice in question.choice_set.all %}
             <p>
@@ -15,12 +15,6 @@
         {% endfor %}
         <input type="submit" value="Vote">
     </form>
-
-    <ul>
-    {% for choice in question.choice_set.all %}
-        <li>{{ choice.choice_text }}</li>
-    {% endfor %}
-    </ul>
 {% else %}
     <p>Boo ... it didn't work :(</p>
 {% endif %}
