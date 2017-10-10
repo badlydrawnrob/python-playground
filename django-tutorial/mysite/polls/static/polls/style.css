@@ -1,0 +1,7 @@
+body {
+    background: white url("images/background.jpg") repeat top left;
+}
+
+li a {
+    color: green;
+}
