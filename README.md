@@ -22,8 +22,18 @@
 That's about it. I need something that interfaces with a simple database, keeping things light. It's for prototypes, and will probably be replaced by another programming language at some stage. [Roc](https://www.roc-lang.org/) looks promising, but I'm not a heavy coding guy, so might have a team by then!
 
 
+## Tools
+
+- [UV in production?](https://pythonspeed.com/articles/uv-python-production/)
+
+
 ## Handy snippets
 
-| Command                                    | Does this            |
-| ------------------------------------------ | -------------------- |
-| `pip install -r /path/to/requirements.txt` | Install requirements | 
+| Command                                    | Does this                           |
+| ------------------------------------------ | ------------------------------------|
+| `pip install -r /path/to/requirements.txt` | Install requirements                |
+| `uv init [folder-name]                     | Start `uv` project                  |
+| `uv venv --python python3.11 my_env`       | Create/Download virtual environment |
+| `source my_env/bin/activate`               | Activate virtual environment        |
+| `deactivate`                               | Deactivate (exit) venv              |
+
