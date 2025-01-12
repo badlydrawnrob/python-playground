@@ -12,6 +12,7 @@ You can rip a lot of this stuff from the book, but put it in very simple terms. 
 - Basic syntax differences
     - `function()` calls and arguments
     - Typing (just a taste)
+    - Python [comments](https://realpython.com/python-comments-guide/)
 - The `app` variable (I guess this holds the state)
 - Models (Elm has one master model)
 - Decorators

@@ -10,9 +10,12 @@ Whereas Elm has a central `Model` (generally) to work from and uses modules and 
 
 > These are annoying and compared to Elm (where everything just works), not particularly user-friendly. You'd think you could just run commands once you're set up with a `venv` (virtual environment).
 
-1. `uvicorn` command [won't run](https://stackoverflow.com/a/69322150)
+1. Module naming clashes and `venv`:
+    - `uv` commands require calling from the `venv` parent directory
+    - `01` numbers are invalid for module names
+2. `uvicorn` command [won't run](https://stackoverflow.com/a/69322150)
     - Preface it with `uv run` (equivalent to `python -m`)
-2. Using Thonny as an IDE
+3. Using Thonny as an IDE
     - I can get the version of Python running but the other stuff is harder
 
 ## Tools
