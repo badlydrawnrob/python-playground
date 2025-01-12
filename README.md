@@ -41,9 +41,14 @@ That's about it. I need something that interfaces with a simple database, keepin
 | `uv add [package]`                         | Download and install a package      |
 | `uv tree`                                  | List all dependencies (as a tree)   |
 | `uv run [command]`                         | Run the server, run a file, etc     |
+| `uv sync`                                  | Sets up a project's "stuff"[^3]     |
+| `uv run uvicorn src.main:app --reload`     | Run command for subfolder file[^4]  |
 
 
 [^1]: You can't run this app while there's a virtual environment running in the terminal. You can set the virtual environment by going to `Tools -> Options ... -> Interpreter -> Python executable` and selecting the path or symlink in your `venv-folder-name`.
 
 [^2]: If you're using stock Python commands, you'll probably need to preface with `python3 -m`, such as `python3 -m pip install [package]`. If you're using `uv` you don't need to worry about this (just use `uv run` etc). You also won't need to worry about `PATH` or any of that shit (I think `uv` does that for you).
 
+[^3]: From scratch. Environment, dependencies, and so on. I think this needs a `pyproject.toml` file (and maybe a `.python-version` file). Lookup the docs for more info.
+
+[^4]: It seems that the `uv` command **must** be run from the parent directory that the virtual server lives in. You also need to use the `module-folder.dot_format.py` to call a [subfolder's file](https://stackoverflow.com/a/62934660).
