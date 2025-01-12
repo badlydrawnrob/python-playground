@@ -1,10 +1,17 @@
 # README
 
+## Chapters
+
+1. Hello World
+2. Routing
+
+
 ## Paradigms
 
 > I really don't understand Python's OOP style very much.
 
 Whereas Elm has a central `Model` (generally) to work from and uses modules and functions, Python has instances of classes which (I think) are stateful.
+
 
 ## Problems
 
@@ -17,6 +24,7 @@ Whereas Elm has a central `Model` (generally) to work from and uses modules and 
     - Preface it with `uv run` (equivalent to `python -m`)
 3. Using Thonny as an IDE
     - I can get the version of Python running but the other stuff is harder
+
 
 ## Tools
 
