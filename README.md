@@ -87,7 +87,7 @@ niceTypes =
 | Command                                    | Does this                            |
 | ------------------------------------------ | -------------------------------------|
 | `pip install -r /path/to/requirements.txt` | Install requirements[^2]             |
-| `uv init [folder-name]                     | Start `uv` project                   |
+| `uv init [folder-name]`                    | Start `uv` project                   |
 | `uv python install [version]`              | Install a Python version (or latest) |
 | `uv python list`                           | List all Python versions installed   |
 | `uv python pin`                            | Create a `.python-version` file      |
