@@ -19,7 +19,7 @@ Whereas Elm has a central `Model` (generally) to work from and uses modules and 
 
 1. Module naming clashes and `venv`:
     - `uv` commands require calling from the `venv` parent directory
-    - `01` numbers are invalid for module names
+    - `01` numbers cannot come first for module naming (`name_01` is ok)
 2. `uvicorn` command [won't run](https://stackoverflow.com/a/69322150)
     - Preface it with `uv run` (equivalent to `python -m`)
 3. Using Thonny as an IDE
