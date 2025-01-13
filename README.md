@@ -4,7 +4,11 @@
 
 [Elm](https://elm-lang.org/) makes so much more sense to me: the syntax, the structure, it's functional style, typed data, and so on. I'm stripping this back to the absolute essentials of Python, which is to say as little as possible to get the job done.
 
-It's also not as intuitive or consistant as Elm. Sometimes you get shorter code, but more readable? Not really.
+## Coding style
+
+> It doesn't feel as intuitive or consistent as Elm.
+
+Perhaps you get shorter code at scale, but is it more readable? I'm not so sure.
 
 - Length of a list?
     - `List.length [1, 2, 3]`
@@ -14,9 +18,11 @@ It's also not as intuitive or consistant as Elm. Sometimes you get shorter code,
     - `[1, 2, 3][0]`
 - Reverse that?
     - `List.elemIndex (List.reverse [1, 2, 3])`
-    - `[1, 2, 3][-1]
+    - `[1, 2, 3][-1]`
 
-It's also not at all type safe (by default, and type annotations are awkward) ... even the naming conventions are messy (capitals and lowercase):
+It's also not at all type safe by default (and type annotations are awkward). Even the naming conventions feel messy (capitals and lowercase):
+
+### Python
 
 ```python
 from typing import List
@@ -30,6 +36,9 @@ def ugly_types(num: List[int]) -> dict:
 # returns nothing
 
 ```
+
+### Elm 
+
 ```elm
 type alias Numbers =
     { numbers :  List Int }
