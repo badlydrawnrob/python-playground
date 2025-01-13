@@ -4,9 +4,51 @@
 
 [Elm](https://elm-lang.org/) makes so much more sense to me: the syntax, the structure, it's functional style, typed data, and so on. I'm stripping this back to the absolute essentials of Python, which is to say as little as possible to get the job done.
 
+It's also not as intuitive or consistant as Elm. Sometimes you get shorter code, but more readable? Not really.
+
+- Length of a list?
+    - `List.length [1, 2, 3]`
+    - `len([1, 2, 3])`
+- Access an element?
+    - `List.elemIndex [1, 2, 3]`
+    - `[1, 2, 3][0]`
+- Reverse that?
+    - `List.elemIndex (List.reverse [1, 2, 3])`
+    - `[1, 2, 3][-1]
+
+It's also not at all type safe (by default, and type annotations are awkward) ... even the naming conventions are messy (capitals and lowercase):
+
+```python
+from typing import List
+
+# Requires `return` to print anything!
+def ugly_types(num: List[int]) -> dict:
+    { "numbers": num } 
+```
+```terminal
+> ugly_types([1, 2, 3])
+# returns nothing
+
+```
+```elm
+type alias Numbers =
+    { numbers :  List Int }
+
+-- Returns data by default ...
+niceTypes : List Int -> Numbers
+niceTypes =
+    Numbers
+```
+```terminal
+> niceTypes [1, 2, 3]
+```
+
 
 ## Questions
 
+> Large Elm applications can become difficult to understand.
+
+- At scale does Python become more readable?
 - Perhaps Python is handy for certain applications?
 - Perhaps a functional style is possible?
 - Perhaps you just need to memorise syntax differences?
@@ -31,18 +73,21 @@ That's about it. I need something that interfaces with a simple database, keepin
 
 ## Handy snippets
 
-| Command                                    | Does this                           |
-| ------------------------------------------ | ------------------------------------|
-| `pip install -r /path/to/requirements.txt` | Install requirements[^2]            |
-| `uv init [folder-name]                     | Start `uv` project                  |
-| `uv venv --python python3.11 my_env`       | Create/Download virtual environment |
-| `source my_env/bin/activate`               | Activate virtual environment        |
-| `deactivate`                               | Deactivate (exit) venv              |
-| `uv add [package]`                         | Download and install a package      |
-| `uv tree`                                  | List all dependencies (as a tree)   |
-| `uv run [command]`                         | Run the server, run a file, etc     |
-| `uv sync`                                  | Sets up a project's "stuff"[^3]     |
-| `uv run uvicorn src.main:app --reload`     | Run command for subfolder file[^4]  |
+| Command                                    | Does this                            |
+| ------------------------------------------ | -------------------------------------|
+| `pip install -r /path/to/requirements.txt` | Install requirements[^2]             |
+| `uv init [folder-name]                     | Start `uv` project                   |
+| `uv python install [version]`              | Install a Python version (or latest) |
+| `uv python list`                           | List all Python versions installed   |
+| `uv python pin`                            | Create a `.python-version` file      |
+| `uv venv --python python3.11 [my_env]`     | Create/Download virtual environment  |
+| `source my_env/bin/activate`               | Activate virtual environment         |
+| `deactivate`                               | Deactivate (exit) venv               |
+| `uv add [package]`                         | Download and install a package       |
+| `uv tree`                                  | List all dependencies (as a tree)    |
+| `uv run [command]`                         | Run the server, run a file, etc      |
+| `uv sync`                                  | Sets up a project's "stuff"[^3]      |
+| `uv run uvicorn src.main:app --reload`     | Run command for subfolder file[^4]   |
 
 
 [^1]: You can't run this app while there's a virtual environment running in the terminal. You can set the virtual environment by going to `Tools -> Options ... -> Interpreter -> Python executable` and selecting the path or symlink in your `venv-folder-name`.
