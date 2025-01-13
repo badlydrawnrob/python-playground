@@ -67,6 +67,7 @@ That's about it. I need something that interfaces with a simple database, keepin
 ## Tools
 
 - [UV in production?](https://pythonspeed.com/articles/uv-python-production/)
+- [UV commands](https://docs.astral.sh/uv/reference/cli/) (a quick overview)
 - [Thonny](https://thonny.org/) — a beginner IDE[^1]
 - [VS Code](https://code.visualstudio.com/docs/python/python-tutorial) setup tutorial
 
