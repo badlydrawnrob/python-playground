@@ -22,14 +22,14 @@ That's about it. I need something that interfaces with a simple database, keepin
 Perhaps you get shorter code at scale, but is it more readable? I'm not so sure.
 
 - Length of a list?
-    - `List.length [1, 2, 3]`
     - `len([1, 2, 3])`
+    - `List.length [1, 2, 3]`
 - Access an element?
-    - `List.elemIndex [1, 2, 3]`
     - `[1, 2, 3][0]`
+    - `List.elemIndex [1, 2, 3]`
 - Reverse that?
-    - `List.elemIndex (List.reverse [1, 2, 3])`
     - `[1, 2, 3][-1]`
+    - `List.elemIndex (List.reverse [1, 2, 3])`
 
 It's also not at all type safe by default (and type annotations are awkward). Even the naming conventions feel messy (capitals and lowercase):
 
