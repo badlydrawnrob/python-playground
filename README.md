@@ -31,7 +31,7 @@ Perhaps you get shorter code at scale, but is it more readable? I'm not so sure.
     - `[1, 2, 3][-1]`
     - `List.elemIndex (List.reverse [1, 2, 3])`
 
-It's also not at all type safe by default (and type annotations are awkward). Even the naming conventions feel messy (capitals and lowercase):
+It's also not at all type safe by default (and type annotations are awkward). Even the naming conventions feel messy (capitals and lowercase)! Here are some examples and comparisons for Python versus Elm Lang.
 
 ### Python
 
