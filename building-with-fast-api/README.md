@@ -33,4 +33,9 @@ You're going to need the following:
 - An API test kit (such as [Bruno](https://www.usebruno.com/) or [Rest Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client))[^1]
 
 
+## Hosting
+
+- [AGSI](https://help.pythonanywhere.com/pages/ASGICommandLine) setup in Python Anywhere
+
+
 [^1]: I find Postman too flippin' complicated to use. Insomnia is another option.
