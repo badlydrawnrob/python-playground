@@ -21,3 +21,35 @@ You can rip a lot of this stuff from the book, but put it in very simple terms. 
     - what is a request, request body, response body
     - RESTful elements and actions
     - Code responses (does not exist) etc
+
+
+## Chapter 02: Routing
+
+> You can use an app like Bruno instead of Curl.
+> Here's some [curl usage commands](https://gist.github.com/subfuzion/08c5d85437d5d4f00e58#curl-usage).
+> Curl is a `GET` by default.
+
+```terminal
+> source .venv/bin/activate
+> (venv)
+
+-- Open a new terminal window
+> (venv) curl http://localhost:8000
+{"message":"Hello Buddy!"}
+> (venv) curl http://localhost:8000/todo
+{"todos":[]}
+```
+
+Adding an entry to the to-do list
+
+```terminal
+-- Take care with your `' "` quotes!
+curl -X POST \
+"http://localhost:8000/todo" \
+-H "accept: application/json" \
+-H "Content-Type: application/json" \
+-d '{ "id": 1, "item": "First to-do is to finish this book!" }'
+
+-- Check it worked
+curl http://localhost:8000/todo
+``` 

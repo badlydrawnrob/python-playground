@@ -1,5 +1,13 @@
 from fastapi import APIRouter
 
+# ------------------------------------------------------------------------------
+# A very basic setup
+# ==============================================================================
+# ⚠️ There's no errors or validation here ...
+# 
+# - This allows ANY dictionary to be sent to the API
+# - There's no checks or errors setup
+
 router = APIRouter()
 
 
