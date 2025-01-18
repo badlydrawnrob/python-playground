@@ -1,0 +1,18 @@
+meta {
+  name: to-do-list-post
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:8000/todo
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "id": 1,
+    "item": "My first to-do is: finish the book"
+  }
+}
