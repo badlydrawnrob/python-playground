@@ -10,6 +10,7 @@ There's quite a lot of minor (and perhaps major) errors in this book, so you've 
 You can rip a lot of this stuff from the book, but put it in very simple terms. Perhaps your Ai can help you do this, in the form of flashcards for simplicity?
 
 - Basic Git terminology
+- Declaration order (Python seems to 
 - A class instance (such as `FastAPI()`)
 - Basic syntax differences
     - `function()` calls and arguments
@@ -18,6 +19,7 @@ You can rip a lot of this stuff from the book, but put it in very simple terms. 
 - The `app` variable (I guess this holds the state)
 - Models (Elm has one master model)
     - See also Pydantics `BaseModel` class
+    - Nested classes
 - Decorators
 - A route and route handler (with images)
     - what is a path, query params, urls

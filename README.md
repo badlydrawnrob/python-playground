@@ -46,6 +46,8 @@ It's also not at all type safe by default (and type annotations are awkward). Ev
 
 ### Python
 
+> [Declaration order](https://stackoverflow.com/a/758197) matters in Python!
+
 ```python
 from typing import List
 
