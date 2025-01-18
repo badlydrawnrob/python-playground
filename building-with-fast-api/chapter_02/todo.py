@@ -1,17 +1,23 @@
 from fastapi import APIRouter
+from model import ToDo
+
 
 # ------------------------------------------------------------------------------
-# A very basic setup
+# A very to-do app
 # ==============================================================================
-# ⚠️ There's no errors or validation here ...
-# 
-# - This allows ANY dictionary to be sent to the API
-# - There's no checks or errors setup
+# You don't want to allow ANY dictionary to be sent to the API, such as
+# an empty dict, malformed data, so on. So now we import out model that's been
+# set up with Pydantic.
+# 
+# ⚠️ Malicious input
+# ------------------
+# You want to have checks and errors setup to protect yourself, or you a malicious
+# user might tank your database!
 
 router = APIRouter()
 
 
-# Model ------------------------------------------------------------------------
+# Data -------------------------------------------------------------------------
 
 todo_list = []
 
@@ -24,7 +30,7 @@ todo_list = []
 # 2. Get all todos
 
 @router.post("/todo")
-async def add_todo(todo: dict) -> dict:
+async def add_todo(todo: ToDo) -> dict:
     todo_list.append(todo)
     return { "message": "Todo added successfully" }
 

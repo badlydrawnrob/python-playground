@@ -1,5 +1,7 @@
 # Anki knowledge
 
+There's quite a lot of minor (and perhaps major) errors in this book, so you've got to take care to double check the code's validity.
+
 ## Terminology
 
 > The difference between Elm type modules,
@@ -15,12 +17,15 @@ You can rip a lot of this stuff from the book, but put it in very simple terms. 
     - Python [comments](https://realpython.com/python-comments-guide/)
 - The `app` variable (I guess this holds the state)
 - Models (Elm has one master model)
+    - See also Pydantics `BaseModel` class
 - Decorators
 - A route and route handler (with images)
     - what is a path, query params, urls
     - what is a request, request body, response body
     - RESTful elements and actions
     - Code responses (does not exist) etc
+- Schemas and models (with validation)
+    - Sanitize the user generated input data
 
 
 ## Chapter 02: Routing

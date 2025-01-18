@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from chapter_02.todo import router
+from todo import router
 
 # ------------------------------------------------------------------------------
 # A to do app

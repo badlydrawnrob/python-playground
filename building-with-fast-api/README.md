@@ -25,6 +25,8 @@ Whereas Elm has a central `Model` (generally) to work from and uses modules and 
     - `01` numbers cannot come first for module naming (`name_01` is ok)
 2. **`uvicorn` command [won't run](https://stackoverflow.com/a/69322150)**
     - Preface it with `uv run` (equivalent to `python -m`)
+    - Or, make sure you've `source .venv/bin/activate`d your environment
+    - Also take care with modules, folders, and names.[^2]
 3. **`uvicorn` doesn't [allow secure `https`](https://www.uvicorn.org/deployment/#running-with-https)** (by default)
 4. Using Thonny as an IDE
     - I can get the version of Python running but the other stuff is harder
@@ -35,7 +37,7 @@ Whereas Elm has a central `Model` (generally) to work from and uses modules and 
 
 You're going to need the following:
 
-- An API test kit (such as [Bruno](https://www.usebruno.com/) or [Rest Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client))[^2]
+- An API test kit (such as [Bruno](https://www.usebruno.com/) or [Rest Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client))[^3]
 
 
 ## Hosting
@@ -45,4 +47,6 @@ You're going to need the following:
 
 [^1]: "I would not recommend using directory names in `.python-version` files or using a custom virtual environment name in a project."
 
-[^2]: I find Postman too flippin' complicated to use. Insomnia is another option.
+[^2]: There's two ways to do this. Either call `uvicorn subfolder.file:app` and make sure your modules use `from subfolder.file` names, OR `cd` into the correct folder and run Uvicorn from there!
+
+[^3]: I find Postman too flippin' complicated to use. Insomnia is another option.
