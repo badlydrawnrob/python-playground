@@ -13,6 +13,11 @@ from model import ToDo
 # ------------------
 # You want to have checks and errors setup to protect yourself, or you a malicious
 # user might tank your database!
+#
+# Errors
+# ------
+# 1. Currently if `todo_list` has zero entries, we get an `Internal Server Error`,
+#    not our `else` branch from Uvicorn.
 
 router = APIRouter()
 
@@ -28,6 +33,9 @@ todo_list = []
 #
 # 1. Post a new todo
 # 2. Get all todos
+# 3. Get a particular todo (you could List.filter here too)
+#    - See Bruno `:id` path @ https://docs.usebruno.com/send-requests/REST/parameters
+#    - Here we're using 🔎 "FastApi Path class"
 
 @router.post("/todo")
 async def add_todo(todo: ToDo) -> dict:
@@ -37,3 +45,16 @@ async def add_todo(todo: ToDo) -> dict:
 @router.get("/todo")
 async def retrieve_todos() -> dict:
     return { "todos": todo_list }
+
+@router.get("/todo/{id}")
+async def retrieve_single_todo(id: int) -> dict:
+    for todo in todo_list:
+        # check each dict.id for equality
+        if todo.id == id: # The supplied ID in the url
+            return {
+                "todo": todo # the whole dict
+            }
+        else:
+            return {
+                "message": "This To Do doesn't exist!" # (1) !=
+            }

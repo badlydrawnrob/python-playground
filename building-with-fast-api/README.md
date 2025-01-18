@@ -5,7 +5,7 @@
 > [Some notes](https://github.com/astral-sh/uv/issues/10543#issuecomment-2587276856) on using `uv` and `venv` setup[^1]
 
 1. Hello World
-2. Routing
+2. Routing (1.6.0 — ...)
 
 
 ## Paradigms
