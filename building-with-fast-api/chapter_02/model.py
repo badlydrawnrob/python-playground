@@ -11,6 +11,10 @@ from pydantic import BaseModel
 # --------
 # 1. Any number (including duplicate `id`s)
 # 2. Any string (any length, including empty)
+#
+# Notes
+# -----
+# Keys are CASE SENSITIVE
 
 
 # Model ------------------------------------------------------------------------
@@ -18,3 +22,7 @@ from pydantic import BaseModel
 class ToDo(BaseModel):
     id: int
     item: str
+
+class Item(BaseModel):
+    item: str
+    status: str
