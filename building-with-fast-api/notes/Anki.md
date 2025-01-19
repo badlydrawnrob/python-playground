@@ -6,7 +6,7 @@ There's quite a lot of minor (and perhaps major) errors in this book, so you've 
 
 > The difference between Elm type modules,
 > and Python classes, methods, stateful stuff.
-> **Errors and types are not as good**
+> **Errors and types are not as good and language design is worse**
 
 You can rip a lot of this stuff from the book, but put it in very simple terms. Perhaps your Ai can help you do this, in the form of flashcards for simplicity?
 
@@ -15,6 +15,7 @@ You can rip a lot of this stuff from the book, but put it in very simple terms. 
 - Returning values (unlike Elm you must `return value` or else `None`) 
 - A class instance (such as `FastAPI()`)
     - FastApi implicitly builds the `ToDo(attributes="...")` class
+    - Path(..., KWARGS) and what the fuck is ellipses?
 - Basic syntax differences
     - `function()` calls and arguments
     - Typing (just a taste)

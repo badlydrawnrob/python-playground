@@ -6,7 +6,8 @@ from model import ToDo
 # ==============================================================================
 # You don't want to allow ANY dictionary to be sent to the API, such as
 # an empty dict, malformed data, so on. So now we import out model that's been
-# set up with Pydantic.
+# set up with Pydantic. FastApi and Pydantic also help to document our API endpoints,
+# and Bruno helps us test it.
 # 
 # ⚠️ Malicious input
 # ------------------
@@ -34,6 +35,8 @@ todo_list = []
 # create multiple routes instead of only one!
 #
 # 1. Post a new todo
+#    - This requires a _request body_ to be sent to our API.
+#    - A request body is simply data you send by `POST`/`UPDATE` etc.
 # 2. Get all todos
 # 3. Get a particular to-dos (you could List.filter here too)
 #    - See Bruno `:id` path @ https://docs.usebruno.com/send-requests/REST/parameters
