@@ -6,12 +6,15 @@ There's quite a lot of minor (and perhaps major) errors in this book, so you've 
 
 > The difference between Elm type modules,
 > and Python classes, methods, stateful stuff.
+> **Errors and types are not as good**
 
 You can rip a lot of this stuff from the book, but put it in very simple terms. Perhaps your Ai can help you do this, in the form of flashcards for simplicity?
 
 - Basic Git terminology
-- Declaration order (Python seems to 
+- Declaration order (Python nested class requires a strict order)
+- Returning values (unlike Elm you must `return value` or else `None`) 
 - A class instance (such as `FastAPI()`)
+    - FastApi implicitly builds the `ToDo(attributes="...")` class
 - Basic syntax differences
     - `function()` calls and arguments
     - Typing (just a taste)
@@ -50,13 +53,16 @@ You can rip a lot of this stuff from the book, but put it in very simple terms. 
 Adding an entry to the to-do list
 
 ```terminal
--- Take care with your `' "` quotes!
+# Take care with your `' "` quotes!
 curl -X POST \
 "http://localhost:8000/todo" \
 -H "accept: application/json" \
 -H "Content-Type: application/json" \
 -d '{ "id": 1, "item": "First to-do is to finish this book!" }'
 
--- Check it worked
+# Later chapter
+-d '{ "id": 1, "item": { "item": "Water the plants", "status": "Done" } }'
+
+# Check it worked
 curl http://localhost:8000/todo
 ``` 

@@ -77,6 +77,37 @@ niceTypes =
 ```
 
 
+## The compiler
+
+> Elm catches most bugs before they make you crazy ...
+> Python, well, doesn't:
+> 
+> 1. Types are turned off by default
+> 2. Missing packages are not displayed in `repl`
+> 3. `None` is non-descript and unhelpful
+
+```python
+def does_id_exist(todo: ToDo, id: int) -> bool:
+    for todo in todo_list:
+        if todo.id == id:
+            return False
+        else:
+            return True
+```
+```terminal
+> does_id_exist([{"id": 1}], 1)
+```
+
+These are the problems by default:
+
+1. `None` is implicitly returned, but no errors are shown
+2. `ToDo` type is ignored, and our malformed dict shows no errors
+3. I'm not even using `ToDo` in the procedure body ... still no errors
+4.  searching `todo_list` (which is currently empty)
+
+Seems to be a LOT more setup required to get default Elm compiler stuff.
+
+
 ## Questions
 
 > Large Elm applications can become difficult to understand.
