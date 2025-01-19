@@ -16,6 +16,11 @@
 Whereas Elm has a central `Model` (generally) to work from and uses modules and functions, Python has instances of classes which (I think) are stateful.
 
 
+## Commands
+
+1. `uv run uvicorn api:app --port 8000 --reload` (or run from `.venv`)
+
+
 ## Problems
 
 > These are annoying and compared to Elm (where everything just works), not particularly user-friendly. You'd think you could just run commands once you're set up with a `venv` (virtual environment).
@@ -30,7 +35,6 @@ Whereas Elm has a central `Model` (generally) to work from and uses modules and 
 3. **`uvicorn` doesn't [allow secure `https`](https://www.uvicorn.org/deployment/#running-with-https)** (by default)
 4. Using Thonny as an IDE
     - I can get the version of Python running but the other stuff is harder
-
 
 
 ## Tools

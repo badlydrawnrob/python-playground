@@ -1,9 +1,8 @@
 from fastapi import APIRouter
 from model import ToDo
 
-
 # ------------------------------------------------------------------------------
-# A very to-do app
+# A very simple to-do app
 # ==============================================================================
 # You don't want to allow ANY dictionary to be sent to the API, such as
 # an empty dict, malformed data, so on. So now we import out model that's been
@@ -16,8 +15,12 @@ from model import ToDo
 #
 # Errors
 # ------
+# > This would make a good "how do we fix this" problem.
+#
 # 1. Currently if `todo_list` has zero entries, we get an `Internal Server Error`,
 #    not our `else` branch from Uvicorn.
+#    - `elif` `not []` will return `True` although it feels hacky.
+#    - `len([]) == 0` is another option
 
 router = APIRouter()
 
@@ -48,13 +51,19 @@ async def retrieve_todos() -> dict:
 
 @router.get("/todo/{id}")
 async def retrieve_single_todo(id: int) -> dict:
-    for todo in todo_list:
-        # check each dict.id for equality
-        if todo.id == id: # The supplied ID in the url
-            return {
-                "todo": todo # the whole dict
-            }
-        else:
-            return {
-                "message": "This To Do doesn't exist!" # (1) !=
-            }
+    """Get a single to-do
+    
+    1. Check if our to-do list is empty
+    2. For each to-do, check the `:id`
+    3. Print the record if it exists
+    """
+    if not todo_list:
+        return { "message": "Your to-do list is empty" }
+    else:
+        for todo in todo_list:
+            if todo.id == id:
+                return { "todo": todo }
+            else:
+                return {
+                    "message": "This to-do doesn't exist!" # (1) !=
+                }

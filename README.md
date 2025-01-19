@@ -87,6 +87,12 @@ niceTypes =
 - Perhaps you just need to memorise syntax differences?
 
 
+## Courses
+
+- [Imperial College London](https://python.pages.doc.ic.ac.uk/2021/materials.html) course 
+([example](https://python.pages.doc.ic.ac.uk/lessons/core05/07-style/03-docstring.html)
+
+
 ## Tools
 
 - [UV in production?](https://pythonspeed.com/articles/uv-python-production/)
