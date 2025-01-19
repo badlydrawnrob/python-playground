@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Path
 from model import ToDo
 
 # ------------------------------------------------------------------------------
@@ -13,15 +13,15 @@ from model import ToDo
 # You want to have checks and errors setup to protect yourself, or you a malicious
 # user might tank your database!
 #
-# Errors
-# ------
+# Fixing Errors
+# -------------
 # > This would make a good "how do we fix this" problem.
 #
 # 1. Now we're giving an error message if `todo_list` contains zero entries.
 #    - Otherwise we'll get a `Internal Server Error`
 #    - `len([]) == 0` is another way to do this
 
-router = APIRouter()
+todo_router = APIRouter()
 
 
 # Data -------------------------------------------------------------------------
@@ -35,21 +35,22 @@ todo_list = []
 #
 # 1. Post a new todo
 # 2. Get all todos
-# 3. Get a particular todo (you could List.filter here too)
+# 3. Get a particular to-dos (you could List.filter here too)
 #    - See Bruno `:id` path @ https://docs.usebruno.com/send-requests/REST/parameters
-#    - Here we're using 🔎 "FastApi Path class"
+#    - 🔎 "FastApi Path class" is optional but can be useful for adding additional
+#      validation or default values to path parameters. Why the (...)? No idea.
 
-@router.post("/todo")
+@todo_router.post("/todo")
 async def add_todo(todo: ToDo) -> dict:
     todo_list.append(todo)
     return { "message": "To-do added successfully" }
 
-@router.get("/todo")
+@todo_router.get("/todo")
 async def retrieve_todos() -> dict:
     return { "todos": todo_list }
 
-@router.get("/todo/{id}")
-async def retrieve_single_todo(id: int) -> dict:
+@todo_router.get("/todo/{id}")
+async def retrieve_single_todo(id: int = Path(..., title="The ID of the to-do to retrieve")) -> dict:
     """Get a single to-do
     
     1. Check if our to-do list is empty

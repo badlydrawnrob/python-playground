@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from todo import router
+from todo import todo_router
 
 # ------------------------------------------------------------------------------
 # A to do app
@@ -22,4 +22,4 @@ app = FastAPI()
 async def welcome() -> dict:
     return { "message": "Hello Buddy!" }
 
-app.include_router(router) # includes TO DO routes (instance of `APIRouter()`)
+app.include_router(todo_router) # includes TO DO routes (instance of `APIRouter()`)
