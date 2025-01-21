@@ -8,6 +8,11 @@ from model import ToDo
 # an empty dict, malformed data, so on. So now we import out model that's been
 # set up with Pydantic. FastApi and Pydantic also help to document our API endpoints,
 # and Bruno helps us test it.
+#
+# FastApi types
+# -------------
+# What is `Path`? See also `Annotated`:
+#     @ https://tinyurl.com/fast-api-import-path
 # 
 # ⚠️ Malicious input
 # ------------------
