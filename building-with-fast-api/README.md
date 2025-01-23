@@ -1,5 +1,7 @@
 # README
 
+> A [brief overview](https://lyz-code.github.io/blue-book/fastapi/) of FastApi
+
 ## Chapters
 
 > [Some notes](https://github.com/astral-sh/uv/issues/10543#issuecomment-2587276856) on using `uv` and `venv` setup[^1]
