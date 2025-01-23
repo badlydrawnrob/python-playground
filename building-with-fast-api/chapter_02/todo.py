@@ -11,6 +11,13 @@ from model import ToDo
 # set up with Pydantic. FastApi and Pydantic also help to document our API endpoints,
 # and Bruno helps us test it.
 #
+# FastApi Documentation
+# ---------------------
+# 👍 API documentation is auto-generated; it uses Swagger and ReDoc:
+# - It's not as nice as Bruno, feels a little clunky. Nice to have though!
+# - @ http://127.0.0.1:8000/docs/
+#
+#
 # FastApi types
 # -------------
 # What is `Path`? See also `Annotated`:
