@@ -38,13 +38,14 @@ from model import ToDo
 # user might tank your database!
 #
 #
-# Fixing Errors
-# -------------
-# > This would make a good "how do we fix this" problem.
+# Bugs
+# ----
+# > Think about "how might we fix this" problems for students ...
 #
-# 1. Now we're giving an error message if `todo_list` contains zero entries.
-#    - Otherwise we'll get a `Internal Server Error`
-#    - `len([]) == 0` is another way to do this
+# 1. `POST` accepts duplicate `{id}`s
+# 2. `GET` `{id}` with an `[]` empty `todo_list` returns `Internal Server Error`
+#    - Fixed: you can also use `len([]) == 0` here
+
 
 todo_router = APIRouter()
 
