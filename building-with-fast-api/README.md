@@ -15,7 +15,29 @@
 > I really don't understand Python's OOP style very much.
 > The book is a bit sloppy in places with conflicting instructions.
 
-Whereas Elm has a central `Model` (generally) to work from and uses modules and functions, Python has instances of classes which (I think) are stateful.
+Whereas Elm has a central `Model` (generally) to work from and uses modules and functions, Python has instances of classes which (I think) are stateful. It feels like Python adds a whole lot of mess to the code base.
+
+A good example of this is FastAPI allows [generating API examples](https://tinyurl.com/fastapi-json-schema-extra) along with your models. I feel the model and **examples should be handled separately**, and Bruno does this perfectly:
+
+```python
+class ToDo(BaseModel):
+    id: int
+    item: Item
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "id": "1",
+                    "item": {
+                        "item": "Grab some shopping for dinner",
+                        "status": "to-do"
+                    }
+                }
+            ]
+        }
+    }
+```
 
 
 ## Commands
