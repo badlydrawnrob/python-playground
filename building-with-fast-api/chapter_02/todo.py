@@ -1,3 +1,5 @@
+from typing import Annotated
+
 from fastapi import APIRouter, Path
 from model import ToDo
 
@@ -13,6 +15,7 @@ from model import ToDo
 # -------------
 # What is `Path`? See also `Annotated`:
 #     @ https://tinyurl.com/fast-api-import-path
+#     @ https://stackoverflow.com/a/76399911
 # 
 # ⚠️ Malicious input
 # ------------------
@@ -46,7 +49,11 @@ todo_list = []
 # 3. Get a particular to-dos (you could List.filter here too)
 #    - See Bruno `:id` path @ https://docs.usebruno.com/send-requests/REST/parameters
 #    - 🔎 "FastApi Path class" is optional but can be useful for adding additional
-#      validation or default values to path parameters. Why the (...)? No idea.
+#      validation or default values to path parameters.
+#    - It's `Path(...,title="descr")` in the book, with elipsis, but here I'm
+#      using `Annotated`
+#      @ https://tinyurl.com/wtf-is-elipsis-python (seems a dumb idea)
+#      @ https://tinyurl.com/fastapi-path-params-annotate
 
 @todo_router.post("/todo")
 async def add_todo(todo: ToDo) -> dict:
@@ -58,7 +65,9 @@ async def retrieve_todos() -> dict:
     return { "todos": todo_list }
 
 @todo_router.get("/todo/{id}")
-async def retrieve_single_todo(id: int = Path(..., title="The ID of the to-do to retrieve")) -> dict:
+async def retrieve_single_todo(
+    id: Annotated[int, Path(title="The ID of the to-do to retrieve")]
+    ) -> dict:
     """Get a single to-do
     
     1. Check if our to-do list is empty

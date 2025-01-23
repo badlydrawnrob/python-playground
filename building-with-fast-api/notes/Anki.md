@@ -15,7 +15,7 @@ You can rip a lot of this stuff from the book, but put it in very simple terms. 
 - Returning values (unlike Elm you must `return value` or else `None`) 
 - A class instance (such as `FastAPI()`)
     - FastApi implicitly builds the `ToDo(attributes="...")` class
-    - Path(..., KWARGS) and what the fuck is ellipses?
+    - Path(..., KWARGS) and [what the fuck is ellipses](https://tinyurl.com/pydantic-wtf-is-elipsis)?
 - Basic syntax differences
     - `function()` calls and arguments
     - Typing (just a taste)
