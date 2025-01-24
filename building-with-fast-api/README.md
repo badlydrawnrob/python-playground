@@ -2,6 +2,23 @@
 
 > A [brief overview](https://lyz-code.github.io/blue-book/fastapi/) of FastApi
 
+
+## Learning method
+
+> Coding in the [age of Ai](https://github.com/badlydrawnrob/anki/issues/92)
+> Watch out for Ai hallucinations!
+
+1. Copilot and ChatGPT
+2. Ai generated flashcards (human in the loop)
+3. Memorable examples (storify)
+4. Readability (simple language, <s>academic writing</s>)
+
+Alongside my general process of: read, make notes (per chapter), condense notes, talk to your Ai study partner, generate flashcards, files or programs. For now, I'll limit the Ai to only giving me a fun example of the code (and not structuring the full Anki card's field data).
+
+"Give me a fun example for scaffolded learning on ____"
+"Give it to me as [draw!, missing, simple] data"
+
+
 ## Chapters
 
 > [Some notes](https://github.com/astral-sh/uv/issues/10543#issuecomment-2587276856) on using `uv` and `venv` setup[^1]
