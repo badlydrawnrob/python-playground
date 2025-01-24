@@ -14,8 +14,11 @@ from pydantic import BaseModel
 #
 # Notes
 # -----
-# Unlike Elm lang it seems like _declaration order is important_ here. Running
-# `uvicorn` with `Item` below `ToDo` throws an error.
+# 1. Declaration order is important!
+#     - Running `uvicorn` with `Item` below `ToDo` throws an error.
+# 2. The book uses a `ToDoItem` with `item: str` ...
+#     - But we really want to replace the whole `Item`
+#     - This keeps the rest of our program consistent!
 
 # Model ------------------------------------------------------------------------
 # I'm using Bruno for all examples, which you can see in `/bruno/collection/`
@@ -36,5 +39,5 @@ class ToDo(BaseModel):
     id: int
     item: Item
 
-class ToDoItem(BaseModel):
-    item: str # update Item
+# class ToDoItem(BaseModel):
+#     item: str # update Item

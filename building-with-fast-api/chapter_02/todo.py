@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Path
-from model import ToDo, ToDoItem
+from model import ToDo, Item
 
 # ------------------------------------------------------------------------------
 # A very simple to-do app
@@ -73,6 +73,12 @@ todo_list = []
 #    - @ https://tinyurl.com/fastapi-path-params-annotate
 # 5. What the fuck is elipsis? (...)
 #    - @ https://tinyurl.com/wtf-is-elipsis-python
+#
+# Wishlist
+# --------
+# 1. Only partially update `Item` (e.g, the `status` field)
+#    - `todo.item.status == str`?
+#    - Do we really need another `class` for that?
 
 @todo_router.post("/todo")
 async def add_todo(todo: ToDo) -> dict:
@@ -104,7 +110,7 @@ async def retrieve_single_todo(
 
 @todo_router.put("/todo/{id}")
 async def update_single_todo(
-    todo_data: ToDoItem,
+    todo_data: Item,
     id: Annotated[int, Path(title="The ID of the to-do to be updated")] 
     ) -> dict:
     """Update a single to-do
@@ -115,7 +121,7 @@ async def update_single_todo(
     """
     for todo in todo_list:
         if todo.id == id:
-            todo.item = todo_data.item # relace with the request body
+            todo.item = todo_data # relace with the request body
 
             return { "message": "To-do updated successfully" }
         
