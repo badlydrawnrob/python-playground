@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Path
-from model import ToDo
+from model import ToDo, ToDoItem
 
 # ------------------------------------------------------------------------------
 # A very simple to-do app
@@ -65,12 +65,13 @@ todo_list = []
 # Useful knowledge ...
 # --------------------
 # 1. What is a _request body_?
-# 2. What is an `:id`/`{id}` path?
+# 2. How can we access to-dos with `.id` dot notation?
+# 3. What is an `:id`/`{id}` path?
 #    - https://docs.usebruno.com/send-requests/REST/parameters
-# 3. What is `Path()` and `Annotated`?
-#    - Additional validation, default values, descriptive titles
+# 4. What is `Path()` and `Annotated`?
+#    - Additional validation (it's a path `:id`), default values, descriptive titles
 #    - @ https://tinyurl.com/fastapi-path-params-annotate
-# 4. What the fuck is elipsis? (...)
+# 5. What the fuck is elipsis? (...)
 #    - @ https://tinyurl.com/wtf-is-elipsis-python
 
 @todo_router.post("/todo")
@@ -100,3 +101,22 @@ async def retrieve_single_todo(
                 return { "todo": todo }
             else:
                 return { "message": "This to-do doesn't exist" }
+
+@todo_router.put("/todo/{id}")
+async def update_single_todo(
+    todo_data: ToDoItem,
+    id: Annotated[int, Path(title="The ID of the to-do to be updated")] 
+    ) -> dict:
+    """Update a single to-do
+    
+    1. Check if the id matches an existing to-do
+    2. If exists, replace with request body (`todo_data`)
+    3. Return a message if successfully updated
+    """
+    for todo in todo_list:
+        if todo.id == id:
+            todo.item = todo_data.item # relace with the request body
+
+            return { "message": "To-do updated successfully" }
+        
+    return { "message": "To-do with supplied ID doesn't exist" }

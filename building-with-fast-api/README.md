@@ -66,16 +66,19 @@ class ToDo(BaseModel):
 
 > These are annoying and compared to Elm (where everything just works), not particularly user-friendly. You'd think you could just run commands once you're set up with a `venv` (virtual environment).
 
-1. **Module naming clashes and `venv`:**
+1. **Dot notation: how are values extracted?**
+    - `dictionary.id` rather than `dictionary["id"]`
+2. Module naming clashes and `venv`:**
     - `uv` commands require calling from the `venv` parent directory
     - `01` numbers cannot come first for module naming (`name_01` is ok)
-2. **`uvicorn` command [won't run](https://stackoverflow.com/a/69322150)**
+3. **`uvicorn` command [won't run](https://stackoverflow.com/a/69322150)**
     - Preface it with `uv run` (equivalent to `python -m`)
     - Or, make sure you've `source .venv/bin/activate`d your environment
     - Also take care with modules, folders, and names.[^2]
-3. **`uvicorn` doesn't [allow secure `https`](https://www.uvicorn.org/deployment/#running-with-https)** (by default)
-4. Using Thonny as an IDE
+4. **`uvicorn` doesn't [allow secure `https`](https://www.uvicorn.org/deployment/#running-with-https)** (by default)
+5. Using Thonny as an IDE
     - I can get the version of Python running but the other stuff is harder
+6. You might want to return `html` instead of `json`. You can [do both](https://tinyurl.com/fastapi-return-html-or-json)!
 
 
 ## Tools

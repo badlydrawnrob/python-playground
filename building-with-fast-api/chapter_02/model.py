@@ -18,10 +18,15 @@ from pydantic import BaseModel
 # `uvicorn` with `Item` below `ToDo` throws an error.
 
 # Model ------------------------------------------------------------------------
-# You can also add model examples that will be generated in the JSON Schema ..
+# I'm using Bruno for all examples, which you can see in `/bruno/collection/`
+# folder. You can also add model examples as `model_config` that will be used
+# in the generated JSON Schema, but it feels messier than splitting out these
+# two different concerns.that will be generated in the JSON Schema ..
 # but I feel like this is a BAD IDEA and better split out with Bruno.
-# - This is different than the book for Pydantic v2
-# - @ https://tinyurl.com/fastapi-json-schema-extra
+#
+# You can see the alternative route here:
+# - @ https://tinyurl.com/py-playground-commit-3ab8420
+# - @ https://tinyurl.com/fastapi-json-schema-extra
 
 class Item(BaseModel):
     item: str
@@ -31,16 +36,5 @@ class ToDo(BaseModel):
     id: int
     item: Item
 
-    model_config = {
-        "json_schema_extra": {
-            "examples": [
-                {
-                    "id": "1",
-                    "item": {
-                        "item": "Grab some shopping for dinner",
-                        "status": "to-do"
-                    }
-                }
-            ]
-        }
-    }
+class ToDoItem(BaseModel):
+    item: str # update Item
