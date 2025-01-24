@@ -19,6 +19,8 @@ from pydantic import BaseModel
 # 2. The book uses a `ToDoItem` with `item: str` ...
 #     - But we really want to replace the whole `Item`
 #     - This keeps the rest of our program consistent!
+# 3. You can access attributes by dot notation:
+#    - `ToDo().id` or `Item().status`
 
 # Model ------------------------------------------------------------------------
 # I'm using Bruno for all examples, which you can see in `/bruno/collection/`
