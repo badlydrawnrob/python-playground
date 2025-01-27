@@ -12,7 +12,9 @@ You can rip a lot of this stuff from the book, but put it in very simple terms. 
 
 - Basic Git terminology
 - Declaration order (Python nested class requires a strict order)
-- Returning values (unlike Elm you must `return value` or else `None`) 
+- Returning values (unlike Elm you must `return value` or else `None`)
+- Lists and mutability (the functions will change the `list` instance)
+    - We NEVER have to worry about this in Elm Lang.
 - A class instance (such as `FastAPI()`)
     - FastApi implicitly builds the `ToDo(attributes="...")` class
     - Path(..., KWARGS) and [what the fuck is ellipses](https://tinyurl.com/pydantic-wtf-is-elipsis)?

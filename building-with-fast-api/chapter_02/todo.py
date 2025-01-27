@@ -42,8 +42,12 @@ from model import ToDo, Item
 # ----
 # > Think about "how might we fix this" problems for students ...
 #
-# 1. `POST` accepts duplicate `{id}`s
-# 2. `GET` `{id}` with an `[]` empty `todo_list` returns `Internal Server Error`
+# 1. We're MUTATING the list within this module
+#    - This is a problem if we want to use this list elsewhere
+#    - We could copy the dictionary if we preferred
+#      @ https://tinyurl.com/python-mutable-lists
+# 2. `POST` accepts duplicate `{id}`s
+# 3. `GET` `{id}` with an `[]` empty `todo_list` returns `Internal Server Error`
 #    - Fixed: you can also use `len([]) == 0` here
 
 
@@ -80,14 +84,17 @@ todo_list = []
 #    - `todo.item.status == str`?
 #    - Do we really need another `class` for that?
 
+
 @todo_router.post("/todo")
 async def add_todo(todo: ToDo) -> dict:
     todo_list.append(todo)
     return { "message": "To-do added successfully" }
 
+
 @todo_router.get("/todo")
 async def retrieve_todos() -> dict:
     return { "todos": todo_list }
+
 
 @todo_router.get("/todo/{id}")
 async def retrieve_single_todo(
@@ -108,6 +115,7 @@ async def retrieve_single_todo(
             else:
                 return { "message": "This to-do doesn't exist" }
 
+
 @todo_router.put("/todo/{id}")
 async def update_single_todo(
     todo_data: Item,
@@ -124,5 +132,24 @@ async def update_single_todo(
             todo.item = todo_data # relace with the request body
 
             return { "message": "To-do updated successfully" }
+        
+    return { "message": "To-do with supplied ID doesn't exist" }
+
+
+@todo_router.delete("/todo/{id}")
+async def delete_single_todo(
+    id: Annotated[int, Path(title="The ID of the to-do to be deleted")]
+    ) -> dict:
+    """Delete a single to-do
+    
+    1. Check if the id matches an existing to-do
+    2. If exists, remove the to-do
+    3. Return a message if successfully deleted
+    """
+    for todo in todo_list:
+        if todo.id == id:
+            todo_list.remove(todo)
+
+            return { "message": "To-do deleted successfully" }
         
     return { "message": "To-do with supplied ID doesn't exist" }
