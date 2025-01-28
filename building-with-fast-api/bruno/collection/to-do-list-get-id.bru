@@ -19,7 +19,8 @@ docs {
   
   Here we're getting whatever `id` passed into the url. If the `:id` doesn't exist, or if the list is empty, return an error message.
   
-  ## Bugs
+  ## 🐞 Bugs
   
-  Our `POST` accepts duplicate `id`s, so we'll need to fix that.
+  1. Our `POST` accepts duplicate `id`s, so we'll need to fix that.
+  2. This will only return the _first_ `:id` of that kind (even if there's 2 of them)
 }

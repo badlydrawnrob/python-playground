@@ -77,10 +77,16 @@ todo_list = []
 #    - @ https://tinyurl.com/fastapi-path-params-annotate
 # 5. What the fuck is elipsis? (...)
 #    - @ https://tinyurl.com/wtf-is-elipsis-python
+# 6. Why might we use `.pop(index)` rather than `.remove()`?
+#    - `.remove()` is far easier to read ...
+#    - but won't remove duplicates (only first instance)
 #
 # Wishlist
 # --------
-# 1. Only partially update `Item` (e.g, the `status` field)
+# 1. Make sure there's no duplicates in `todo_list`
+#    - So our `delete_single_todo(:id)` will never see more than two of the
+#      same value.
+# 2. Only partially update `Item` (e.g, the `status` field)
 #    - `todo.item.status == str`?
 #    - Do we really need another `class` for that?
 
@@ -145,6 +151,9 @@ async def delete_single_todo(
     1. Check if the id matches an existing to-do
     2. If exists, remove the to-do
     3. Return a message if successfully deleted
+
+    The book uses `.pop()` looping on the index,
+    `.remove()` is far easier to read!
     """
     for todo in todo_list:
         if todo.id == id:
@@ -153,3 +162,18 @@ async def delete_single_todo(
             return { "message": "To-do deleted successfully" }
         
     return { "message": "To-do with supplied ID doesn't exist" }
+
+
+@todo_router.delete("/todo")
+async def delete_all_todos() -> dict:
+    """Delete all to-dos
+    
+    1. Check if the to-do list is empty
+    2. If not, clear the list
+    3. Return a message if successfully deleted
+    """
+    if not todo_list:
+        return { "message": "Your to-do list is already empty" }
+    else:
+        todo_list.clear()
+        return { "message": "All to-dos deleted successfully" }

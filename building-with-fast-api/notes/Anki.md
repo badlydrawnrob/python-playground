@@ -33,7 +33,9 @@ You can rip a lot of this stuff from the book, but put it in very simple terms. 
     - RESTful elements and actions
     - Code responses (does not exist) etc
 - Schemas and models (with validation)
+    - Auth tokens and CSRF etc
     - Sanitize the user generated input data
+    - Avoiding malicious code (such as sql/js injection)
 
 
 ## Chapter 02: Routing
