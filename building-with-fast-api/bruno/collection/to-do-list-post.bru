@@ -13,6 +13,23 @@ post {
 body:json {
   {
     "id": 1,
-    "item": "My first to-do is: finish the book"
+    "item": {
+      "item": "Read chapter 02 of the book",
+      "status": "To-do"
+    }
   }
+}
+
+docs {
+  # To Do
+  
+  > Keys are case-sensitive
+  
+  1. Must contain an `int` with key `id`
+  2. Must contain an `Item` with key `item`
+      - `Item` contains `item: str`, `status: str`
+  
+  ## 🐞 Bugs
+  
+  Currently accepts empty strings and duplicate `id`s 😔
 }

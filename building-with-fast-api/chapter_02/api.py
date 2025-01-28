@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from chapter_02.todo import router
+from todo import todo_router
 
 # ------------------------------------------------------------------------------
 # A to do app
@@ -15,6 +15,18 @@ from chapter_02.todo import router
 #
 # - `app` variable now has an instance of the `FastAPI` class.
 # - `.include_router` is a method of this class
+#
+# Notes
+# -----
+# > You should have an authenticated user and some way to store both
+# > a login token and CSRF for forms: some method of TRUST per user.
+# > Never share your login token with anyone else! (especially Github etc)
+#
+# 1. Beware of duplicates (`:id`)
+# 2. Beware of empty lists
+# 3. Beware of mutating lists (use `.copy()`?)
+# 4. Beware of malicious input (validate and SANATIZE)
+# 5. Beware of irriversible changes (`DELETE` all)
 
 app = FastAPI()
 
@@ -22,4 +34,4 @@ app = FastAPI()
 async def welcome() -> dict:
     return { "message": "Hello Buddy!" }
 
-app.include_router(router) # includes TO DO routes (instance of `APIRouter()`)
+app.include_router(todo_router) # includes TO DO routes (instance of `APIRouter()`)
