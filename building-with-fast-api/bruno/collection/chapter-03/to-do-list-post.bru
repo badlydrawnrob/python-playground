@@ -1,0 +1,35 @@
+meta {
+  name: to-do-list-post
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8000/todo
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "id": 1,
+    "item": {
+      "item": "Read chapter 02 of the book",
+      "status": "To-do"
+    }
+  }
+}
+
+docs {
+  # To Do
+  
+  > Keys are case-sensitive
+  
+  1. Must contain an `int` with key `id`
+  2. Must contain an `Item` with key `item`
+      - `Item` contains `item: str`, `status: str`
+  
+  ## 🐞 Bugs
+  
+  Currently accepts empty strings and duplicate `id`s 😔
+}

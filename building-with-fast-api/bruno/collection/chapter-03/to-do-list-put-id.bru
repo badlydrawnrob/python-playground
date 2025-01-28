@@ -1,0 +1,35 @@
+meta {
+  name: to-do-list-put-id
+  type: http
+  seq: 5
+}
+
+put {
+  url: http://localhost:8000/todo/:id
+  body: json
+  auth: none
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "item": "Read chapter 02 of the book",
+    "status": "Done"
+  }
+}
+
+docs {
+  # To Do
+  
+  Update the `:id` with new (key `"item"`) data.
+  
+  ## 🐞 Bugs
+  
+  1. Which `:id` do we update if there's duplicates?
+  
+  
+  
+}
