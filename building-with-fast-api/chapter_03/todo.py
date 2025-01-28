@@ -6,50 +6,45 @@ from model import ToDo, Item
 # ------------------------------------------------------------------------------
 # A very simple to-do app
 # ==============================================================================
-# You don't want to allow ANY dictionary to be sent to the API, such as
-# an empty dict, malformed data, so on. So now we import out model that's been
-# set up with Pydantic. FastApi and Pydantic also help to document our API endpoints,
-# and Bruno helps us test it.
+# ⚠️ Beware of malicious code and make sure you sanitize the data (`json`) that
+# comes in to the http server. Pydantic helps us validate data. Don't allow anyone
+# to tank your database! Have your code checked over by a professional, and make
+# sure to use the right tools to protect yourself.
 #
 #
 # API Documentation
 # -----------------
-# 👍 API documentation is auto-generated; the single most useful thing here is
-# probably the OpenApi `.json` file, which can be imported online, used in apps,
-# or shared with other devs ... it uses Swagger and ReDoc:
-# -  @ http://127.0.0.1:8000/docs/
-# -  @ http://127.0.0.1:8000/redoc/
-# 
-# 👎 It's NOT as nice as Bruno, ui feels a little clunky. At some stage you might
-# be able to sync the OpenApi `.json` file into this app.
-# - @ https://github.com/usebruno/bruno/issues/81
+# > See Bruno app for all `json` REST examples.
+#
+# @ http://127.0.0.1:8000/docs/
+# @ http://127.0.0.1:8000/redoc/
 #
 #
 # FastApi types
 # -------------
-# What is `Path`? See also `Annotated`:
-#     @ https://tinyurl.com/fast-api-import-path
-#     @ https://stackoverflow.com/a/76399911
+# > See `Annotated` for annotated types.
+# > These help us to validate and document our API.
+#
+# @ https://tinyurl.com/fast-api-import-path
+# @ https://stackoverflow.com/a/76399911
 # 
 #
-# ⚠️ Malicious input
-# ------------------
-# You want to have checks and errors setup to protect yourself, or you a malicious
-# user might tank your database!
+# Learning points
+# ---------------
+# > Each chapter has it's own useful learning points that students should know.
+#
+# 1. By now you should know what a path, request, query is.
+# 2. You should understand the difference between mutable and immutable data.
+# 3. You should know the difference between `POST`, `GET`, `PUT`, `DELETE`.
+# 4. You should know what Pydantic is and how to use it.
 #
 #
-# Bugs
-# ----
-# > Think about "how might we fix this" problems for students ...
-#
-# 1. We're MUTATING the list within this module
-#    - This is a problem if we want to use this list elsewhere
-#    - We could copy the dictionary if we preferred
-#      @ https://tinyurl.com/python-mutable-lists
-# 2. `POST` accepts duplicate `{id}`s
-# 3. `GET` `{id}` with an `[]` empty `todo_list` returns `Internal Server Error`
-#    - Fixed: you can also use `len([]) == 0` here
-
+# Wishlist
+# --------
+# 1. Duplicate `:id`s should not be allowed
+# 2. String length: how long?
+# 3. String length: not empty
+# 4. Only partially update `Item` (e.g, the `status` field)
 
 todo_router = APIRouter()
 
@@ -60,36 +55,8 @@ todo_list = []
 
 
 # Routes -----------------------------------------------------------------------
-# See `/docs` or `/redoc` (urls), or `/bruno` (folder) for documentation!
-# 
-# Here we're using `APIRouter()` instead of `FastAPI()` which allows us to
-# create multiple routes instead of only one!
-#
-#
-# Useful knowledge ...
-# --------------------
-# 1. What is a _request body_?
-# 2. How can we access to-dos with `.id` dot notation?
-# 3. What is an `:id`/`{id}` path?
-#    - https://docs.usebruno.com/send-requests/REST/parameters
-# 4. What is `Path()` and `Annotated`?
-#    - Additional validation (it's a path `:id`), default values, descriptive titles
-#    - @ https://tinyurl.com/fastapi-path-params-annotate
-# 5. What the fuck is elipsis? (...)
-#    - @ https://tinyurl.com/wtf-is-elipsis-python
-# 6. Why might we use `.pop(index)` rather than `.remove()`?
-#    - `.remove()` is far easier to read ...
-#    - but won't remove duplicates (only first instance)
-#
-# Wishlist
-# --------
-# 1. Make sure there's no duplicates in `todo_list`
-#    - So our `delete_single_todo(:id)` will never see more than two of the
-#      same value.
-# 2. Only partially update `Item` (e.g, the `status` field)
-#    - `todo.item.status == str`?
-#    - Do we really need another `class` for that?
-
+# `APIRouter()` instead of `FastAPI()` allows us to create multiple routes
+# instead of only one!
 
 @todo_router.post("/todo")
 async def add_todo(todo: ToDo) -> dict:
@@ -106,20 +73,15 @@ async def retrieve_todos() -> dict:
 async def retrieve_single_todo(
     id: Annotated[int, Path(title="The ID of the to-do to retrieve")]
     ) -> dict:
-    """Get a single to-do
-    
-    1. Check if our to-do list is empty
-    2. For each to-do, check the `:id`
-    3. Print the record if it exists
-    """
-    if not todo_list:
-        return { "message": "Your to-do list is empty" } # (1) !=
+    """Retrieve a single to-do"""
+    if not todo_list: # check if the list is empty
+        return { "message": "Your to-do list is empty" }
     else:
         for todo in todo_list:
             if todo.id == id:
                 return { "todo": todo }
             else:
-                return { "message": "This to-do doesn't exist" }
+                return { "message": f"To-do with (:id {id}) doesn't exist" }
 
 
 @todo_router.put("/todo/{id}")
@@ -127,19 +89,14 @@ async def update_single_todo(
     todo_data: Item,
     id: Annotated[int, Path(title="The ID of the to-do to be updated")] 
     ) -> dict:
-    """Update a single to-do
-    
-    1. Check if the id matches an existing to-do
-    2. If exists, replace with request body (`todo_data`)
-    3. Return a message if successfully updated
-    """
+    """Update a single to-do"""
     for todo in todo_list:
         if todo.id == id:
-            todo.item = todo_data # relace with the request body
+            todo.item = todo_data # replace with the request body
 
-            return { "message": "To-do updated successfully" }
+            return { "message": f"To-do with (:id {id}) updated successfully" }
         
-    return { "message": "To-do with supplied ID doesn't exist" }
+    return { "message": f"To-do with (:id {id}) doesn't exist" }
 
 
 @todo_router.delete("/todo/{id}")
@@ -147,31 +104,21 @@ async def delete_single_todo(
     id: Annotated[int, Path(title="The ID of the to-do to be deleted")]
     ) -> dict:
     """Delete a single to-do
-    
-    1. Check if the id matches an existing to-do
-    2. If exists, remove the to-do
-    3. Return a message if successfully deleted
 
-    The book uses `.pop()` looping on the index,
-    `.remove()` is far easier to read!
+    Uses `.remove()` instead of `.pop()` for readability.
     """
     for todo in todo_list:
         if todo.id == id:
-            todo_list.remove(todo)
+            todo_list.remove(todo) # remove the to-do
 
-            return { "message": "To-do deleted successfully" }
+            return { "message": f"To-do with (:id {id}) deleted successfully" }
         
-    return { "message": "To-do with supplied ID doesn't exist" }
+    return { "message": f"To-do with (:id {id}) doesn't exist" }
 
 
 @todo_router.delete("/todo")
 async def delete_all_todos() -> dict:
-    """Delete all to-dos
-    
-    1. Check if the to-do list is empty
-    2. If not, clear the list
-    3. Return a message if successfully deleted
-    """
+    """Delete all to-dos"""
     if not todo_list:
         return { "message": "Your to-do list is already empty" }
     else:

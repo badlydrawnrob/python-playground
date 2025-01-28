@@ -4,29 +4,26 @@ from todo import todo_router
 # ------------------------------------------------------------------------------
 # A to do app
 # ==============================================================================
-# Uvicorn cannot use the `APIRouter()` instance directly to serve the application,
-# like we did with `uv run uvicorn api:app --port 8000 --reload`. We've got to
-# add these routes to the `FastAPI()` instance to enable their visibility.
+# See `chapter_02` for full instructions.
+# 
+# 1. Create routes using the `APIRouter()` class
+# 2. Instantiate `FastAPI()` class in `app` ...
+# 3. Add the `todo_router` to the `app with `.include_router` method!
 #
-# Include router
-# --------------
-# `include_router(router, ...)` method is responsible for adding routes defined
-# with `APIRouter` class to the main application's instance.
-#
-# - `app` variable now has an instance of the `FastAPI` class.
-# - `.include_router` is a method of this class
+# Uvicorn
+# -------
+# `uvicorn api:app --port 8000 --reload`.
 #
 # Notes
 # -----
-# > You should have an authenticated user and some way to store both
-# > a login token and CSRF for forms: some method of TRUST per user.
-# > Never share your login token with anyone else! (especially Github etc)
+# > Always authenticate the user.
+# > Use a login token and CSRF for forms.
+# > Don't share secrets online (Github tokens)
 #
-# 1. Beware of duplicates (`:id`)
-# 2. Beware of empty lists
-# 3. Beware of mutating lists (use `.copy()`?)
-# 4. Beware of malicious input (validate and SANATIZE)
-# 5. Beware of irriversible changes (`DELETE` all)
+# 1. Beware of duplicates and empty lists
+# 2. We're using MUTABLE data here (use `.copy()` for immutable?)
+# 3. Validate and SANITIZE (malicious input)
+# 4. Warn the user of irriversible changes (`DELETE` all)
 
 app = FastAPI()
 
@@ -34,4 +31,4 @@ app = FastAPI()
 async def welcome() -> dict:
     return { "message": "Hello Buddy!" }
 
-app.include_router(todo_router) # includes TO DO routes (instance of `APIRouter()`)
+app.include_router(todo_router)
