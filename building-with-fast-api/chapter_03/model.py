@@ -33,11 +33,5 @@ class ToDo(BaseModel):
     id: int
     item: Item
 
-class ToDoItem(BaseModel):
-    item: str
-
 # Return type ------------------------------------------------------------------
 # These are what we'll use to validate our `json` responses.
-
-class ToDoItems(BaseModel):
-    todos: List[ToDoItem]

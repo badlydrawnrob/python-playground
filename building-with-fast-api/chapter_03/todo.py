@@ -1,7 +1,7 @@
-from typing import Annotated
+from typing import Annotated, List
 
 from fastapi import APIRouter, Path
-from model import ToDo, Item, ToDoItems
+from model import ToDo, Item
 
 # ------------------------------------------------------------------------------
 # A very simple to-do app
@@ -64,9 +64,18 @@ async def add_todo(todo: ToDo) -> dict:
     return { "message": "To-do added successfully" }
 
 
-@todo_router.get("/todo", response_model=ToDoItems)
-async def retrieve_todo() -> dict:
-    return { "todos": todo_list }
+@todo_router.get("/todo")
+async def retrieve_todo() -> List[Item]:
+    """Retrieve all to-do items
+    
+    This is different to the book, as that code doesn't work.
+    """
+    list = []
+
+    for todo in todo_list:
+        list.append(todo.item)
+
+    return list
 
 
 @todo_router.get("/todo/{id}")
