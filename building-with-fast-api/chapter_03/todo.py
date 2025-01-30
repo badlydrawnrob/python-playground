@@ -1,7 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Path
-from model import ToDo, Item
+from model import ToDo, Item, ToDoItems
 
 # ------------------------------------------------------------------------------
 # A very simple to-do app
@@ -64,8 +64,8 @@ async def add_todo(todo: ToDo) -> dict:
     return { "message": "To-do added successfully" }
 
 
-@todo_router.get("/todo")
-async def retrieve_todos() -> dict:
+@todo_router.get("/todo", response_model=ToDoItems)
+async def retrieve_todo() -> dict:
     return { "todos": todo_list }
 
 

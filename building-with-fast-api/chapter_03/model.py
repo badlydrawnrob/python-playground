@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import List
 
 # ------------------------------------------------------------------------------
 # Schema
@@ -14,12 +15,15 @@ from pydantic import BaseModel
 #
 # Bruno
 # -----
-# See Bruno folder for all `json` REST examples. The book uses in-place schemas
-# but I find them ugly and it's better to seperate concerns. See `chapter_02` for
-# more information.
+# We'll use Bruno instead of `model_config` within the `class`es. It's a far nicer
+# experience to view the documentation there. See `/chapter_02` for more info.
+#
+# - Our response data won't have examples with Bruno.
+# - You can figure it out by looking at the `json` responses.
 
 
 # Model ------------------------------------------------------------------------
+# These are what we'll use to validate our `json` requests.
 
 class Item(BaseModel):
     item: str
@@ -28,3 +32,12 @@ class Item(BaseModel):
 class ToDo(BaseModel):
     id: int
     item: Item
+
+class ToDoItem(BaseModel):
+    item: str
+
+# Return type ------------------------------------------------------------------
+# These are what we'll use to validate our `json` responses.
+
+class ToDoItems(BaseModel):
+    todos: List[ToDoItem]
