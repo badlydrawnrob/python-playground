@@ -24,6 +24,18 @@ from todo import todo_router
 # 2. We're using MUTABLE data here (use `.copy()` for immutable?)
 # 3. Validate and SANITIZE (malicious input)
 # 4. Warn the user of irriversible changes (`DELETE` all)
+#
+# Response codes
+# --------------
+# Common HTTP status codes include `200` for a successful request, `404` for a
+# request not found, and `500` for a server error. It's important to return the
+# correct status code to avoid confusing the client.
+#
+# 1xx: Request has been received
+# 2xx: The request was successful
+# 3xx: The request was redirected
+# 4xx: The request was invalid (client error)
+# 5xx: The server failed to fulfill a valid request
 
 app = FastAPI()
 
