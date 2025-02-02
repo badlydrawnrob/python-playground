@@ -1,0 +1,26 @@
+meta {
+  name: to-do-list-delete-id
+  type: http
+  seq: 6
+}
+
+delete {
+  url: http://localhost:8000/todo/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 1
+}
+
+docs {
+  # To Do
+  
+  > If there are duplicate `:id` dictionaries, this will delete the first one in the list.
+  
+  **Delete** the `:id` with new (key `"item"`) data.
+  
+  
+  
+}

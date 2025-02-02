@@ -1,0 +1,30 @@
+meta {
+  name: to-do-list-get-id
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://localhost:8000/todo/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 1
+}
+
+docs {
+  # To Do
+  
+  > We're now returning `404` exceptions
+  
+  - Return a `ToDo` with given `:id`
+  - Otherwise return an error
+      - `[]` doesn't return `404` at the moment
+  
+  ## 🐞 Bugs
+  
+  1. Return the _first_ `:id` of that kind (even if there's 2 of them)
+  2. We may have duplicate `:id`s so need to fix this in `POST`!
+}

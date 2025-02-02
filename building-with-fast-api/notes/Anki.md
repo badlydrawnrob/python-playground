@@ -29,13 +29,15 @@ You can rip a lot of this stuff from the book, but put it in very simple terms. 
 - Decorators
 - A route and route handler (with images)
     - what is a path, query params, urls
-    - what is a request, request body, response body
+    - what is a request, request body, response body, response header
     - RESTful elements and actions
-    - Code responses (does not exist) etc
+    - Code responses (does not exist) and ERROR handling etc
 - Schemas and models (with validation)
     - Auth tokens and CSRF etc
     - Sanitize the user generated input data
     - Avoiding malicious code (such as sql/js injection)
+- Errors
+    - `raise` (short circuits the rest of the code, throws error)
 
 
 ## Chapter 02: Routing

@@ -8,7 +8,7 @@
 > Coding in the [age of Ai](https://github.com/badlydrawnrob/anki/issues/92)
 > Watch out for Ai hallucinations!
 
-1. Copilot and ChatGPT
+1. Copilot and ChatGPT (it works!)
 2. Ai generated flashcards (human in the loop)
 3. Memorable examples (storify)
 4. Readability (simple language, <s>academic writing</s>)
@@ -27,9 +27,33 @@ Alongside my general process of: read, make notes (per chapter), condense notes,
 2. Routing (1.6.0 — 1.6.6)
 
 
+## Commands
+
+1. `uv run uvicorn api:app --port 8000 --reload` (or run from `.venv`)
+
+
+## Tools
+
+You're going to need the following:
+
+### Python
+
+- [Pydantic](https://pydantic.dev/)
+- [Uvicorn](https://www.uvicorn.org/)
+- [VS Code Python plugin](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
+- [MyPy](https://mypy-lang.org/) (optional, runs slowly)
+
+### [Bruno](https://www.usebruno.com/)
+
+> A great API test kit for Mac.
+> Much simpler than the alternatives (IMO)
+
+[Rest Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client), [Postman](https://www.postman.com/)[^3], and [Insomnia](https://insomnia.rest/) are other options.
+
+
 ## Paradigms
 
-> I really don't understand Python's OOP style very much.
+> I really don't want to use Python's OOP style very much.
 > The book is a bit sloppy in places with conflicting instructions.
 
 Whereas Elm has a central `Model` (generally) to work from and uses modules and functions, Python has instances of classes which (I think) are stateful. It feels like Python adds a whole lot of mess to the code base.
@@ -56,10 +80,11 @@ class ToDo(BaseModel):
     }
 ```
 
+### Self documentation
 
-## Commands
+> `/docs` gives a JSON Schema documentation ...
 
-1. `uv run uvicorn api:app --port 8000 --reload` (or run from `.venv`)
+But to implement it looks like messy code. Things like `Annotated[]`, `"json_schema_extra"`, and so on. I'm finding that Bruno is pretty nice to work (as an alternative) with and does most of what I'd need.
 
 
 ## Problems
@@ -79,13 +104,6 @@ class ToDo(BaseModel):
 5. Using Thonny as an IDE
     - I can get the version of Python running but the other stuff is harder
 6. You might want to return `html` instead of `json`. You can [do both](https://tinyurl.com/fastapi-return-html-or-json)!
-
-
-## Tools
-
-You're going to need the following:
-
-- An API test kit (such as [Bruno](https://www.usebruno.com/) or [Rest Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client))[^3]
 
 
 ## Hosting
