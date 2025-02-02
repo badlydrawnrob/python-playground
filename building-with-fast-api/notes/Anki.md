@@ -36,6 +36,8 @@ You can rip a lot of this stuff from the book, but put it in very simple terms. 
     - Auth tokens and CSRF etc
     - Sanitize the user generated input data
     - Avoiding malicious code (such as sql/js injection)
+- Errors
+    - `raise` (short circuits the rest of the code, throws error)
 
 
 ## Chapter 02: Routing

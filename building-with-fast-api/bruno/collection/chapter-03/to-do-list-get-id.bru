@@ -17,10 +17,14 @@ params:path {
 docs {
   # To Do
   
-  Here we're getting whatever `id` passed into the url. If the `:id` doesn't exist, or if the list is empty, return an error message.
+  > We're now returning `404` exceptions
+  
+  - Return a `ToDo` with given `:id`
+  - Otherwise return an error
+      - `[]` doesn't return `404` at the moment
   
   ## 🐞 Bugs
   
-  1. Our `POST` accepts duplicate `id`s, so we'll need to fix that.
-  2. This will only return the _first_ `:id` of that kind (even if there's 2 of them)
+  1. Return the _first_ `:id` of that kind (even if there's 2 of them)
+  2. We may have duplicate `:id`s so need to fix this in `POST`!
 }

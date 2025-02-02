@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Path
+from fastapi import APIRouter, Path, HTTPException, status
 from model import ToDo, ToDoItem, ToDoItems
 
 # ------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ from model import ToDo, ToDoItem, ToDoItems
 # FastApi types etc
 # -----------------
 # > `Annotated` is helpful with auto-generated docs
-# > `response_model` is a "magic" shortcut
+# > `response_model` is a "magic" shortcut (if both, `response_model` takes priority)
 # >
 # > Neither are strictly necessary when using Bruno!
 #
@@ -39,6 +39,7 @@ from model import ToDo, ToDoItem, ToDoItems
 # 3. Handling errors:
 #    - Doesn't exist, protected pages, insufficient permissions, etc
 #    - @ https://fastapi.tiangolo.com/tutorial/handling-errors/
+#    - @ https://fastapi.tiangolo.com/reference/dependencies/#security
 # 
 #
 # Old Learning points
@@ -54,6 +55,7 @@ from model import ToDo, ToDoItem, ToDoItems
 # -------------------
 # - `PUT` replaces the resource (e.g: the whole record)
 # - `PATCH` replaces the _value_ (e.g: `{ "name": "new product name" }`)
+# - `HTTPException` tells our client what went wrong (with correct status code)
 #
 #
 # Wishlist
@@ -72,6 +74,8 @@ todo_list = []
 
 
 # Routes -----------------------------------------------------------------------
+# We're using Python "magic" in `retrieve_todo`.
+# The "Elm way" would be: @ https://tinyurl.com/fastapi-anti-magic-responsel 
 
 @todo_router.post("/todo")
 async def add_todo(todo: ToDo) -> dict:
@@ -97,7 +101,10 @@ async def retrieve_single_todo(
             if todo.id == id:
                 return { "todo": todo }
             else:
-                return { "message": f"To-do with (:id {id}) doesn't exist" }
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"To-do with (:id {id}) doesn't exist"
+                )
 
 
 # Update a single ToDo (the first one it finds)
