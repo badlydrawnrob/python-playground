@@ -25,6 +25,7 @@ Alongside my general process of: read, make notes (per chapter), condense notes,
 
 1. Hello World
 2. Routing (1.6.0 — 1.6.6)
+3. Response models and error handling (1.7.0 — 1.7.4)
 
 
 ## Commands
