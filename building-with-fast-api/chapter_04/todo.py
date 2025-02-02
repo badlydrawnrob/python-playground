@@ -6,14 +6,20 @@ from model import ToDo, ToDoItem, ToDoItems
 # ------------------------------------------------------------------------------
 # A very simple to-do app
 # ==============================================================================
-# See `chapter_02` and `_03` for full notes.
-# Always get a professional to check over your code (for security)
+# I've CUT CODE DOWN! @ https://tinyurl.com/cutcodedown-com-minimalist and am
+# not using `/doc` or `/redoc` (much) whose `Annotated[]` and other code just
+# adds needless complexity (and lessens readability). Just use Bruno for now.
+# 
 #
 # Overview
 # --------
+# > See `chapter_02` and `_03` for full notes.
+# > Always get a professional to check over your code (for security)
+#
 # 1. Pydantic helps us validate data
 # 2. `/docs` and `/redoc` for documentation (use Bruno!)
 # 3. `Annotated` is helpful for auto-generated docs (but I'm not using it)
+#     - #! It is useful for adding contstraints, however (min/max length)
 # 4. `response_model` is a "magic" shortcut (response types are better?)
 # 5. Handle errors with `HTTPException` and return the correct `status_code=`
 #
@@ -58,8 +64,16 @@ todo_list = []
 
 @todo_router.post("/todo", status_code=201)
 async def add_todo(todo: ToDo) -> dict:
+    for item in todo_list:
+        if item.id == todo.id:
+            raise HTTPException(
+                status_code=409,
+                detail="To-do with id already exists"
+            )
+
     todo_list.append(todo)
-    return { "message": "To-do added successfully" }
+    return {"message": "To-do added successfully"}
+
 
 # Return the ToDo list without the `:id`
 @todo_router.get("/todo", response_model=ToDoItems)
@@ -69,13 +83,10 @@ async def retrieve_todo() -> dict:
 
 # Return the ToDo _with_ the `:id`
 @todo_router.get("/todo/{id}")
-async def retrieve_single_todo(
-    id: Annotated[int, Path(title="The ID of the to-do to retrieve")]
-    ) -> dict:
+async def retrieve_single_todo(id: int) -> dict:
 
-    if not todo_list: # check if the list is empty
-        # currently returns `200` OK: the WRONG status code!
-        return { "message": "Your to-do list is empty" }
+    if not todo_list:
+        raise HTTPException(status_code=404, detail="To-do list is empty!")
     else:
         for todo in todo_list:
             if todo.id == id:
@@ -89,19 +100,13 @@ async def retrieve_single_todo(
 
 # Update a single ToDo (the first one it finds)
 @todo_router.put("/todo/{id}")
-async def update_single_todo(
-    todo_data: ToDoItem,
-    id: Annotated[int, Path(title="The ID of the to-do to be updated")]
-    ) -> dict:
+async def update_single_todo(todo_data: ToDoItem, id: int) -> dict:
 
     for todo in todo_list:
         if todo.id == id:
             todo.item = todo_data.item # replace with the request body
 
-            return {
-                "message": f"To-do with (:id {id}) updated successfully",
-                "todos": todo_list #! Debugging (don't do this in production!)
-            }
+            return { "message": f"To-do with (:id {id}) updated successfully" }
         
     raise HTTPException(
         status_code=404,
@@ -111,14 +116,11 @@ async def update_single_todo(
 
 # Delete a single ToDo
 @todo_router.delete("/todo/{id}")
-async def delete_single_todo(
-    id: Annotated[int, Path(title="The ID of the to-do to be deleted")]
-    ) -> dict:
+async def delete_single_todo(id: int) -> dict:
     """Uses `.remove()` instead of `.pop()` for readability."""
-
     for todo in todo_list:
         if todo.id == id:
-            todo_list.remove(todo) # remove the to-do
+            todo_list.remove(todo)
 
             return { "message": f"To-do with (:id {id}) deleted successfully" }
         

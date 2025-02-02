@@ -38,6 +38,8 @@ You can rip a lot of this stuff from the book, but put it in very simple terms. 
     - Avoiding malicious code (such as sql/js injection)
 - Errors
     - `raise` (short circuits the rest of the code, throws error)
+- Pydantic
+    - Adding constraints (regex, Annotated, etc)
 
 
 ## Chapter 02: Routing

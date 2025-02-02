@@ -1,0 +1,33 @@
+meta {
+  name: to-do-list-post
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8000/todo
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "id": 1,
+    "item": "Read chapter 02 of the book"
+  }
+}
+
+docs {
+  # To Do
+  
+  > - Keys are case-sensitive
+  > - Converts to pydantic `ToDo`
+  
+  1. Must contain an `"id"` `int`
+  2. Must contain an `"item"` `str`
+  
+  ## 🐞 Bugs
+  
+  - Accepts empty `item` strings
+  - Accepts long `item` strings
+}
