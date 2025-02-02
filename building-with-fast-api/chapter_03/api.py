@@ -17,7 +17,7 @@ from todo import todo_router
 # Notes
 # -----
 # > Always authenticate the user.
-# > Use a login token and CSRF for forms.
+# > Use a login token and CSRF for forms
 # > Don't share secrets online (Github tokens)
 #
 # 1. Beware of duplicates and empty lists

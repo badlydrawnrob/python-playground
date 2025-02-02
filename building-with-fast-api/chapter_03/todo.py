@@ -1,7 +1,7 @@
-from typing import Annotated, List
+from typing import Annotated
 
 from fastapi import APIRouter, Path
-from model import ToDo, Item
+from model import ToDo, ToDoItem, ToDoItems
 
 # ------------------------------------------------------------------------------
 # A very simple to-do app
@@ -20,23 +20,40 @@ from model import ToDo, Item
 # @ http://127.0.0.1:8000/redoc/
 #
 #
-# FastApi types
-# -------------
-# > See `Annotated` for annotated types.
-# > These help us to validate and document our API.
+# FastApi types etc
+# -----------------
+# > `Annotated` is helpful with auto-generated docs
+# > `response_model` is a "magic" shortcut
+# >
+# > Neither are strictly necessary when using Bruno!
 #
-# @ https://tinyurl.com/fast-api-import-path
-# @ https://stackoverflow.com/a/76399911
+# 1. `Annotated` types: help to validate and document API
+#    - @ https://tinyurl.com/fast-api-import-path
+#    - @ https://stackoverflow.com/a/76399911
+# 2. Response types and `response_model=`:
+#    - Return the _actual_ type with a response type, which will be used
+#      to validate the response. You need to _explicitly_ code the return value.
+#    - Use `response_model=` to have FastApi document and validate with
+#      a Pydantic model. This is useful when you want to exclude fields.
+#    - @ https://fastapi.tiangolo.com/tutorial/response-model/
+# 3. Handling errors:
+#    - Doesn't exist, protected pages, insufficient permissions, etc
+#    - @ https://fastapi.tiangolo.com/tutorial/handling-errors/
 # 
 #
-# Learning points
-# ---------------
+# Old Learning points
+# -------------------
 # > Each chapter has it's own useful learning points that students should know.
 #
 # 1. By now you should know what a path, request, query is.
 # 2. You should understand the difference between mutable and immutable data.
 # 3. You should know the difference between `POST`, `GET`, `PUT`, `DELETE`.
 # 4. You should know what Pydantic is and how to use it.
+#
+# New learning points
+# -------------------
+# - `PUT` replaces the resource (e.g: the whole record)
+# - `PATCH` replaces the _value_ (e.g: `{ "name": "new product name" }`)
 #
 #
 # Wishlist
@@ -55,34 +72,24 @@ todo_list = []
 
 
 # Routes -----------------------------------------------------------------------
-# `APIRouter()` instead of `FastAPI()` allows us to create multiple routes
-# instead of only one!
 
 @todo_router.post("/todo")
 async def add_todo(todo: ToDo) -> dict:
     todo_list.append(todo)
     return { "message": "To-do added successfully" }
 
-
-@todo_router.get("/todo")
-async def retrieve_todo() -> List[Item]:
-    """Retrieve all to-do items
-    
-    This is different to the book, as that code doesn't work.
-    """
-    list = []
-
-    for todo in todo_list:
-        list.append(todo.item)
-
-    return list
+# Return the ToDo list without the `:id`
+@todo_router.get("/todo", response_model=ToDoItems)
+async def retrieve_todo() -> dict:
+    return { "todos": todo_list }
 
 
+# Return the ToDo _with_ the `:id`
 @todo_router.get("/todo/{id}")
 async def retrieve_single_todo(
     id: Annotated[int, Path(title="The ID of the to-do to retrieve")]
     ) -> dict:
-    """Retrieve a single to-do"""
+
     if not todo_list: # check if the list is empty
         return { "message": "Your to-do list is empty" }
     else:
@@ -93,29 +100,32 @@ async def retrieve_single_todo(
                 return { "message": f"To-do with (:id {id}) doesn't exist" }
 
 
+# Update a single ToDo (the first one it finds)
 @todo_router.put("/todo/{id}")
 async def update_single_todo(
-    todo_data: Item,
-    id: Annotated[int, Path(title="The ID of the to-do to be updated")] 
+    todo_data: ToDoItem,
+    id: Annotated[int, Path(title="The ID of the to-do to be updated")]
     ) -> dict:
-    """Update a single to-do"""
+
     for todo in todo_list:
         if todo.id == id:
-            todo.item = todo_data # replace with the request body
+            todo.item = todo_data.item # replace with the request body
 
-            return { "message": f"To-do with (:id {id}) updated successfully" }
+            return {
+                "message": f"To-do with (:id {id}) updated successfully",
+                "todos": todo_list #! Debugging (don't do this in production!)
+            }
         
     return { "message": f"To-do with (:id {id}) doesn't exist" }
 
 
+# Delete a single ToDo
 @todo_router.delete("/todo/{id}")
 async def delete_single_todo(
     id: Annotated[int, Path(title="The ID of the to-do to be deleted")]
     ) -> dict:
-    """Delete a single to-do
+    """Uses `.remove()` instead of `.pop()` for readability."""
 
-    Uses `.remove()` instead of `.pop()` for readability.
-    """
     for todo in todo_list:
         if todo.id == id:
             todo_list.remove(todo) # remove the to-do

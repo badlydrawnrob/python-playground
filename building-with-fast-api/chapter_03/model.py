@@ -25,13 +25,16 @@ from typing import List
 # Model ------------------------------------------------------------------------
 # These are what we'll use to validate our `json` requests.
 
-class Item(BaseModel):
-    item: str
-    status: str
-
 class ToDo(BaseModel):
     id: int
-    item: Item
+    item: str
+
+class ToDoItem(BaseModel):
+    item: str
+
 
 # Return type ------------------------------------------------------------------
-# These are what we'll use to validate our `json` responses.
+# These are what we'll use to validate our `json` responses, if needed.
+
+class ToDoItems(BaseModel):
+    todos: List[ToDoItem]

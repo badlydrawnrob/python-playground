@@ -27,6 +27,11 @@ Alongside my general process of: read, make notes (per chapter), condense notes,
 2. Routing (1.6.0 — 1.6.6)
 
 
+## Commands
+
+1. `uv run uvicorn api:app --port 8000 --reload` (or run from `.venv`)
+
+
 ## Tools
 
 You're going to need the following:
@@ -75,10 +80,11 @@ class ToDo(BaseModel):
     }
 ```
 
+### Self documentation
 
-## Commands
+> `/docs` gives a JSON Schema documentation ...
 
-1. `uv run uvicorn api:app --port 8000 --reload` (or run from `.venv`)
+But to implement it looks like messy code. Things like `Annotated[]`, `"json_schema_extra"`, and so on. I'm finding that Bruno is pretty nice to work (as an alternative) with and does most of what I'd need.
 
 
 ## Problems
