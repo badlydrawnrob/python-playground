@@ -77,7 +77,7 @@ todo_list = []
 # We're using Python "magic" in `retrieve_todo`.
 # The "Elm way" would be: @ https://tinyurl.com/fastapi-anti-magic-responsel 
 
-@todo_router.post("/todo")
+@todo_router.post("/todo", status_code=201)
 async def add_todo(todo: ToDo) -> dict:
     todo_list.append(todo)
     return { "message": "To-do added successfully" }
@@ -95,6 +95,7 @@ async def retrieve_single_todo(
     ) -> dict:
 
     if not todo_list: # check if the list is empty
+        # currently returns `200` OK: the WRONG status code!
         return { "message": "Your to-do list is empty" }
     else:
         for todo in todo_list:
@@ -123,7 +124,10 @@ async def update_single_todo(
                 "todos": todo_list #! Debugging (don't do this in production!)
             }
         
-    return { "message": f"To-do with (:id {id}) doesn't exist" }
+    raise HTTPException(
+        status_code=404,
+        detail=f"To-do with (:id {id}) doesn't exist"
+    )
 
 
 # Delete a single ToDo
@@ -139,14 +143,20 @@ async def delete_single_todo(
 
             return { "message": f"To-do with (:id {id}) deleted successfully" }
         
-    return { "message": f"To-do with (:id {id}) doesn't exist" }
+    raise HTTPException(
+        status_code=404,
+        detail=f"To-do with (:id {id}) doesn't exist"
+    )
 
 
 @todo_router.delete("/todo")
 async def delete_all_todos() -> dict:
     """Delete all to-dos"""
     if not todo_list:
-        return { "message": "Your to-do list is already empty" }
+        raise HTTPException(
+            status_code=404,
+            detail=f"To-do list is empty!"
+        )
     else:
         todo_list.clear()
         return { "message": "All to-dos deleted successfully" }

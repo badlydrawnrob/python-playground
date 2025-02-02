@@ -27,6 +27,8 @@ from todo import todo_router
 #
 # Response codes
 # --------------
+# > @ https://umbraco.com/knowledge-base/http-status-codes/
+#
 # Common HTTP status codes include `200` for a successful request, `404` for a
 # request not found, and `500` for a server error. It's important to return the
 # correct status code to avoid confusing the client.
