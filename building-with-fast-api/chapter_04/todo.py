@@ -6,10 +6,16 @@ from model import ToDo, ToDoItem, ToDoItems
 # ------------------------------------------------------------------------------
 # A very simple to-do app
 # ==============================================================================
-# ⚠️ Beware of malicious code and make sure you sanitize the data (`json`) that
-# comes in to the http server. Pydantic helps us validate data. Don't allow anyone
-# to tank your database! Have your code checked over by a professional, and make
-# sure to use the right tools to protect yourself.
+# See `chapter_02` and `_03` for full notes.
+# Always get a professional to check over your code (for security)
+#
+# Overview
+# --------
+# 1. Pydantic helps us validate data
+# 2. `/docs` and `/redoc` for documentation (use Bruno!)
+# 3. `Annotated` is helpful for auto-generated docs (but I'm not using it)
+# 4. `response_model` is a "magic" shortcut (response types are better?)
+# 5. Handle errors with `HTTPException` and return the correct `status_code=`
 #
 #
 # API Documentation
@@ -18,52 +24,25 @@ from model import ToDo, ToDoItem, ToDoItems
 #
 # @ http://127.0.0.1:8000/docs/
 # @ http://127.0.0.1:8000/redoc/
-#
-#
-# FastApi types etc
-# -----------------
-# > `Annotated` is helpful with auto-generated docs
-# > `response_model` is a "magic" shortcut (if both, `response_model` takes priority)
-# >
-# > Neither are strictly necessary when using Bruno!
-#
-# 1. `Annotated` types: help to validate and document API
-#    - @ https://tinyurl.com/fast-api-import-path
-#    - @ https://stackoverflow.com/a/76399911
-# 2. Response types and `response_model=`:
-#    - Return the _actual_ type with a response type, which will be used
-#      to validate the response. You need to _explicitly_ code the return value.
-#    - Use `response_model=` to have FastApi document and validate with
-#      a Pydantic model. This is useful when you want to exclude fields.
-#    - @ https://fastapi.tiangolo.com/tutorial/response-model/
-# 3. Handling errors:
-#    - Doesn't exist, protected pages, insufficient permissions, etc
-#    - @ https://fastapi.tiangolo.com/tutorial/handling-errors/
-#    - @ https://fastapi.tiangolo.com/reference/dependencies/#security
 # 
 #
 # Old Learning points
 # -------------------
-# > Each chapter has it's own useful learning points that students should know.
+# > You (the student) should be able to answer ...
 #
-# 1. By now you should know what a path, request, query is.
-# 2. You should understand the difference between mutable and immutable data.
-# 3. You should know the difference between `POST`, `GET`, `PUT`, `DELETE`.
-# 4. You should know what Pydantic is and how to use it.
-#
-# New learning points
-# -------------------
-# - `PUT` replaces the resource (e.g: the whole record)
-# - `PATCH` replaces the _value_ (e.g: `{ "name": "new product name" }`)
-# - `HTTPException` tells our client what went wrong (with correct status code)
+# 1. What is a: path? request? query?
+# 2. What's the difference between mutable and immutable data?
+# 3. What is a `POST`, `GET`, `PUT`, `DELETE`? (replace resource or update value?)
+# 4. Why is Pydantic useful? How is it used?
 #
 #
 # Wishlist
 # --------
-# 1. Duplicate `:id`s should not be allowed
-# 2. String length: how long?
-# 3. String length: not empty
-# 4. Only partially update `Item` (e.g, the `status` field)
+# 1. Avoid duplicate `:id`s on `POST`
+# 2. Does a request body require `str` length restrictions?
+# 3. Make sure `str` length != empty
+# 4. Only update the `"item"` _value_ (not the entire thing)
+#    - `PUT` -vs- `PATCH` @ https://www.youtube.com/watch?v=s33eVDbsyYM
 
 todo_router = APIRouter()
 
