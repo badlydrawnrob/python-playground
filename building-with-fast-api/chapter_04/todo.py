@@ -1,11 +1,12 @@
-from typing import Annotated
-
-from fastapi import APIRouter, Path, HTTPException, status
+from fastapi import APIRouter, Path, HTTPException, status, Request, Depends
+from fastapi.templating import Jinja2Templates
 from model import ToDo, ToDoItem, ToDoItems
 
 # ------------------------------------------------------------------------------
 # A very simple to-do app
 # ==============================================================================
+# 🚀 See @ commit `1.8.1` for `json` only version (without Jinja templates)
+# 
 # I've CUT CODE DOWN! @ https://tinyurl.com/cutcodedown-com-minimalist and am
 # not using `/doc` or `/redoc` (much) whose `Annotated[]` and other code just
 # adds needless complexity (and lessens readability). Just use Bruno for now.
@@ -32,6 +33,18 @@ from model import ToDo, ToDoItem, ToDoItems
 # @ http://127.0.0.1:8000/redoc/
 # 
 #
+# New learning points
+# -------------------
+# > ⚠️ Jinja setup is a bit verbose and ugly. Just use Elm lang?
+# > Jinja templates are quite simple: `if`, loops, flters, functions, etc.
+#
+# 1. The book uses Bootstrap framework, but I'll use Pico CSS.
+# 2. You'll need to understand `Request` and `Depends` for Jinja templates.
+#    - @ https://fastapi.tiangolo.com/advanced/using-request-directly/
+#    - @ https://tinyurl.com/fastapi-what-is-depends
+#    - @ https://fastapi.tiangolo.com/tutorial/request-forms/#about-form-fields
+#
+#
 # Old Learning points
 # -------------------
 # > You (the student) should be able to answer ...
@@ -57,13 +70,20 @@ todo_router = APIRouter()
 
 todo_list = []
 
+# Templates --------------------------------------------------------------------
+
+templates = Jinja2Templates(directory="templates")
+
 
 # Routes -----------------------------------------------------------------------
 # We're using Python "magic" in `retrieve_todo`.
 # The "Elm way" would be: @ https://tinyurl.com/fast-api-anti-magic-response 
 
 @todo_router.post("/todo", status_code=201)
-async def add_todo(todo: ToDo) -> dict:
+async def add_todo(
+        request: Request,
+        todo: ToDo = Depends(ToDo.as_form)
+    ) -> dict:
     for item in todo_list:
         if item.id == todo.id:
             raise HTTPException(
@@ -71,31 +91,42 @@ async def add_todo(todo: ToDo) -> dict:
                 detail="To-do with id already exists"
             )
 
-    todo_list.append(todo)
-    return {"message": "To-do added successfully"}
+    todo.id = len(todo_list) + 1 # increment the `:id`
+    todo_list.append(todo) # add the new to-do
+
+    return templates.TemplateResponse("todo.jinja", {
+        "request": request,
+        "todos": todo_list
+    })
 
 
 # Return the ToDo list without the `:id`
 @todo_router.get("/todo", response_model=ToDoItems)
-async def retrieve_todo() -> dict:
-    return { "todos": todo_list }
+async def retrieve_todo(request: Request) -> dict:
+    return templates.TemplateResponse("home.jinja", {
+        "request": request,
+        "todos": todo_list
+    })
 
 
 # Return the ToDo _with_ the `:id`
 @todo_router.get("/todo/{id}")
-async def retrieve_single_todo(id: int) -> dict:
+async def retrieve_single_todo(request: Request, id: int) -> dict:
 
     if not todo_list:
         raise HTTPException(status_code=404, detail="To-do list is empty!")
     else:
         for todo in todo_list:
             if todo.id == id:
-                return { "todo": todo }
-            else:
-                raise HTTPException(
-                    status_code=404,
-                    detail=f"To-do with (:id {id}) doesn't exist"
-                )
+                return templates.TemplateResponse("todo.jinja", {
+                    "request": request,
+                    "todos": todo
+                })
+                    
+        raise HTTPException(
+            status_code=404,
+            detail=f"To-do with (:id {id}) doesn't exist"
+        )
 
 
 # Update a single ToDo (the first one it finds)
