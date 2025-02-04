@@ -26,6 +26,9 @@ Alongside my general process of: read, make notes (per chapter), condense notes,
 1. Hello World
 2. Routing (1.6.0 — 1.6.6)
 3. Response models and error handling (1.7.0 — 1.7.4)
+4. Templating with Jinja (1.8.0 — 1.8.2)
+    — **1.8.1** for `json` version.
+5. Structuring FastApi applications
 
 
 ## Commands
@@ -56,6 +59,15 @@ You're going to need the following:
 
 > I really don't want to use Python's OOP style very much.
 > The book is a bit sloppy in places with conflicting instructions.
+
+1. `json` is preferrable to `.jinja` (at scale)[^4] (just use Elm?)
+2. Try to avoid "magic" Python that isn't transferable
+    - Features like `@classmethod`, `response_model=` are handy but not portable
+3. Aim to keep your models, SQL, data, and code as simple as possible
+    - If you're unsure about something, possibly best to leave it out.
+
+
+## Elm -vs- Python
 
 Whereas Elm has a central `Model` (generally) to work from and uses modules and functions, Python has instances of classes which (I think) are stateful. It feels like Python adds a whole lot of mess to the code base.
 
@@ -117,3 +129,5 @@ But to implement it looks like messy code. Things like `Annotated[]`, `"json_sch
 [^2]: There's two ways to do this. Either call `uvicorn subfolder.file:app` and make sure your modules use `from subfolder.file` names, OR `cd` into the correct folder and run Uvicorn from there!
 
 [^3]: I find Postman too flippin' complicated to use. Insomnia is another option.
+
+[^4]: `jinja` code adds a bit more complexity to your API code. Seems great for small setups but could prove a liability with complicated forms and UI. For now, handle most of the complexity with Elm lang and look into HTMX or static site generators for blog posts and FAQs. Possibly handle `User` admin with FastApi.
