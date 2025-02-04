@@ -1,0 +1,28 @@
+{% extends "home.jinja" %}
+{% block todo_container %}
+<form method="post">
+    <input type="text" name="item" value="{{ item }}" placeholder="Add a to-do">
+    <button type="submit">Submit</button>
+</form>
+
+<section>
+    {# The singular `json` key name #}
+    {% if todo %}
+        <h2>ID: {{ todo.id }}</h2>
+        <p>Item: {{ todo.item }}</p>
+    {% else %}
+    {# The plural `json` key name (could be better named) #}
+    <ul>
+    {% for todo in todos %}
+        {# The book uses `loop.index` not `.id` #}
+        <li>
+            <a href="/todo/{{ todo.id }}">ID: {{ todo.id }}</a>
+            <ul>
+                <li>Item: {{ todo.item }}</li>
+            </ul>
+        </li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+</section>
+{% endblock %}
