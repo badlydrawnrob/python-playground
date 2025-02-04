@@ -40,9 +40,17 @@ You can rip a lot of this stuff from the book, but put it in very simple terms. 
     - `raise` (short circuits the rest of the code, throws error)
 - Pydantic
     - Adding constraints (regex, Annotated, etc)
+- **Structuring applications**
+    - And best practices for comments, packages, etc
+    - To an intermediate level.
 
 
-## Chapter 02: Routing
+## Setup
+
+1. `requirements.txt`
+2. `uv` basic commands
+
+## Routing
 
 > You can use an app like Bruno instead of Curl.
 > Here's some [curl usage commands](https://gist.github.com/subfuzion/08c5d85437d5d4f00e58#curl-usage).
