@@ -12,8 +12,10 @@
 2. Ai generated flashcards (human in the loop)
 3. Memorable examples (storify)
 4. Readability (simple language, <s>academic writing</s>)
+    - Personally I find code hard to read at scale ...
+    - Or when each function has lots going on (multi-coloured!)
 
-Alongside my general process of: read, make notes (per chapter), condense notes, talk to your Ai study partner, generate flashcards, files or programs. For now, I'll limit the Ai to only giving me a fun example of the code (and not structuring the full Anki card's field data).
+Limit Ai to give a fun example of the code (block), with a view to create cards later, as well as clarifying things as a study partner. My general process is: read, make notes (per chapter), condense notes, generate flashcards, files and programs. Creating a small series of books could come later.
 
 "Give me a fun example for scaffolded learning on ____"
 "Give it to me as [draw!, missing, simple] data"
