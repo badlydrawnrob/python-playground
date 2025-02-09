@@ -9,7 +9,9 @@ from models.users import User, UserSign
 #
 # Questions
 # ---------
-# 1. What is `tags=` for?
+# 1. `tags=` is used for `/redoc` ...
+#    - It splits up your menu for each route type
+#    - Probably worthwhile adding, even if you're using Bruno
 
 user_router = APIRouter(
     tags=["User"]

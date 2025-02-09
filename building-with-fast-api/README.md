@@ -67,6 +67,10 @@ You're going to need the following:
 > A great API test kit for Mac.
 > Much simpler than the alternatives (IMO)
 
+The only _downsides_ to using Bruno is **you've got to manually write your documentation and tests**. FastApi comes with `/docs` and `/redoc` which are pretty handy, but the API testing isn't as nice. However, doing things in Bruno means we can easily switch to a different API framework and keep all our tests in place.
+
+- Import `openapi.json` to a new collection
+
 [Rest Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client), [Postman](https://www.postman.com/)[^3], and [Insomnia](https://insomnia.rest/) are other options.
 
 
