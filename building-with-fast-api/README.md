@@ -30,7 +30,7 @@ Limit Ai to give a fun example of the code (block), with a view to create cards 
 3. Response models and error handling (1.7.0 — 1.7.4)
 4. Templating with Jinja (1.8.0 — 1.8.2)
     — **1.8.1** for `json` version
-5. Structuring FastApi applications (1.9.0 — ...)
+5. Structuring FastApi applications (1.9.0 — 1.9.1)
 
 
 ## Commands
