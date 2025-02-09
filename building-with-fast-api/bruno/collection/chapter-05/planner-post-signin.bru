@@ -1,0 +1,24 @@
+meta {
+  name: planner-post-signin
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8000/user/signin
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "fastapi@packt.com",
+    "password": "strong!!!"
+  }
+}
+
+docs {
+  # Sign in
+  
+  This is a slight difference from `User()` as we only need `email` and `password`.
+}

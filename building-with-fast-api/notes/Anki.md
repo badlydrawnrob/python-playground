@@ -2,6 +2,16 @@
 
 There's quite a lot of minor (and perhaps major) errors in this book, so you've got to take care to double check the code's validity.
 
+## Notes
+
+1. For some examples, better to have a snippet ...
+    - And link to the full file examples (e.g: `Msg` unpacking `Maybe` once)
+    - This assures that the card viewing experience is pleasant, without too much awkward scrolling etc ... but may mean viewing on desktop instead.
+2. If you already know something reasonably well (and have study notes) ...
+    - It's OK to skip it and let the code speak for itself.
+    - However, if you forget in future, a link to notes would be helpful.
+
+
 ## Terminology
 
 > The difference between Elm type modules,

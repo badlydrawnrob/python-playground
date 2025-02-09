@@ -29,13 +29,26 @@ Limit Ai to give a fun example of the code (block), with a view to create cards 
 2. Routing (1.6.0 — 1.6.6)
 3. Response models and error handling (1.7.0 — 1.7.4)
 4. Templating with Jinja (1.8.0 — 1.8.2)
-    — **1.8.1** for `json` version.
-5. Structuring FastApi applications
+    — **1.8.1** for `json` version
+5. Structuring FastApi applications (1.9.0 — ...)
 
 
 ## Commands
 
 1. `uv run uvicorn api:app --port 8000 --reload` (or run from `.venv`)
+
+
+## Errata
+
+> There's a lot of small mistakes and continuity errors
+> **The general rule is BE CONSISTENT!**
+
+For example, pg.131:
+
+1. `NewUser` model is mentioned but not created.
+2. `User` fields are not yet used
+3. `User.username` is used (`curl` example) but not created
+4. `users.py` is referred to as `user.py`
 
 
 ## Tools
