@@ -7,7 +7,8 @@ from typing import List
 # ==============================================================================
 # Once again `response_model=` (seems) to be used when we want a different
 # response back from the server than the input json body ... for example,
-# removing sensitive data from the response.
+# removing sensitive data from the response. We're now using SQLModel (or MongoDB)
+# to format our `Event` models.
 #
 # Questions
 # ---------

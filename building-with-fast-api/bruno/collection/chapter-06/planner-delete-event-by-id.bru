@@ -1,0 +1,21 @@
+meta {
+  name: planner-delete-event-by-id
+  type: http
+  seq: 6
+}
+
+delete {
+  url: http://localhost:8000/event/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 1
+}
+
+docs {
+  # Event
+  
+  > `DELETE` by `:id`
+}

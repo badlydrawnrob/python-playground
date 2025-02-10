@@ -50,6 +50,11 @@ For example, pg.131:
 3. `User.username` is used (`curl` example) but not created
 4. `users.py` is referred to as `user.py`
 
+Also 
+
+1. Make sure any required dependencies are introduced clearly!
+    - `SQLModel` is imported, but no download is mentioned.
+
 
 ## Tools
 
