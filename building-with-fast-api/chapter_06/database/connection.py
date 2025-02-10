@@ -10,6 +10,8 @@ from models.events import Event
 # ---------
 # 1. What is `"check_same_thread"`?
 # 2. VISUALLY explain `create_engine()`, `conn()`, and `get_session()`
+# 3. What does `session.refresh()` do?
+#     - It seems to need an object (I'm so out of touch with OOP!)
 
 # File location ----------------------------------------------------------------
 

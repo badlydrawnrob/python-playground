@@ -1,5 +1,8 @@
-from fastapi import APIRouter, Body, HTTPException, status
-from models.events import Event
+from fastapi import APIRouter, Body, Depends, HTTPException, Request, status
+
+from database.connection import get_session
+from models.events import Event, EventUpdate
+
 from typing import List
 
 # ------------------------------------------------------------------------------
@@ -15,12 +18,24 @@ from typing import List
 # 1. Why would we use `response_model=` when we already have a response type?
 #    - I think that FastApi will always prioritise the `response_model=`
 # 2. What is `Body()` and how does it work?
+#    - ⚠️ `Body()` here is not necessary as we're already using Pydantic model
+#    - @ https://stackoverflow.com/a/56996770
+#    - @ https://fastapi.tiangolo.com/tutorial/body/
+# 3. What do `Depends()` and `Request()` do?
+#    - The dependency condition (the function) must be satisfied before any
+#      operation can be executed.
+#    - Basically (what I think this means is) that an session MUST be opened,
+#      before any of the function code can be executed.
+# 4. Lookup path, query, and request parameters:
+#    - To understand things like `session=` and `response_model=`
+#    - @ https://gpttutorpro.com/fastapi-basics-path-parameters-query-parameters-and-request-body/
 
 event_router = APIRouter(
     tags=["Events"]
 )
 
 # Events DB --------------------------------------------------------------------
+# 📆 We start to use a PROPER `Event` table for our storage. See `models.events`!
 
 events = []
 
@@ -41,8 +56,13 @@ async def retrieve_event(id: int) -> Event:
     raise HTTPException(status_code=404, detail=f"Event with {id} doesn't exist")
 
 @event_router.post("/new")
-async def create_event(body: Event = Body()) -> dict:
-    events.append(body)
+async def create_event(
+    body: Event = Body(), #! Body() is not needed here (see notes)
+    session=Depends(get_session) #! I think this is a named attribute?
+    ) -> dict:
+    session.add(body)     # Pull object
+    session.commit()      # Commit and FLUSH
+    session.refresh(body) #! Refresh the database? How does this work?
 
     return { "message": "Event created successfully" }
 

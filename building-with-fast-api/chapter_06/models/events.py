@@ -13,15 +13,17 @@ from typing import List, Optional
 # ---------
 # > Questions on SQL and the model (how does it look?)
 #
-# 1. What does `table=` parameter do?
-# 2. What does `sa_column=` do?
-# 3. What do our fields, such as `id` look like now?
-# 4. Is it wise to make `id` column `Optional`? (NO!)
-# 5. In which order should fields be? (ABC versus POSITIONAL)
-# 6. What is the difference between columns and fields?
+# 1. Do Pydantic fields need to be in a specific order? (NO!)
+# 2. What does `table=` parameter do?
+# 3. What does `sa_column=` do?
+# 4. What do our fields, such as `id` look like now?
+# 5. Is it wise to make `id` column `Optional`? (NO!)
+# 6. In which order should fields be? (ABC versus POSITIONAL)
+# 7. What is the difference between columns and fields?
 #    - @ https://tinyurl.com/sql-fields-vs-columns (dba.stackexchange)
-# 7. Does `session` automatically open/close the session?
+# 8. Does `session` automatically open/close the session?
 #    - `.commit()` is responsible for FLUSHING transactions (in the session)
+# 9. What does `session.refresh()` do?
 
 class Event(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True) # unique identifier

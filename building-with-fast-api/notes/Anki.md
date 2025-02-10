@@ -23,8 +23,9 @@ You can rip a lot of this stuff from the book, but put it in very simple terms. 
 - Basic Git terminology
 - Declaration order (Python nested class requires a strict order)
 - Returning values (unlike Elm you must `return value` or else `None`)
-- Lists and mutability (the functions will change the `list` instance)
+- **Lists and mutability** (the functions will change the `list` instance)
     - We NEVER have to worry about this in Elm Lang.
+- **Python [named keyword arguments](https://treyhunner.com/2018/04/keyword-arguments-in-python/)**
 - A class instance (such as `FastAPI()`)
     - FastApi implicitly builds the `ToDo(attributes="...")` class
     - Path(..., KWARGS) and [what the fuck is ellipses](https://tinyurl.com/pydantic-wtf-is-elipsis)?
@@ -48,8 +49,9 @@ You can rip a lot of this stuff from the book, but put it in very simple terms. 
     - Avoiding malicious code (such as sql/js injection)
 - Errors
     - `raise` (short circuits the rest of the code, throws error)
-- Pydantic
+- [Pydantic](https://medium.com/@marcnealer/a-practical-guide-to-using-pydantic-8aafa7feebf6)
     - Adding constraints (regex, Annotated, etc)
+    - Are named arguments order dependant?
 - **Structuring applications**
     - And best practices for comments, packages, etc
     - To an intermediate level.

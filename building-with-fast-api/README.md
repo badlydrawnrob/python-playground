@@ -9,11 +9,14 @@
 > Watch out for Ai hallucinations!
 
 1. Copilot and ChatGPT (it works!)
-2. Ai generated flashcards (human in the loop)
-3. Memorable examples (storify)
-4. Readability (simple language, <s>academic writing</s>)
+2. **Ai generated flashcards** (human in the loop)
+3. **Memorable examples (storify)**
+4. **Readability** (simple language, <s>academic writing</s>)
     - Personally I find code hard to read at scale ...
     - Or when each function has lots going on (multi-coloured!)
+5. **RRReduce the amount you learn** (or teach)
+    - **The Python learning journey is f* endless ...**
+    - Some things can be "they just are" without asking WHY.
 
 Limit Ai to give a fun example of the code (block), with a view to create cards later, as well as clarifying things as a study partner. My general process is: read, make notes (per chapter), condense notes, generate flashcards, files and programs. Creating a small series of books could come later.
 
@@ -54,6 +57,8 @@ Also
 
 1. Make sure any required dependencies are introduced clearly!
     - `SQLModel` is imported, but no download is mentioned.
+2. Some "upgrades", such as ~~`@app.on_event("startup")`~~ take time to learn
+    - The app lifecycle, for example, requires [understanding](https://github.com/PacktPublishing/Building-Python-Web-APIs-with-FastAPI/issues/12#issue-2843134599) of `contextlib`.
 
 
 ## Tools
