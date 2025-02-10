@@ -17,6 +17,7 @@
 5. **RRReduce the amount you learn** (or teach)
     - **The Python learning journey is f* endless ...**
     - Some things can be "they just are" without asking WHY.
+    - Stay in the shallows? Deep dive? It depends.
 
 Limit Ai to give a fun example of the code (block), with a view to create cards later, as well as clarifying things as a study partner. My general process is: read, make notes (per chapter), condense notes, generate flashcards, files and programs. Creating a small series of books could come later.
 
