@@ -5,9 +5,9 @@ from models.events import Event
 # ------------------------------------------------------------------------------
 # Our USER model
 # ==============================================================================
-# Here we'll set our user model, which has a `User.Events` column, to list all
+# ~~Here we'll set our user model, which has a `User.Events` column, to list all
 # the events attached to that specific user. We have a couple of types, depending
-# on the situation (for example, sign-in form). We could also create a separate
+# on the situation (for example, sign-in form).~~ We could also create a separate
 # `User` model for the `response_model=` in our routes, to hide the `password`.
 #
 # Questions
@@ -18,10 +18,4 @@ from models.events import Event
 
 class User(BaseModel):
     email: EmailStr # A custom type for emails
-    password: str
-    events: Optional[List[Event]] # Empty by default, currently not used
-
-# For `sign-up` and `sign-in`
-class UserSign(BaseModel):
-    email: EmailStr
     password: str

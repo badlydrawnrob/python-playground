@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, status
-from models.users import User, UserSign
+from models.users import User
 
 # ------------------------------------------------------------------------------
 # Our USERS routes
@@ -27,7 +27,7 @@ users = {}
 # for both, rather than creating separate models for `sign-up` and `sign-in`.
 
 @user_router.post("/signup")
-async def sign_new_user(data: UserSign) -> dict:
+async def sign_new_user(data: User) -> dict:
     if data.email in users:
         raise HTTPException(status_code=409, detail="Username already exists")
 
@@ -35,7 +35,7 @@ async def sign_new_user(data: UserSign) -> dict:
     return { "message": "User registered!" }
 
 @user_router.post("/signin")
-async def sign_in_user(user: UserSign) -> dict:
+async def sign_in_user(user: User) -> dict:
     # Check if `UserSign().email` is in the `users` dictionary
     # You could also use `if _ or _` here!
     if user.email not in users:
