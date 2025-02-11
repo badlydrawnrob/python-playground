@@ -50,7 +50,7 @@ event_router = APIRouter(
 # Events DB --------------------------------------------------------------------
 # 📆 We start to use a PROPER `Event` table for our storage. See `models.events`!
 
-events = []
+# events = []
 
 # Routes -----------------------------------------------------------------------
 # != See `chapter_03` for full checks. We're ignoring some checks here, such
@@ -104,18 +104,23 @@ async def update_event(id: int, data: EventUpdate, session=Depends(get_session))
     return event
 
 @event_router.delete("/{id}")
-async def delete_event(id: int) -> dict:
-    for event in events:
-        if event.id == id:
-            events.remove(event)
-            return { "message": f"Event with {id} deleted" }
-    
-    raise HTTPException(status_code=404, detail=f"Event with {id} does not exist")
+async def delete_event(id: int, session=Depends(get_session)) -> dict:
+    event = session.get(Event, id)
+    if event:
+        session.delete(event)
+        session.commit()
+        return {
+            "message": f"Event with ID: {id} has been deleted!"
+        }
+    raise HTTPException(
+        status_code=404,
+        detail=f"Event with supplied ID {id} does not exist"
+    )
 
-@event_router.delete("/")
-async def delete_all_events() -> dict:
-    if len(events) == 0:
-        raise HTTPException(status_code=404, detail="Event list already empty")
+# @event_router.delete("/")
+# async def delete_all_events() -> dict:
+#     if len(events) == 0:
+#         raise HTTPException(status_code=404, detail="Event list already empty")
     
-    events.clear()
-    return { "message": "Events deleted successfully" }
+#     events.clear()
+#     return { "message": "Events deleted successfully" }
