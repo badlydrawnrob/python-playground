@@ -33,7 +33,11 @@ from typing import List
 #    - To understand things like `session=` and `response_model=`
 #    - @ https://gpttutorpro.com/fastapi-basics-path-parameters-query-parameters-and-request-body/
 # 5. `data.dict` is deprecated, but what's `exclude_unset=`?
+#    - THE EXAMPLE DOCUMENTATION USES `PATCH`, so just use `PATCH`!
+#    - See @ https://sqlmodel.tianglo.com/tutorial/fastapi/update
 #    - `setattr()` also needs explaining, as does it's params
+# 6. #! The example code folders use `await` keyword.
+#    - Is this a necessity?
 #
 # Bugs
 # ----
@@ -84,20 +88,20 @@ async def create_event(
 
     return { "message": "Event created successfully" }
 
-@event_router.put("/edit/{id}") # I've removed the `response_model=` here
+#! You could also use `PATCH` here (which might be preferrable partial updates)
+@event_router.patch("/edit/{id}", response_model=Event)
 async def update_event(id: int, data: EventUpdate, session=Depends(get_session)) -> Event:
-    event = session.get(Event, id)
-    if event:
-        event_data: data.dict(exclude_unset=True) # What's this?
-        for key, value in event_data.items(): # The fields in the row I guess
-            setattr(event, key, value)
-        session.add(event)
-        session.commit()
-        session.refresh(event)
-    raise HTTPException(
-        status_code=404,
-        detail=f"Event with supplied ID: {id} does not exist"
-    )
+    event = session.get(Event, id) # We use the `Event` model to GET the event from DB ...
+    # See tag `1.10.4` for deprecated version
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found!")
+    event_data = data.model_dump(exclude_unset=True) # Our `EventUpdate` body
+    event.sqlmodel_update(event_data) # Update `Event` with `EventUpdate` data
+    session.add(event)
+    session.commit()
+    session.refresh(event)
+    # Make sure you return something or you'll get `Internal Server Error`
+    return event
 
 @event_router.delete("/{id}")
 async def delete_event(id: int) -> dict:

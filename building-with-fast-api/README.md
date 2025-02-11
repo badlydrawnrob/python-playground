@@ -61,6 +61,10 @@ Also
 2. Some "upgrades", such as ~~`@app.on_event("startup")`~~ take time to learn
     - The app lifecycle, for example, requires [understanding](https://github.com/PacktPublishing/Building-Python-Web-APIs-with-FastAPI/issues/12#issue-2843134599) of `contextlib`.
 
+### Watch out for silly errors
+
+1. **Not adding `:id`** to the Bruno path parameters (getting `method not allowed`)
+
 
 ## Tools
 

@@ -47,7 +47,7 @@ class Event(SQLModel, table=True):
 # session.commit()
 
 class EventUpdate(SQLModel): # Not a table
-    # no id field?
+    # NO ID FIELD REQUIRED (this is supplied in the `:id` url)
     title: Optional[str]
     image: Optional[str]
     description: Optional[str]

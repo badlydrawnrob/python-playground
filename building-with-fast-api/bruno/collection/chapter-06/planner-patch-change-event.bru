@@ -1,22 +1,21 @@
 meta {
-  name: planner-put-change-event
+  name: planner-patch-change-event
   type: http
   seq: 4
 }
 
-put {
+patch {
   url: http://localhost:8000/event/edit/:id
   body: json
   auth: none
 }
 
 params:path {
-  id: 
+  id: 1
 }
 
 body:json {
   {
-    "id": 1,
     "title": "Packt's FastApi book launch 2",
     "image": "fastapi-book.jpeg",
     "description": "The launch of the FastApi book will hold on xyz.",
@@ -31,4 +30,10 @@ docs {
   > All fields here are **optional**!
   
   Update an event if `:id` exists
+  
+  ## 🐞 Bugs
+  
+  In the book it uses `PUT` and a deprecate method of `data.dict`. That won't work anymore.
+  
+  
 }
