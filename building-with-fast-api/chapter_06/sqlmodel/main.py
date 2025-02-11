@@ -8,7 +8,7 @@ from routes.events import event_router
 import uvicorn
 
 # ------------------------------------------------------------------------------
-# A PLANNER app
+# A PLANNER app (SQLModel)
 # ==============================================================================
 # See earlier chapters for full instructions on FastApi etc. Now we have our app
 # architecture sorted, it's time to set up an ORM, our SQL database, and allow

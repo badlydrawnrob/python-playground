@@ -37,7 +37,7 @@ Limit Ai to give a fun example of the code (block), with a view to create cards 
 5. Structuring FastApi applications (1.9.0 — 1.9.1)
 6. Working with the database
     - SQLModel (1.10.0 — 1.10.6)
-    - MongoDB (...)
+    - ~~MongoDB~~[^2] (I'm sticking with SQLite)
 
 
 ## Commands
@@ -149,7 +149,7 @@ But to implement it looks like messy code. Things like `Annotated[]`, `"json_sch
 3. **`uvicorn` command [won't run](https://stackoverflow.com/a/69322150)**
     - Preface it with `uv run` (equivalent to `python -m`)
     - Or, make sure you've `source .venv/bin/activate`d your environment
-    - Also take care with modules, folders, and names.[^2]
+    - Also take care with modules, folders, and names.[^5]
 4. **`uvicorn` doesn't [allow secure `https`](https://www.uvicorn.org/deployment/#running-with-https)** (by default)
 5. Using Thonny as an IDE
     - I can get the version of Python running but the other stuff is harder
@@ -163,8 +163,10 @@ But to implement it looks like messy code. Things like `Annotated[]`, `"json_sch
 
 [^1]: "I would not recommend using directory names in `.python-version` files or using a custom virtual environment name in a project."
 
-[^2]: There's two ways to do this. Either call `uvicorn subfolder.file:app` and make sure your modules use `from subfolder.file` names, OR `cd` into the correct folder and run Uvicorn from there!
+[^2]: MongoDB is a an arse to setup (especially for beginners), more hassle than SQLite (and possibly Postgres easier also). The code in chapters `06`/`07` and above also starts to get Pythonic (class methods rather than functional style) and I see diminishing returns from learning in the MongoDB style.
 
 [^3]: I find Postman too flippin' complicated to use. Insomnia is another option.
 
 [^4]: `jinja` code adds a bit more complexity to your API code. Seems great for small setups but could prove a liability with complicated forms and UI. For now, handle most of the complexity with Elm lang and look into HTMX or static site generators for blog posts and FAQs. Possibly handle `User` admin with FastApi.
+
+[^5]: There's two ways to do this. Either call `uvicorn subfolder.file:app` and make sure your modules use `from subfolder.file` names, OR `cd` into the correct folder and run Uvicorn from there!

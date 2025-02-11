@@ -1,0 +1,24 @@
+meta {
+  name: planner-mongo-get
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://localhost:8000/
+  body: none
+  auth: none
+}
+
+body:json {
+  {
+    "email": "fastapi@packt.com",
+    "password": "strong!!!"
+  }
+}
+
+docs {
+  # MongoDB
+  
+  I've decided to not continue with this books examples of Mongo going forward. I will adapt the examples as best as I can with SQLite.
+}
