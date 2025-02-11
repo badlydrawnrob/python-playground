@@ -35,6 +35,9 @@ Limit Ai to give a fun example of the code (block), with a view to create cards 
 4. Templating with Jinja (1.8.0 — 1.8.2)
     — **1.8.1** for `json` version
 5. Structuring FastApi applications (1.9.0 — 1.9.1)
+6. Working with the database
+    - SQLModel (1.10.0 — 1.10.6)
+    - MongoDB (...)
 
 
 ## Commands
