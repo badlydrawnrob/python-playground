@@ -32,6 +32,8 @@ from typing import List
 # 4. Lookup path, query, and request parameters:
 #    - To understand things like `session=` and `response_model=`
 #    - @ https://gpttutorpro.com/fastapi-basics-path-parameters-query-parameters-and-request-body/
+# 5. `data.dict` is deprecated, but what's `exclude_unset=`?
+#    - `setattr()` also needs explaining, as does it's params
 #
 # Bugs
 # ----
@@ -81,6 +83,21 @@ async def create_event(
     session.refresh(body) #! Refresh the database? How does this work?
 
     return { "message": "Event created successfully" }
+
+@event_router.put("/edit/{id}") # I've removed the `response_model=` here
+async def update_event(id: int, data: EventUpdate, session=Depends(get_session)) -> Event:
+    event = session.get(Event, id)
+    if event:
+        event_data: data.dict(exclude_unset=True) # What's this?
+        for key, value in event_data.items(): # The fields in the row I guess
+            setattr(event, key, value)
+        session.add(event)
+        session.commit()
+        session.refresh(event)
+    raise HTTPException(
+        status_code=404,
+        detail=f"Event with supplied ID: {id} does not exist"
+    )
 
 @event_router.delete("/{id}")
 async def delete_event(id: int) -> dict:

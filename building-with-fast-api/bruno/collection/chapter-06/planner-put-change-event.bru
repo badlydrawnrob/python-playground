@@ -1,0 +1,34 @@
+meta {
+  name: planner-put-change-event
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://localhost:8000/event/edit/:id
+  body: json
+  auth: none
+}
+
+params:path {
+  id: 
+}
+
+body:json {
+  {
+    "id": 1,
+    "title": "Packt's FastApi book launch 2",
+    "image": "fastapi-book.jpeg",
+    "description": "The launch of the FastApi book will hold on xyz.",
+    "tags": ["elm", "js"],
+    "location": "Laneway"
+  }
+}
+
+docs {
+  # Event
+  
+  > All fields here are **optional**!
+  
+  Update an event if `:id` exists
+}
