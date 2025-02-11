@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Body, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Body, Depends, HTTPException, Request
 
 from database.connection import get_session
 from models.events import Event, EventUpdate
+from sqlmodel import select
 
 from typing import List
 
@@ -22,13 +23,19 @@ from typing import List
 #    - @ https://stackoverflow.com/a/56996770
 #    - @ https://fastapi.tiangolo.com/tutorial/body/
 # 3. What do `Depends()` and `Request()` do?
+#    - Show how `Depends()` creates the `session=` and explain `yield`
 #    - The dependency condition (the function) must be satisfied before any
 #      operation can be executed.
 #    - Basically (what I think this means is) that an session MUST be opened,
 #      before any of the function code can be executed.
+#    - Is there a more functional way of doing this?
 # 4. Lookup path, query, and request parameters:
 #    - To understand things like `session=` and `response_model=`
 #    - @ https://gpttutorpro.com/fastapi-basics-path-parameters-query-parameters-and-request-body/
+#
+# Bugs
+# ----
+# 1. Duplicate `:id`s cause errors with SQL `POST`
 
 event_router = APIRouter(
     tags=["Events"]
@@ -42,18 +49,27 @@ events = []
 # Routes -----------------------------------------------------------------------
 # != See `chapter_03` for full checks. We're ignoring some checks here, such
 # as `[]` empty events, if event `id` is a duplicate, and so on.
+#
+# 1. Use `Depends()` to create a session
+# 2. Use Pydantic to format the `Event` model
+# 3. Add an `Event` and `.commit()` it to the database (make sure to `.refresh()`)
+# 4. Grab all `Event`s with a `SELECT` statement with `session.exec()`
 
 @event_router.get("/", response_model=List[Event])
-async def retrieve_all_events() -> List[Event]:
+async def retrieve_all_events(session=Depends(get_session)) -> List[Event]:
+    statement = select(Event) #! The SQL statement, 'SELECT * FROM Event' I think?
+    events = session.exec(statement).all() # Execute the statement within session (all rows?)
     return events
 
 @event_router.get("/{id}", response_model=Event)
-async def retrieve_event(id: int) -> Event:
-    for event in events:
-        if event.id == id:
-            return event
-    
-    raise HTTPException(status_code=404, detail=f"Event with {id} doesn't exist")
+async def retrieve_event(id: int, session=Depends(get_session)) -> Event:
+    event = session.get(Event, id)
+    if event:
+        return event
+    raise HTTPException(
+        status_code=404,
+        detail=f"Event with ID: {id} does not exist"
+    )
 
 @event_router.post("/new")
 async def create_event(
