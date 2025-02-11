@@ -24,6 +24,8 @@ Limit Ai to give a fun example of the code (block), with a view to create cards 
 "Give me a fun example for scaffolded learning on ____"
 "Give it to me as [draw!, missing, simple] data"
 
+It's safe to say I'm not comfortable with backend and servers, so I want my experience and pleasant and simple as possible. SQLite is reasonable simple to use.
+
 
 ## Chapters
 
