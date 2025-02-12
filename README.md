@@ -78,7 +78,7 @@ niceTypes =
 ```
 
 
-## The compiler
+## The compiler
 
 > Elm catches most bugs before they make you crazy ...
 > Python, well, doesn't:
