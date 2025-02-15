@@ -102,12 +102,20 @@ The only _downsides_ to using Bruno is **you've got to manually write your docum
 
 ### SQLite
 
+> My general opinion is:
+> - Simple is better
+> - Smaller is better
+> - Less is better (dependencies)
+> - Human readable is better (docs)
+> - Boring is better (in general, stable)
+
 1. How do I generate [`UUID`](https://iifx.dev/en/articles/101721447)s (and what about performance?)
 2. How do I load secrets and [environment variables](https://stackoverflow.com/a/45267398)? with [Pydantic](https://docs.pydantic.dev/latest/concepts/pydantic_settings/#usage)?
     - I think SQLite setup is a lot easier than Postgres
 3. Is async desirable with SQLite? (NEVER pre-optimise, wait until there's a need)
     - The package is now deprecated, but there are 3rd party tools available.
     - You might also be better off with RabbitMQ or some other queuing/sharding.
+4. Why would I use [Peewee over SQLAlchemy](https://www.reddit.com/r/Python/comments/4tnqai/comment/d5jyuug/) or SQLModel?
 
 #### How do I do database migrations?
 
