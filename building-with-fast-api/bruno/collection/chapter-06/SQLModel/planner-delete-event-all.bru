@@ -1,0 +1,19 @@
+meta {
+  name: planner-delete-event-all
+  type: http
+  seq: 8
+}
+
+delete {
+  url: http://localhost:8000/event/
+  body: none
+  auth: none
+}
+
+docs {
+  # Event
+  
+  > `DELETE` all events
+  
+  ⚠️ This is destructive ... warn the user!
+}

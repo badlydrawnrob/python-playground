@@ -33,9 +33,10 @@
 # Questions
 # ---------
 # 1. `await` keyword is used a lot. Is this needed for other ORMs?
-# 2. `class Database` starts to use `BaseSettings` and methods
+# 2. Pydantic `BaseSettings` class is used to load environment variables!
+# 3. `class Database` starts to use `BaseSettings` and methods
 #    - How can this be done in a functional style (with SQLite or Postgres)
-# 3. Motor is also required, but isn't mentioned as a `pip` install ...
+# 4. Motor is also required, but isn't mentioned as a `pip` install ...
 #    - At this point I'm stopping the learning, as I don't see any real advantage
 #      to coding a database in this fashion, and MongoDB was quite painful to get
 #      setup. AVOID!

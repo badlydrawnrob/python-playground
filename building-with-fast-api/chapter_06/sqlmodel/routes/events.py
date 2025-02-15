@@ -2,7 +2,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Request
 
 from database.connection import get_session
 from models.events import Event, EventUpdate
-from sqlmodel import select
+from sqlmodel import select, delete
 
 from typing import List
 
@@ -14,30 +14,59 @@ from typing import List
 # removing sensitive data from the response. We're now using SQLModel (or MongoDB)
 # to format our `Event` models.
 #
+# Notes
+# -----
+# ⚠️ SQLModel and error messaging is far from perfect right now. For instance, a
+# `count()` function that SQLAlchemy allows fails hard with this package. Error
+# messages can feel a bit cryptic, and some say SQLModel ain't ready for production.
+# As SQLite isn't really setup for async, we may as well use BORING technology.
+#
+# ⚠️ Before running `DELETE` be absolutely sure it's the correct command, and
+# prompt the user to confirm. This is a destructive operation!
+#
 # Questions
 # ---------
-# 1. Why would we use `response_model=` when we already have a response type?
-#    - I think that FastApi will always prioritise the `response_model=`
-# 2. What is `Body()` and how does it work?
-#    - ⚠️ `Body()` here is not necessary as we're already using Pydantic model
-#    - @ https://stackoverflow.com/a/56996770
-#    - @ https://fastapi.tiangolo.com/tutorial/body/
-# 3. What do `Depends()` and `Request()` do?
+# > Database sessions:
+# 1. What does `session.exec` do?
+# 2. What is `Depends()`?
 #    - Show how `Depends()` creates the `session=` and explain `yield`
 #    - The dependency condition (the function) must be satisfied before any
 #      operation can be executed.
 #    - Basically (what I think this means is) that an session MUST be opened,
 #      before any of the function code can be executed.
 #    - Is there a more functional way of doing this?
-# 4. Lookup path, query, and request parameters:
+# 3. Lookup path, query, and request parameters:
 #    - To understand things like `session=` and `response_model=`
 #    - @ https://gpttutorpro.com/fastapi-basics-path-parameters-query-parameters-and-request-body/
-# 5. `data.dict` is deprecated, but what's `exclude_unset=`?
+# 4. `data.dict` is deprecated, but what's `exclude_unset=`?
 #    - THE EXAMPLE DOCUMENTATION USES `PATCH`, so just use `PATCH`!
 #    - See @ https://sqlmodel.tianglo.com/tutorial/fastapi/update
 #    - `setattr()` also needs explaining, as does it's params
-# 6. #! The example code folders use `await` keyword.
+# 5. Using `count()` with SQLModel fails HARD:
+#    - `events = session.exec(select(Event)).count() # Count all events` FAILS
+#    - `AttributeError: 'ScalarResult' object has no attribute 'count'`
+#    - @ https://github.com/fastapi/sqlmodel/issues/280
+#    - @ https://sqlmodel.tiangolo.com/tutorial/one/ (using `first()` or `one()`)
+# 6. How do I delete all rows in a table?
+#    - @ https://stackoverflow.com/a/69743841
+#    - Ask Brave "SQLModel delete all rows"
+#    - #! We access `.rowcount` to see how many rows were deleted. How would this
+#      be done with Peewee?
+#    
+#
+# > Pydantic:
+# 1. Why would we use `response_model=` when we already have a response type?
+#    - I think that FastApi will always prioritise the `response_model=`
+# 2. What is `Body()` and how does it work?
+#    - ⚠️ `Body()` here is not necessary as we're already using Pydantic model
+#    - @ https://stackoverflow.com/a/56996770
+#    - @ https://fastapi.tiangolo.com/tutorial/body/
+# 3. What is `Request()` and is it necessary?
+#
+# > Async:
+# 1. #! The example code folders use `await` keyword.
 #    - Is this a necessity?
+#
 #
 # Bugs
 # ----
@@ -117,10 +146,17 @@ async def delete_event(id: int, session=Depends(get_session)) -> dict:
         detail=f"Event with supplied ID {id} does not exist"
     )
 
-# @event_router.delete("/")
-# async def delete_all_events() -> dict:
-#     if len(events) == 0:
-#         raise HTTPException(status_code=404, detail="Event list already empty")
+#! Here be danger! (See notes)
+@event_router.delete("/")
+async def delete_all_events(session=Depends(get_session)) -> dict:
+    events = session.exec(select(Event)).first() # See if there are any events
+
+    if events == None:
+        raise HTTPException(status_code=404, detail="Event list already empty")
     
-#     events.clear()
-#     return { "message": "Events deleted successfully" }
+    statement = delete(Event)
+    result = session.exec(statement)
+    session.commit()
+    rows = result.rowcount # This is very useful for debugging!
+
+    return { "message": f"Deleted {rows} rows this time"}

@@ -42,15 +42,26 @@ It's safe to say I'm not comfortable with backend and servers, so I want my expe
     - ~~MongoDB~~[^2] (I'm sticking with SQLite)
 
 
+## Silly errors
+### And things that don't work
+
+> With SQLModel, some things that should be easy don't seem to be.
+
+1. **`:id` not added** to the Bruno path parameters (getting `method not allowed`)
+2. **`count()`** fails hard: the alternative is [`first()`](https://sqlmodel.tiangolo.com/tutorial/one/) with SQLModel
+
+
 ## Commands
 
 1. `uv run uvicorn api:app --port 8000 --reload` (or run from `.venv`)
+2. `uv run main.py` (if you've setup properly `__main__.py`)
 
 
 ## Errata
 
-> There's a lot of small mistakes and continuity errors
-> **The general rule is BE CONSISTENT!**
+> **The major rule is to always BE CONSISTENT!**
+> There's a lot of small mistakes and continuity errors ...
+> So use ⚠️ `#!` style comments for major breaking code! 
 
 For example, pg.131:
 
@@ -65,10 +76,6 @@ Also
     - `SQLModel` is imported, but no download is mentioned.
 2. Some "upgrades", such as ~~`@app.on_event("startup")`~~ take time to learn
     - The app lifecycle, for example, requires [understanding](https://github.com/PacktPublishing/Building-Python-Web-APIs-with-FastAPI/issues/12#issue-2843134599) of `contextlib`.
-
-### Watch out for silly errors
-
-1. **Not adding `:id`** to the Bruno path parameters (getting `method not allowed`)
 
 
 ## Tools
@@ -95,7 +102,12 @@ The only _downsides_ to using Bruno is **you've got to manually write your docum
 
 ### SQLite
 
-1. Generate [`UUID`](https://iifx.dev/en/articles/101721447)s (but what about performance?)
+1. How do I generate [`UUID`](https://iifx.dev/en/articles/101721447)s (and what about performance?)
+2. How do I load secrets and [environment variables](https://stackoverflow.com/a/45267398)? with [Pydantic](https://docs.pydantic.dev/latest/concepts/pydantic_settings/#usage)?
+    - I think SQLite setup is a lot easier than Postgres
+3. Is async desirable with SQLite? (NEVER pre-optimise, wait until there's a need)
+    - The package is now deprecated, but there are 3rd party tools available.
+    - You might also be better off with RabbitMQ or some other queuing/sharding.
 
 #### How do I do database migrations?
 
