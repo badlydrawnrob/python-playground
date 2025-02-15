@@ -54,7 +54,7 @@ It's safe to say I'm not comfortable with backend and servers, so I want my expe
 
 For example, pg.131:
 
-1. `NewUser` model is mentioned but not created.
+1. `NewUser` model is mentioned but not created
 2. `User` fields are not yet used
 3. `User.username` is used (`curl` example) but not created
 4. `users.py` is referred to as `user.py`
@@ -92,6 +92,20 @@ The only _downsides_ to using Bruno is **you've got to manually write your docum
 - Import `openapi.json` to a new collection
 
 [Rest Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client), [Postman](https://www.postman.com/)[^3], and [Insomnia](https://insomnia.rest/) are other options.
+
+### SQLite
+
+1. Generate [`UUID`](https://iifx.dev/en/articles/101721447)s (but what about performance?)
+
+#### How do I do database migrations?
+
+> Possibly better to do data migrations simply and often?
+> Also may have to consider the `json` and client code (w/ business logic)
+> Also handy is `user_version` which you can do [like this](https://github.com/sqlitebrowser/sqlitebrowser/issues/366).
+
+- For simple changes, consider [manually migrating](https://stackoverflow.com/a/998652)
+- You can also use [ORM tools](https://docs.peewee-orm.com/en/2.10.2/peewee/playhouse.html#migrate) or something like [alembic](https://alembic.sqlalchemy.org/en/latest/) (depending on what ORM you're using)
+- GUIs like [Enso](https://ensoanalytics.com/) or [Ai](https://medium.com/@timothyjosephcw/enhancing-data-migration-testing-with-ai-in-2024-454537440ab3) might be helpful too!
 
 
 ## Paradigms
