@@ -88,6 +88,8 @@ You're going to need the following:
 - [Uvicorn](https://www.uvicorn.org/)
 - [VS Code Python plugin](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
 - [MyPy](https://mypy-lang.org/) (optional, runs slowly)
+- [ORM](https://sqlmodel.tiangolo.com/) of some description
+    - Be extra careful with [raw SQL](https://www.youtube.com/watch?v=Cp3bXHYp-bY).
 
 ### [Bruno](https://www.usebruno.com/)
 
