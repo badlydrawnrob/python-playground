@@ -4,26 +4,28 @@ from typing import List, Optional
 # ------------------------------------------------------------------------------
 # Our EVENT model
 # ==============================================================================
-# We now use `SQLModel` (or MongoDB) to set our Pydantic models, rather than the
-# `BaseModel`. WARNING: remember that this creates a tight coupling between your 
-# API and your SQL models, which is not always preferable. This will link to our
-# `User.Events` table, for user events.
+# We use `SQLModel` rather than Pydantic's `BaseModel` when we're dealing with
+# database tables (CRUD). Some people say tightly coupling your API and SQL models
+# is a bad idea, but will stick with it for now.
+#
+# Notes
+# -----
+# 1. Pydantic fields can be any order (as they're named arguments)
+# 2. `table=True` is used to create a table in the database
+# 3. I'm fairly sure every table needs an `id` field (for unique identifier)
+#    - So `Optional` is probably not a good idea
+# 4. See `connection.py` for `session.refresh()` information
 #
 # Questions
 # ---------
-# > Questions on SQL and the model (how does it look?)
+# > What's the difference between columns and fields?
+# > @ https://tinyurl.com/sql-fields-vs-columns
 #
-# 1. Do Pydantic fields need to be in a specific order? (NO!)
-# 2. What does `table=` parameter do?
-# 3. What does `sa_column=` do?
-# 4. What do our fields, such as `id` look like now?
-# 5. Is it wise to make `id` column `Optional`? (NO!)
-# 6. In which order should fields be? (ABC versus POSITIONAL)
-# 7. What is the difference between columns and fields?
-#    - @ https://tinyurl.com/sql-fields-vs-columns (dba.stackexchange)
-# 8. Does `session` automatically open/close the session?
-#    - `.commit()` is responsible for FLUSHING transactions (in the session)
-# 9. What does `session.refresh()` do?
+# 1. What is `sa_column` and what does it do? (or `sa_type`)
+#    - @ https://stackoverflow.com/a/70659555
+# 2. If `id` is left out, does FastApi automatically create one?
+# 3. Should I name fields alphabetically or by position?
+# 4. Could `EventUpdate` just be a `BaseModel`?
 
 class Event(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True) # unique identifier
@@ -33,21 +35,9 @@ class Event(SQLModel, table=True):
     location: str
     tags: List[str] = Field(sa_column=Column(JSON))
 
-# An example database `EventSQL` entry
-# new_event = Event(
-#     title="Book Launch",
-#     image="src/fastapi.png",
-#     description="The book launch event will be held at Packt HQ",
-#     location="Zoom call",
-#     tags=["packt","book"]
-# )
-
-# An example database transaction
-# session.add(new_event)
-# session.commit()
-
-class EventUpdate(SQLModel): # Not a table
-    # NO ID FIELD REQUIRED (this is supplied in the `:id` url)
+# This is a type, not a table!
+class EventUpdate(SQLModel):
+    # ID Field not required (supplied in `:id` url)
     title: Optional[str]
     image: Optional[str]
     description: Optional[str]

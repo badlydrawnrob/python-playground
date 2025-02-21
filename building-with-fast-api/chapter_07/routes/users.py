@@ -6,15 +6,9 @@ from models.users import User, UserSign
 # ==============================================================================
 # ⚠️ We're exposing `password` as plain text here, these should ALWAYS be hashed
 # encrypted in production. We'll cover this in chapter 06.
-#
-# Questions
-# ---------
-# 1. `tags=` is used for `/redoc` ...
-#    - It splits up your menu for each route type
-#    - Probably worthwhile adding, even if you're using Bruno
 
 user_router = APIRouter(
-    tags=["User"]
+    tags=["User"]  # used for `/redoc` (menu groupings)
 )
 
 # Database ---------------------------------------------------------------------

@@ -9,92 +9,74 @@ from typing import List
 # ------------------------------------------------------------------------------
 # Our EVENTS routes
 # ==============================================================================
-# Once again `response_model=` (seems) to be used when we want a different
-# response back from the server than the input json body ... for example,
-# removing sensitive data from the response. We're now using SQLModel (or MongoDB)
-# to format our `Event` models.
+# Use a response type when you want to return the full model type. You can use
+# `response_model=` (always prioritised if used) if there's sensitive information
+# and you need to send a slightly different model type than you received (such as
+# a password field).
 #
-# Notes
-# -----
-# ⚠️ SQLModel and error messaging is far from perfect right now. For instance, a
-# `count()` function that SQLAlchemy allows fails hard with this package. Error
-# messages can feel a bit cryptic, and some say SQLModel ain't ready for production.
-# As SQLite isn't really setup for async, we may as well use BORING technology.
+# Error messages
+# --------------
+# > ⚠️ Error messages for Pydantic and SQLModel can be a bit cryptic.
 #
-# ⚠️ Before running `DELETE` be absolutely sure it's the correct command, and
-# prompt the user to confirm. This is a destructive operation!
+# In general Python error messaging is way worse than Elm Lang. In future aim to use a
+# programming language that is EXCELLENT at error messages (many throw errors
+# that are too hard to understand!)
+# 
+# Boring technology
+# -----------------
+# > ⚠️ Where possible use BORING technology.
+# SQLModel is bleeding edge and therefore a risk.
+#
+# UI and User Experience
+# ----------------------
+# > ⚠️ Wherever you `DELETE` data, be sure to prompt the user to confirm.
+#
 #
 # Questions
 # ---------
-# > Database sessions:
-# 1. What does `session.exec` do?
-# 2. What is `Depends()`?
-#    - Show how `Depends()` creates the `session=` and explain `yield`
-#    - The dependency condition (the function) must be satisfied before any
-#      operation can be executed.
-#    - Basically (what I think this means is) that an session MUST be opened,
-#      before any of the function code can be executed.
-#    - Is there a more functional way of doing this?
-# 3. Lookup path, query, and request parameters:
-#    - To understand things like `session=` and `response_model=`
-#    - @ https://gpttutorpro.com/fastapi-basics-path-parameters-query-parameters-and-request-body/
-# 4. `data.dict` is deprecated, but what's `exclude_unset=`?
-#    - THE EXAMPLE DOCUMENTATION USES `PATCH`, so just use `PATCH`!
-#    - See @ https://sqlmodel.tianglo.com/tutorial/fastapi/update
-#    - `setattr()` also needs explaining, as does it's params
-# 5. Using `count()` with SQLModel fails HARD:
-#    - `events = session.exec(select(Event)).count() # Count all events` FAILS
-#    - `AttributeError: 'ScalarResult' object has no attribute 'count'`
-#    - @ https://github.com/fastapi/sqlmodel/issues/280
-#    - @ https://sqlmodel.tiangolo.com/tutorial/one/ (using `first()` or `one()`)
-# 6. How do I delete all rows in a table?
-#    - @ https://stackoverflow.com/a/69743841
-#    - Ask Brave "SQLModel delete all rows"
-#    - #! We access `.rowcount` to see how many rows were deleted. How would this
-#      be done with Peewee?
-#    
-#
-# > Pydantic:
-# 1. Why would we use `response_model=` when we already have a response type?
-#    - I think that FastApi will always prioritise the `response_model=`
-# 2. What is `Body()` and how does it work?
-#    - ⚠️ `Body()` here is not necessary as we're already using Pydantic model
-#    - @ https://stackoverflow.com/a/56996770
-#    - @ https://fastapi.tiangolo.com/tutorial/body/
-# 3. What is `Request()` and is it necessary?
-#
-# > Async:
-# 1. #! The example code folders use `await` keyword.
-#    - Is this a necessity?
-#
+# 1. ⭐ Visually describe what `Depends()` does.
+# 2. ⭐ Understand what a path, query, request parameters are.
+# 3. ⭐ I think we could use `EventUpdate(BaseModel)` here
+#    - And manually unpack it's contents instead of using `data.model_dump()`
+# 4. Is `session=` just a named attribute? (custom)
+# 5. Understand why `data.model_dump(exclude_unset=True)` is used.
+#    - This used to be `data.dict` which is now deprecated
+#    - We're now using `PATCH` instead of `PUT` (partial updates)
+#    - @ https://sqlmodel.tianglo.com/tutorial/fastapi/update
+# 6. Why does `count()` fail with SQLModel? (has no attribute 'count')
+#    - Using `.first()` or `.one()` is the recommended way to get a single row
+#    - https://github.com/fastapi/sqlmodel/issues/280
+#    - https://sqlmodel.tiangolo.com/tutorial/one/
+# 7. Am I deleting all `Event` rows correctly?
+# 8. Is `Body()` necessary here? (I don't think so)
+#    - I think the same goes for `Request()`
+#    - Keep your code clean and simple!
+# 9. Why do some examples use `await` and others don't?
+#    - SQLite is synchronous, so we don't need `await` here!
 #
 # Bugs
 # ----
-# 1. Duplicate `:id`s cause errors with SQL `POST`
+# 1. ⭐ Duplicate `:id`s cause errors with SQL `POST`
+# 2. Make sure all errors are handled.
+#    - See `chapter_03` for full checks, such as `[]` empty events, and
+#      duplicate `:id`s in the "database".
 
 event_router = APIRouter(
-    tags=["Events"]
+    tags=["Events"] # used for `/redoc` (menu groupings)
 )
 
-# Events DB --------------------------------------------------------------------
-# 📆 We start to use a PROPER `Event` table for our storage. See `models.events`!
-
-# events = []
 
 # Routes -----------------------------------------------------------------------
-# != See `chapter_03` for full checks. We're ignoring some checks here, such
-# as `[]` empty events, if event `id` is a duplicate, and so on.
-#
-# 1. Use `Depends()` to create a session
-# 2. Use Pydantic to format the `Event` model
-# 3. Add an `Event` and `.commit()` it to the database (make sure to `.refresh()`)
-# 4. Grab all `Event`s with a `SELECT` statement with `session.exec()`
+# 1. `Depends()` runs the `get_session()` function first (opens a session)
+# 2. `Event` is now an `SQLModel` type (it's a table)
+# 3. `.session.exec()` executes the supplied `statement`
+# 4. Other commands are the same as before (add, commit, refresh)
 
 @event_router.get("/", response_model=List[Event])
 async def retrieve_all_events(session=Depends(get_session)) -> List[Event]:
-    statement = select(Event) #! The SQL statement, 'SELECT * FROM Event' I think?
-    events = session.exec(statement).all() # Execute the statement within session (all rows?)
-    return events
+    statement = select(Event) #! 'SELECT * FROM Event' I think?
+    events = session.exec(statement).all() # Execute the statement
+    return events # FastApi will convert `Event` objects to JSON
 
 @event_router.get("/{id}", response_model=Event)
 async def retrieve_event(id: int, session=Depends(get_session)) -> Event:
@@ -107,46 +89,45 @@ async def retrieve_event(id: int, session=Depends(get_session)) -> Event:
     )
 
 @event_router.post("/new")
-async def create_event(
-    body: Event = Body(), #! Body() is not needed here (see notes)
-    session=Depends(get_session) #! I think this is a named attribute?
-    ) -> dict:
-    session.add(body)     # Pull object
-    session.commit()      # Commit and FLUSH
-    session.refresh(body) #! Refresh the database? How does this work?
+#! Body() isn't needed? async def create_event(body: Event = Body(), session=Depends(get_session)) -> dict:
+async def create_event(body: Event, session=Depends(get_session)) -> dict:
+    session.add(body) # Use the body argument with `Event` type
+    session.commit() # Commit the `Event` to the database
+    session.refresh(body) #! Refresh the `Event` object
 
     return { "message": "Event created successfully" }
 
-#! You could also use `PATCH` here (which might be preferrable partial updates)
+#! We've changed from `PUT` to `PATCH` here (see tag `1.10.4`, deprecated)
 @event_router.patch("/edit/{id}", response_model=Event)
 async def update_event(id: int, data: EventUpdate, session=Depends(get_session)) -> Event:
-    event = session.get(Event, id) # We use the `Event` model to GET the event from DB ...
-    # See tag `1.10.4` for deprecated version
+    event = session.get(Event, id) # Get the `Event` object from database
+
     if not event:
         raise HTTPException(status_code=404, detail="Event not found!")
-    event_data = data.model_dump(exclude_unset=True) # Our `EventUpdate` body
-    event.sqlmodel_update(event_data) # Update `Event` with `EventUpdate` data
+
+    event_data = data.model_dump(exclude_unset=True) # Using our `EventUpdate` body
+    event.sqlmodel_update(event_data) # Update `Event` object with request body data
     session.add(event)
     session.commit()
     session.refresh(event)
-    # Make sure you return something or you'll get `Internal Server Error`
-    return event
+
+    return event # You MUST return something (or you'll get an `Internal Server Error`)
 
 @event_router.delete("/{id}")
 async def delete_event(id: int, session=Depends(get_session)) -> dict:
     event = session.get(Event, id)
+
     if event:
         session.delete(event)
         session.commit()
-        return {
-            "message": f"Event with ID: {id} has been deleted!"
-        }
+        return { "message": f"Event with ID: {id} has been deleted!" }
+    
     raise HTTPException(
         status_code=404,
         detail=f"Event with supplied ID {id} does not exist"
     )
 
-#! Here be danger! (See notes)
+#! DANGER! Warn the user (see notes)
 @event_router.delete("/")
 async def delete_all_events(session=Depends(get_session)) -> dict:
     events = session.exec(select(Event)).first() # See if there are any events
@@ -157,6 +138,6 @@ async def delete_all_events(session=Depends(get_session)) -> dict:
     statement = delete(Event)
     result = session.exec(statement)
     session.commit()
-    rows = result.rowcount # This is very useful for debugging!
+    rows = result.rowcount # How many rows were deleted? (debugging)
 
     return { "message": f"Deleted {rows} rows this time"}

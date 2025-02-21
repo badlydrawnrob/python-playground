@@ -1,23 +1,20 @@
 from pydantic import BaseModel, EmailStr
+from sqlmodel import SQLModel
 from typing import List, Optional
 from models.events import Event
 
 # ------------------------------------------------------------------------------
 # Our USER model
 # ==============================================================================
-# Here we'll set our user model, which has a `User.Events` column, to list all
-# the events attached to that specific user. We have a couple of types, depending
-# on the situation (for example, sign-in form). We could also create a separate
-# `User` model for the `response_model=` in our routes, to hide the `password`.
+# See `models.events` for informations and questions on SQLModel.
 #
 # Questions
 # ---------
-# 1. Will `Optional` give us a `null` in the `json` output?
-# 2. Can we inherit from another custom class? i.e: `UserTwo(User)`?
-#    - This seems possible but error prone.
+# 1. When to use `BaseModel` and when to use `SQLModel`?
+#    - I really need to figure this out (and the differences)
 
-class User(BaseModel):
-    email: EmailStr # A custom type for emails
+class User(SQLModel, table=True):
+    email: EmailStr # A Pydantic type for emails
     password: str
     events: Optional[List[Event]] # Empty by default, currently not used
 

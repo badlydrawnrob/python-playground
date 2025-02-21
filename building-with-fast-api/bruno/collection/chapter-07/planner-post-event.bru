@@ -1,0 +1,36 @@
+meta {
+  name: planner-post-event
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8000/event/new/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "id": 1,
+    "title": "FastApi book launch",
+    "image": "https://linktomyimage.com/image.png",
+    "description": "We will be discussing the contents of the FastApi book in this event. Ensure you come with your own copy to win gifts!",
+    "location": "Zoom call",
+    "tags": ["python", "fastapi", "book", "launch"]
+  }
+}
+
+docs {
+  # Event: add new
+  
+  > Now posting to the `planner.db`
+  
+  Post a new event. All fields are required.
+  
+  ## 🐞 Bugs
+  
+  > #! If you try to post `:id` that already exists, you'll get a big fat SQL error!
+  
+  
+}

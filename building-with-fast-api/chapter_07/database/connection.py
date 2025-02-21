@@ -5,13 +5,21 @@ from models.events import Event
 # Our DATABASE connection
 # ==============================================================================
 # From here we set up, connect, and open our SQL database to incoming connections.
+# For now I'll let FastApi handle creating the database and tables, but this is
+# not necessary (and can be done manually).
 #
 # Questions
 # ---------
-# 1. What is `"check_same_thread"`?
-# 2. VISUALLY explain `create_engine()`, `conn()`, and `get_session()`
-# 3. What does `session.refresh()` do?
-#     - It seems to need an object (I'm so out of touch with OOP!)
+# 1. Should SQLite be set to `STRICT` mode?
+#    - @ https://sqlite.org/stricttables.html
+# 2. What is `check_same_thread` and is it safe?
+#    - @ https://github.com/fastapi/fastapi/discussions/5199
+# 3. VISUALLY explain `create_engine()`, `conn()`, and `get_session()`
+#    - `conn()` is only required to create the database and tables
+#    - I think `get_session()` opens and closes for each request
+# 4. What does `session.refresh()` do?
+#     - It refreshes the object that's been updated, for example
+#     - @ https://sqlmodel.tiangolo.com/tutorial/update/#refresh-the-object
 
 # File location ----------------------------------------------------------------
 
@@ -23,14 +31,13 @@ database_connection_string = f"sqlite:///{database_file}"
 connect_args = { "check_same_thread": False }
 
 # Database instance ------------------------------------------------------------
+# `echo=True` prints out the SQL commands (for debugging)
 
 engine_url = create_engine(database_connection_string, echo=True, connect_args=connect_args)
 
 # Create database --------------------------------------------------------------
-# And any tables we've described in `/models/...`. Our `.metadata` holds all our
-# `table=True` classes we created. This should generally be done once, and if
-# you're manually migrating or setting up your database tables, it can safely
-# be ignored. @ https://sqlmodel.tiangolo.com/tutorial/create-db-and-table/
+# Any `table=True` classes will be stored in `.metadata`. Creates database.
+# @ https://sqlmodel.tiangolo.com/tutorial/create-db-and-table/
 
 def conn():
     SQLModel.metadata.create_all(engine_url)

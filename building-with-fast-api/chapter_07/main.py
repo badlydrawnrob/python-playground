@@ -10,32 +10,32 @@ import uvicorn
 # ------------------------------------------------------------------------------
 # A PLANNER app (SQLModel)
 # ==============================================================================
-# See earlier chapters for full instructions on FastApi etc. Now we have our app
-# architecture sorted, it's time to set up an ORM, our SQL database, and allow
-# CRUD (create, read, update, delete) operations with SQLModel (or MongoDB in
-# the book)
+# See earlier chapters for full instructions on FastApi etc. We've got our app
+# architecture: our Models, ORM, SQLite database, and performing CRUD operations
+# on our data. You might find that backend development is a bit more complicated
+# than frontend ... as there's a lot more to consider.
 #
 # Notes
 # -----
-# We're using SQLModel, which is from the same creator of FastApi, and will allow
-# us to use our Pydantic models as a basis for our SQL tables. WARNING: This has
-# been said to not be the best setup, as it tightly couples your SQL models from
-# your API design. Many say it's better to keep these two separate.
-# 
-# Currently this doesn't specifiy that ONLY signed in users can create and update
-# events, as there's no auth involved. We'll need to add those checks in.
+# > Some say that you should separate your API and ORM models.
+# > They say they shouldn't be tightly coupled (as SQLModel does).
+#
+# 1. SQLModel allows us to use Pydantic with FastApi (managing types)
+#    - It uses SQLAlchemy under the hood
+# 2. Peewee is another alternative, but requires running in parallel ...
+#    - So you won't be able to reuse your Pydantic models
+#
+# Wishlist
+# --------
+# 1. We only want to allow logged in `User`s to create and update events
+# 2. For that to happen we need an auth system, with a JWT token (or similar)
 #
 # Questions
 # ---------
-# 1. How does the `create_engine()` method work?
-#    - `echo=True` prints out the SQL commands carried out
-# 2. Do we only need to setup database ONCE?
-#    - `.create_all(engine)` is an instance of `create_engine()`
-#    - This creates the database and the tables we've defined in model
-# 3. What does `RedirectResponse()` mean, or do?
-# 4. Is `@app.on_event` even needed?
-#    - If I'm doing setup and migrations manually, then no.
-# 5. What the fuck is `__init__.py`? It makes no sense to me.
+# 1. `@app.on_event` creates database if doesn't exist
+#    - This can safely be left out if you're manually creating your database
+#    - #! Deprecated: use `lifespan` event handlers instead
+# 2. What the fuck is `__init__.py`? It makes no sense to me.
 #    - @ https://stackoverflow.com/a/448279 (regular and namespaced packages)
 #    - @ https://stackoverflow.com/a/48804718
 
@@ -47,26 +47,21 @@ app = FastAPI()
 app.include_router(user_router, prefix="/user")
 app.include_router(event_router, prefix="/event")
 
-# Database stuff ---------------------------------------------------------------
-# These will help initiate our database.
-#
-# Notes
-# -----
-# `@app.on_event` is deprecated. Use `lifespan` event handlers instead.
-#    @ #! https://fastapi.tiangolo.com/advanced/events/
+# Database build ---------------------------------------------------------------
 
-@app.on_event("startup") #!
+@app.on_event("startup")
 def on_startup():
     conn()
 
+# Routes -----------------------------------------------------------------------
+    
 @app.get("/")
 async def home():
     return RedirectResponse(url="/event/")
 
 # Run our app ------------------------------------------------------------------
-# If you try running this as `.run(app, ...)` you'll get an error:
+# This is `.run(app, host="0.0.0.0")` in the book, but errors:
 #   "pass the application as an import string to enable 'reload' or 'workers'"
-# The book also uses `0.0.0.0` as the host, but `localhost` is more secure.
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="localhost", port=8000, reload=True)
