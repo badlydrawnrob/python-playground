@@ -15,3 +15,10 @@ dependencies = [
     "uuid>=1.30",
     "uvicorn>=0.34.0",
 ]
+
+[tool.uv]
+dev-dependencies = []
+
+[tool.pyright]
+strict = ["."]
+exclude = ["reactivex", ".venv"]

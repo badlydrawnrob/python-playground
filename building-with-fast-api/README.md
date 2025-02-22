@@ -2,13 +2,25 @@
 
 > A [brief overview](https://lyz-code.github.io/blue-book/fastapi/) of FastApi
 
+## Commands
+
+1. `uv run uvicorn api:app --port 8000 --reload` (or run from `.venv`)
+2. `uv run main.py` (if you've setup properly `__main__.py`)
+
+## Self-documenting (but use Bruno)
+
+> `/docs` gives a JSON Schema documentation ...
+
+But to implement it looks like messy code. Things like `Annotated[]`, `"json_schema_extra"`, and so on. I'm finding that Bruno is pretty nice to work (as an alternative) with and does most of what I'd need.
+
 
 ## Learning method
 
-> Coding in the [age of Ai](https://github.com/badlydrawnrob/anki/issues/92)
-> Watch out for Ai hallucinations!
+> **It's safe to say I'm not comfortable with backend and servers**, so I want my experience and pleasant and **simple as possible**. SQLite is reasonably simple to use.
 
 1. Copilot and ChatGPT (it works!)
+    - Coding in the [age of Ai](https://github.com/badlydrawnrob/anki/issues/92)
+    - Watch out for Ai hallucinations!
 2. **Ai generated flashcards** (human in the loop)
 3. **Memorable examples (storify)**
 4. **Readability** (simple language, <s>academic writing</s>)
@@ -21,10 +33,8 @@
 
 Limit Ai to give a fun example of the code (block), with a view to create cards later, as well as clarifying things as a study partner. My general process is: read, make notes (per chapter), condense notes, generate flashcards, files and programs. Creating a small series of books could come later.
 
-"Give me a fun example for scaffolded learning on ____"
-"Give it to me as [draw!, missing, simple] data"
-
-It's safe to say I'm not comfortable with backend and servers, so I want my experience and pleasant and simple as possible. SQLite is reasonable simple to use.
+- "Give me a fun example for scaffolded learning on ____"
+- "Give it to me as [draw!, missing, simple] data"
 
 
 ## Chapters
@@ -40,31 +50,25 @@ It's safe to say I'm not comfortable with backend and servers, so I want my expe
 6. Working with the database
     - SQLModel (1.10.0 — 1.10.6)
     - ~~MongoDB~~[^2] (I'm sticking with SQLite)
+7. Securing FastApi applications (1.11.0 — ...)
 
 
-## Silly errors
-### And things that don't work
+## Silly errors (and things that don't work)
 
-> The SQLModel documentation isn't always great, and some things that should be
-> easy enough, don't seem to be. Compared to Elm lang, the Python errors can be
+> **The SQLModel documentation [isn't always great](https://github.com/badlydrawnrob/elm-playground/issues/45)**, and some things that should be
+> easy enough, don't seem to be. Compared to Elm lang, Python errors can be
 > a bit cryptic and using the REPL for "practice" or "discovery" isn't always easy
-> or possible with SQLModel.
+> or possible with SQLModel setup.
 
 1. **`:id` not added** to the Bruno path parameters (getting `method not allowed`)
 2. **`count()`** fails hard: the alternative is [`first()`](https://sqlmodel.tiangolo.com/tutorial/one/) with SQLModel
 
 
-## Commands
-
-1. `uv run uvicorn api:app --port 8000 --reload` (or run from `.venv`)
-2. `uv run main.py` (if you've setup properly `__main__.py`)
-
-
 ## Errata
 
-> **The major rule is to always BE CONSISTENT!**
-> There's a lot of small mistakes and continuity errors ...
-> So use ⚠️ `#!` style comments for major breaking code! 
+> **The major rule for writing is ... BE CONSISTENT!**
+> - There's a lot of small mistakes and continuity errors ...
+> - So use ⚠️ `#!` style comments for major breaking code! 
 
 For example, pg.131:
 
@@ -90,7 +94,8 @@ You're going to need the following:
 - [Pydantic](https://pydantic.dev/)
 - [Uvicorn](https://www.uvicorn.org/)
 - [VS Code Python plugin](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
-- [MyPy](https://mypy-lang.org/) (optional, runs slowly)
+- [PyRight](https://microsoft.github.io/pyright/) (CLI in [strict mode](https://github.com/jackgene/reactive-word-cloud-python/blob/b48306f94e1038c26c7c70ab56337ab26fa2b719/pyproject.toml#L21-L23), Pylance in VS Code)
+- ~~[MyPy](https://mypy-lang.org/)~~ (optional, runs slowly)
 - [ORM](https://sqlmodel.tiangolo.com/) of some description
     - Be extra careful with [raw SQL](https://www.youtube.com/watch?v=Cp3bXHYp-bY).
 
@@ -170,12 +175,6 @@ class ToDo(BaseModel):
         }
     }
 ```
-
-### Self documentation
-
-> `/docs` gives a JSON Schema documentation ...
-
-But to implement it looks like messy code. Things like `Annotated[]`, `"json_schema_extra"`, and so on. I'm finding that Bruno is pretty nice to work (as an alternative) with and does most of what I'd need.
 
 
 ## Problems
