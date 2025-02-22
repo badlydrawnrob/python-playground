@@ -6,6 +6,7 @@
 
 1. `uv run uvicorn api:app --port 8000 --reload` (or run from `.venv`)
 2. `uv run main.py` (if you've setup properly `__main__.py`)
+3. `uv run pyright main.py` (run in strict mode, Pylance in VS Code)
 
 ## Self-documenting (but use Bruno)
 
