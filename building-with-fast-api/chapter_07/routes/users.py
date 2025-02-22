@@ -54,7 +54,8 @@ async def sign_in_user(user: UserSign, session=Depends(get_session)) -> dict:
     if db_user is None:
         raise HTTPException(status_code=404, detail="User doesn't exist")
     if db_user.password != user.password:
-        raise HTTPException(status_code=403, detail="Invalid password")
+        # Search Brave Ai answer for "403 vs 401 wrong password"
+        raise HTTPException(status_code=401, detail="Invalid password")
     
     #! We aren't doing any authentication right now, but can pretend we're
     # storing some useful session data and return it (for testing purposes)
