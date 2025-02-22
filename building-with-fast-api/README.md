@@ -45,7 +45,10 @@ It's safe to say I'm not comfortable with backend and servers, so I want my expe
 ## Silly errors
 ### And things that don't work
 
-> With SQLModel, some things that should be easy don't seem to be.
+> The SQLModel documentation isn't always great, and some things that should be
+> easy enough, don't seem to be. Compared to Elm lang, the Python errors can be
+> a bit cryptic and using the REPL for "practice" or "discovery" isn't always easy
+> or possible with SQLModel.
 
 1. **`:id` not added** to the Bruno path parameters (getting `method not allowed`)
 2. **`count()`** fails hard: the alternative is [`first()`](https://sqlmodel.tiangolo.com/tutorial/one/) with SQLModel

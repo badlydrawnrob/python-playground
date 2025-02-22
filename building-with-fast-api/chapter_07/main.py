@@ -17,6 +17,20 @@ import uvicorn
 #
 # Notes
 # -----
+# > 💡 I'm testing out different `.select()` methods in this repo!
+#
+# There's a bunch of ways to write SQL queries, such as:
+# 
+# 1. SQLModel and other ORMs, such as Peewee
+# 2. Query builders like PyPika (or roll your own):
+#    - @ https://death.andgravity.com/own-query-builder is also interesting
+# 3. Writing raw SQL queries:
+#    - Such as SQLAlchemy text, or using `sqlite3` directly
+#    - You've got to manually protect against malicious SQL injections
+#
+# For options (1) and (2) you'd need map your database rows to your Pydantic models,
+# or whatever data structures you're working with: @ https://tinyurl.com/object-relational-mapping-sql
+#  
 # > Some say that you should separate your API and ORM models.
 # > They say they shouldn't be tightly coupled (as SQLModel does).
 #
@@ -29,6 +43,8 @@ import uvicorn
 # --------
 # 1. We only want to allow logged in `User`s to create and update events
 # 2. For that to happen we need an auth system, with a JWT token (or similar)
+# 3. Reduce code duplication (for example, similar `SELECT` statements)
+#    - Abstract this into a function (or a class)
 #
 # Questions
 # ---------
