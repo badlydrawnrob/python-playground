@@ -42,8 +42,9 @@ import uvicorn
 # Wishlist
 # --------
 # 1. We only want to allow logged in `User`s to create and update events
-# 2. For that to happen we need an auth system, with a JWT token (or similar)
-# 3. Reduce code duplication (for example, similar `SELECT` statements)
+# 2. Our `Event` model should have a `User` field (for ownership)
+# 3. For that to happen we need an auth system, with a JWT token (or similar)
+# 4. Reduce code duplication (for example, similar `SELECT` statements)
 #    - Abstract this into a function (or a class)
 #
 # Questions
