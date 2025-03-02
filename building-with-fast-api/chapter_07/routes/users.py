@@ -1,3 +1,4 @@
+from auth.hash_password import HashPassword
 from database.connection import get_session
 from fastapi import APIRouter, Depends, HTTPException, status
 from models.users import User, UserSign
@@ -11,7 +12,9 @@ from sqlmodel import select
 #
 # Wishlist
 # --------
-# 1. User authentication (JWT tokens or similar)
+# 1. What about `+test` type email addresses?
+#    - Should these be disallowed?
+# 2. Which encryption package is best?
 
 user_router = APIRouter(
     tags=["User"]  # used for `/redoc` (menu groupings)
@@ -23,6 +26,11 @@ user_router = APIRouter(
 # structure used to look like this: `{"user@email": User(...)}`
 
 users = {}
+
+# Hashing password -------------------------------------------------------------
+# We're using a `HashPassword` class to hash our passwords.
+
+hash_password = HashPassword()
 
 # Routes -----------------------------------------------------------------------
 # Our database users should have a unique ID, which is a number or UUID. We'll
@@ -40,6 +48,11 @@ async def sign_new_user(data: UserSign, session=Depends(get_session)) -> dict:
     if user: # This could be `None` if user doesn't exist
         raise HTTPException(status_code=409, detail="Username already exists")
 
+    # Hash the password (using `data` which is a `UserSign` class)
+    hashed_password = hash_password.create_hash(data.password)
+    data.password = hashed_password
+
+    # Now add the user with their newly hashed password
     session.add(User(email=data.email, password=data.password)) #! (1)
     session.commit()
 
