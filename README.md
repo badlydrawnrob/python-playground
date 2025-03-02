@@ -77,6 +77,12 @@ niceTypes =
 > niceTypes [1, 2, 3]
 ```
 
+### Other paradigm differences
+
+1. Classes and methods (rather than plain functions).
+2. [Keyword arguments](https://www.geeksforgeeks.org/args-kwargs-python/) and other Python magic.
+3. The concept of [`self`](https://how.dev/answers/what-is-self-in-python) (a pretty dumb idea in my opinion)
+
 
 ## The compiler
 

@@ -39,6 +39,17 @@ import uvicorn
 # 2. Peewee is another alternative, but requires running in parallel ...
 #    - So you won't be able to reuse your Pydantic models
 #
+# Security
+# --------
+# > Dependency Injection is a pattern where an object (in our case a function)
+# > receives an instance variable needed for further execution of the function.
+# > In FastApi a dependency can be defined as either a function or a class.
+# 
+# In FastApi a bearer token (JWT) is an authentication method that is
+# injected into FastApi as dependencies called at runtime. They are dormant
+# until injected into their place of use. There's many other ways to keep your
+# API secure and it's worthwhile hiring a security expert.
+#
 # Wishlist
 # --------
 # 1. We only want to allow logged in `User`s to create and update events
@@ -55,6 +66,8 @@ import uvicorn
 # 2. What the fuck is `__init__.py`? It makes no sense to me.
 #    - @ https://stackoverflow.com/a/448279 (regular and namespaced packages)
 #    - @ https://stackoverflow.com/a/48804718
+# 3. What's the best and most user-friendly way to authenticate users?
+#    - #! This isn't something I feel comfortable setting up myself!
 
 app = FastAPI()
 
