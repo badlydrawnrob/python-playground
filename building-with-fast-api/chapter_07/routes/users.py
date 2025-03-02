@@ -58,6 +58,7 @@ async def sign_new_user(data: UserSign, session=Depends(get_session)) -> dict:
 
     return { "message": f"User with {data.email} registered!" }
 
+
 @user_router.post("/signin")
 async def sign_in_user(user: UserSign, session=Depends(get_session)) -> dict:
     # First check if user already exists

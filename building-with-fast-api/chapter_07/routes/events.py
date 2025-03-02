@@ -88,6 +88,7 @@ async def retrieve_event(id: int, session=Depends(get_session)) -> Event:
         detail=f"Event with ID: {id} does not exist"
     )
 
+
 @event_router.post("/new")
 #! Body() isn't needed? async def create_event(body: Event = Body(), session=Depends(get_session)) -> dict:
 async def create_event(body: Event, session=Depends(get_session)) -> dict:
@@ -112,6 +113,7 @@ async def update_event(id: int, data: EventUpdate, session=Depends(get_session))
     session.refresh(event)
 
     return event # You MUST return something (or you'll get an `Internal Server Error`)
+
 
 @event_router.delete("/{id}")
 async def delete_event(id: int, session=Depends(get_session)) -> dict:
