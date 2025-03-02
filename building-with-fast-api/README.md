@@ -2,6 +2,9 @@
 
 > A [brief overview](https://lyz-code.github.io/blue-book/fastapi/) of FastApi
 
+The only problem with Python as a http server is that it's slower than other languages. This might not be a problem. The book also uses MongoDB in later chapters, and I'm only interested in SQLite. Setting up MongoDB on a Mac was an uncomfortable and painful process, so I gave up.
+
+
 ## Commands
 
 1. `uv run uvicorn api:app --port 8000 --reload` (or run from `.venv`)

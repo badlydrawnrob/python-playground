@@ -7,14 +7,16 @@ from sqlmodel import select
 # ------------------------------------------------------------------------------
 # Our USERS routes
 # ==============================================================================
-# ⚠️ We're exposing `password` as plain text here, these should ALWAYS be hashed
-# encrypted in production. We'll cover this in chapter 06.
+# ⚠️ Our password is plain text over the wire, but gets hashed on signup. I'm not
+# sure if there's a way to hide the password before it's hashed. In production,
+# you never want to store the password as plain text.
 #
 # Wishlist
 # --------
-# 1. What about `+test` type email addresses?
+# 1. Hashing can be slow. How can it be speeded up?
+# 2. What about `+test` type email addresses?
 #    - Should these be disallowed?
-# 2. Which encryption package is best?
+# 3. Which encryption package is best?
 
 user_router = APIRouter(
     tags=["User"]  # used for `/redoc` (menu groupings)
@@ -31,6 +33,10 @@ users = {}
 # We're using a `HashPassword` class to hash our passwords.
 
 hash_password = HashPassword()
+
+# JWT --------------------------------------------------------------------------
+# Comprises the user ID and an expiry time before encoding into a long string.
+# I'm not sure if there's a way to store further information (like auth group)
 
 # Routes -----------------------------------------------------------------------
 # Our database users should have a unique ID, which is a number or UUID. We'll

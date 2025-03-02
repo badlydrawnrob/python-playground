@@ -20,6 +20,14 @@ from models.events import Event
 # 4. What does `session.refresh()` do?
 #     - It refreshes the object that's been updated, for example
 #     - @ https://sqlmodel.tiangolo.com/tutorial/update/#refresh-the-object
+#
+# Security
+# --------
+# 1. We must use an environment variable to store our secrets
+#    - This could include the database connection string, a secret key, our
+#      API key, etc. We don't want to hardcode these values, nor have them within
+#      our codebase in Github (for security reasons).
+#    - @ https://medium.com/@mahimamanik.22/environment-variables-using-pydantic-ff6ccb2b8976
 
 # File location ----------------------------------------------------------------
 
