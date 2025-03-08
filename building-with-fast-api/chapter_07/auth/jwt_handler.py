@@ -1,12 +1,61 @@
+import time
+from datetime import datetime
+from fastapi import HTTPException, status
+from jose import jwt, JWTError
+from database.database import Settings
+
 # ------------------------------------------------------------------------------
 # JWT Token handler
 # ==============================================================================
-# Contains functions to encode and decode the JWT strings. JWTs are signed with
+# Once again the book isn't specific over which package to install. I'm pretty
+# sure `python-jose` is the one, but there's a `jose` package also. Contains
+# functions to encode and decode the JWT strings. JWTs are signed with
 # a secret key known only to the sender and the reciever, but it might be visible
 # to outside users if using a javascript frontend.
 #
 # A JWT is an encoded string usually containing a dictionary housing:
 #
-# 1. A payload
-# 2. A signature
-# 3. It's algorithm
+# 1. A payload (dict containing values to be encoded)
+# 2. A signature (key used to sign the payload)
+# 3. It's algorithm (most common is HS256 algorithm)
+#
+# @ https://pypi.org/project/python-jose/
+
+settings = Settings() # Get the secret key
+
+def create_access_token(user: str) -> str:
+    payload = {
+        "user": user,
+        "expires": time.time() + 3600 # Expires in 1 hour
+    }
+    
+    token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
+    return token
+
+
+def verify_access_token(token: str) -> dict:
+    try:
+        data = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+        expire = data.get("expires")
+
+        # No token was supplied?
+        if expire is None:
+            raise HTTPException(
+                status_code=400, # bad request
+                detail="No access token supplied"
+            )
+
+        # Token has expired?
+        if datetime.utcnow() > datetime.utcfromtimestamp(expire):
+            raise HTTPException(
+                status_code=403, # forbidden
+                detail="Token expired!"
+            )
+        
+        return data
+
+    except JWTError: # @ https://github.com/mpdavis/python-jose/issues/25
+        raise HTTPException(
+            status_code=400, # bad request
+            detail="Invalid token"
+        )

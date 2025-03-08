@@ -20,7 +20,12 @@ But to implement it looks like messy code. Things like `Annotated[]`, `"json_sch
 
 ## Learning method
 
-> **It's safe to say I'm not comfortable with backend and servers**, so I want my experience and pleasant and **simple as possible**. SQLite is reasonably simple to use.
+> **It's safe to say I'm not comfortable with backend and servers**, so I want my experience and pleasant and **simple as possible**. SQLite is reasonably simple to use. Be very mindful of what you need to understand: **is this something I can outsource?**
+
+Remember that sometimes it's enough to know that it's working code that works. A high-level view of what the code does is helpful, otherwise you can view it as a
+"black box" that has an input and an output. Ask yourself "do I really need to understand this in detail" before diving down any rabbit holes.
+
+Some other things to consider are:
 
 1. Copilot and ChatGPT (it works!)
     - Coding in the [age of Ai](https://github.com/badlydrawnrob/anki/issues/92)
