@@ -1,4 +1,4 @@
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 from typing import Optional
 
 # ------------------------------------------------------------------------------
@@ -9,6 +9,7 @@ from typing import Optional
 # `python-decouple` which seems far simpler (although not as robust). You can
 # find more information here:
 #
+# @ https://docs.pydantic.dev/2.10/migration/#basesettings-has-moved-to-pydantic-settings
 # @ https://docs.pydantic.dev/latest/concepts/pydantic_settings/ (original)
 #
 # @ https://pypi.org/project/python-decouple/ (an alternative to Pydantic)

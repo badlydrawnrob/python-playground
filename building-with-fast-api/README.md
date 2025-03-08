@@ -165,6 +165,7 @@ The only _downsides_ to using Bruno is **you've got to manually write your docum
 4. For `status_code=` the book uses `status.HTTP_403_FORBIDDEN` but I'm just using the `403` code by itself, as it's cleaner. This is debatable.
 5. `Depends()` is an important function that injects dependencies into our routes,
 forcing our route to handle something (such as `oauth3_scheme`) first.
+6. [Why use `response_model=`](https://github.com/fastapi/fastapi/discussions/8247) instead of a response type?
 
 
 ## Elm -vs- Python

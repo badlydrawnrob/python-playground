@@ -10,10 +10,15 @@ from uuid import UUID, uuid4
 #
 # Questions
 # ---------
+# > We're now using `TokenResponse` instead of `UserSign`, as we use FastApi's
+# > own sign-in form setup.
+#
 # 1. SQLModel doesn't have any `List` types, so we must convert this to a
 #    Json field in the database ... it's a list of `Event.id`s.
 # 2. When to use `BaseModel` and when to use `SQLModel`?
 #    - I really need to figure this out (and the differences)
+#    - I have a feeling that `SQLModel` should be used mostly, but if we're simply
+#      accessing data from our request body, we can use `BaseModel` too.
 # 3. Following from (1) are there any errors using Pydantic for `UserSign`?
 #    - This is for sign-up and sign-in, just for testing purposes.
 # 4. See `Field()` settings, such as `index=` and `unique=`
@@ -29,7 +34,6 @@ class User(SQLModel, table=True):
     events: Optional[List[int]] = Field(sa_column=Column(JSON))
     # events: Optional[List[Event]] # Used to be a list of `Event` types ...
 
-# (2)
-class UserSign(BaseModel):
-    email: EmailStr
-    password: str
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str
