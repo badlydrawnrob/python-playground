@@ -1,8 +1,13 @@
+from fastapi import Depends, HTTPException
+from fastapi.security import OAuth2PasswordBearer
+from auth.jwt_handler import verify_access_token
+
 # ------------------------------------------------------------------------------
 # Authenticate
 # ==============================================================================
 # Contains the authenticate dependency, which will be injected into our routes
-# to enforce authenticatiion and authorization.
+# to enforce authenticatiion and authorization. This is the single source of
+# truth for retrieving a user for an active session!
 #
 # Depends
 # -------
@@ -22,4 +27,18 @@
 # 3. It's algorithm
 #
 # JWTs are signed using a unique key known only to the server and client, which
-# avoids the encoded string being tampered with.
+# avoids the encoded string being tampered with. The `user` field of the payload
+# is only returned if the token is valid, otherwise we return an error.
+
+# Tells the application that a security scheme is present
+oauth_scheme = OAuth2PasswordBearer(tokenUrl="/user/signin")
+
+async def authenticate(token: str = Depends(oauth_scheme)) -> str:
+    if not token:
+        raise HTTPException(
+            status_code=403,
+            detail="Sign in for access"
+        )
+    
+    decoded_token = verify_access_token(token) # check validity of token
+    return decoded_token["user"]

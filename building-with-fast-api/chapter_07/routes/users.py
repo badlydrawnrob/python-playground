@@ -1,6 +1,6 @@
 from auth.hash_password import HashPassword
 from database.connection import get_session
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from models.users import User, UserSign
 from sqlmodel import select
 

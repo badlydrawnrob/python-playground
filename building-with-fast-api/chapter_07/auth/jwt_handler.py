@@ -1,6 +1,6 @@
 import time
 from datetime import datetime
-from fastapi import HTTPException, status
+from fastapi import HTTPException
 from jose import jwt, JWTError
 from database.database import Settings
 
@@ -20,6 +20,7 @@ from database.database import Settings
 # 3. It's algorithm (most common is HS256 algorithm)
 #
 # @ https://pypi.org/project/python-jose/
+# @ #! https://tinyurl.com/miguel-utcnow-deprecated
 
 settings = Settings() # Get the secret key
 
@@ -46,7 +47,7 @@ def verify_access_token(token: str) -> dict:
             )
 
         # Token has expired?
-        if datetime.utcnow() > datetime.utcfromtimestamp(expire):
+        if datetime.utcnow() > datetime.utcfromtimestamp(expire): #! see link
             raise HTTPException(
                 status_code=403, # forbidden
                 detail="Token expired!"

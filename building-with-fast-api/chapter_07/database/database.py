@@ -1,3 +1,6 @@
+from pydantic import BaseSettings
+from typing import Optional
+
 # ------------------------------------------------------------------------------
 # Our DATABASE settings
 # ==============================================================================
@@ -21,4 +24,4 @@
 # available in any form.
 
 class Settings(BaseSettings):
-    SECRET_KEY: Optional[str] = None
+    SECRET_KEY: Optional[str] = None #! Our functions don't allow `None` (strict)

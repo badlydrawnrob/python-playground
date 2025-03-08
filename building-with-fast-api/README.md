@@ -60,6 +60,8 @@ Limit Ai to give a fun example of the code (block), with a view to create cards 
     - SQLModel (1.10.0 — 1.10.6)
     - ~~MongoDB~~[^2] (I'm sticking with SQLite)
 7. Securing FastApi applications (1.11.0 — ...)
+    - Hash and compare passwords
+    - Generating JWT tokens
 
 
 ## Silly errors (and things that don't work)
@@ -90,6 +92,7 @@ Also
 
 1. Make sure any required dependencies are introduced clearly!
     - `SQLModel` is imported, but no download is mentioned.
+    - `jose` has the same problem. Which `jose` package do you mean?!
 2. Some "upgrades", such as ~~`@app.on_event("startup")`~~ take time to learn
     - The app lifecycle, for example, requires [understanding](https://github.com/PacktPublishing/Building-Python-Web-APIs-with-FastAPI/issues/12#issue-2843134599) of `contextlib`.
 
@@ -151,19 +154,24 @@ The only _downsides_ to using Bruno is **you've got to manually write your docum
 
 > I really don't want to use Python's OOP style very much.
 > The book is a bit sloppy in places with conflicting instructions.
+> Elm Lang just "feels" nicer: documentation, error messaging, and so on.
 
-1. `json` is preferrable to `.jinja` (at scale)[^4] (just use Elm?)
-2. Try to avoid "magic" Python that isn't transferable
+1. **`json` is preferrable to `.jinja`** (at scale)[^4] (just use Elm?)
+2. **Try to avoid Python "magic"** that isn't transferable
     - Features like `@classmethod`, `response_model=` are handy but not portable
-3. Aim to keep your models, SQL, data, and code as simple as possible
+3. **Aim to keep your models, SQL, data, and code as simple as possible**
+    - [Pydantic documentation](https://docs.pydantic.dev/latest/) is kind of narly and confusing. Some examples in the book are (already) outdated.
     - If you're unsure about something, possibly best to leave it out.
+4. For `status_code=` the book uses `status.HTTP_403_FORBIDDEN` but I'm just using the `403` code by itself, as it's cleaner. This is debatable.
+5. `Depends()` is an important function that injects dependencies into our routes,
+forcing our route to handle something (such as `oauth3_scheme`) first.
 
 
 ## Elm -vs- Python
 
 Whereas Elm has a central `Model` (generally) to work from and uses modules and functions, Python has instances of classes which (I think) are stateful. It feels like Python adds a whole lot of mess to the code base.
 
-A good example of this is FastAPI allows [generating API examples](https://tinyurl.com/fastapi-json-schema-extra) along with your models. I feel the model and **examples should be handled separately**, and Bruno does this perfectly:
+A good example of this is FastAPI allows [generating API examples](https://tinyurl.com/fastapi-json-schema-extra) along with your models. I feel the model and **examples should be handled separately**, as the code becomes messy. Better to let Bruno handle the documentation (and use `/docs` as-is), rather than this:
 
 ```python
 class ToDo(BaseModel):
