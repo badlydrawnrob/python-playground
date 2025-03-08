@@ -26,6 +26,17 @@ from uuid import UUID, uuid4
 #    - @ https://tinyurl.com/pydantic-default-factory (auto-generate)
 #    - @ https://github.com/fastapi/sqlmodel/issues/140#issuecomment-950569807 (UUID)
 #    - @ https://dev.to/rexosei/how-to-make-a-field-unique-with-sqlmodel-4km9
+#
+# ⚠️ Warning
+# ----------
+# > If your `SQLModel` fields are `Optional` it's safe to use as request body,
+# > because these fields don't need to be pinged to the API.
+#
+# 1. Is `default_factory` generated if `User` is used in the request body?!)
+#    - This could slow down the function by a few seconds
+# 2. Do you _really_ want to make all other fields `Optional`?
+#    - This doesn't seem sensible for, say, a user admin area. You'll want to
+#      enforce many fields!
 
 class User(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True, index=True, nullable=False)

@@ -118,6 +118,7 @@ You're going to need the following:
 
 The only _downsides_ to using Bruno is **you've got to manually write your documentation and tests**. FastApi comes with `/docs` and `/redoc` which are pretty handy, but the API testing isn't as nice. However, doing things in Bruno means we can easily switch to a different API framework and keep all our tests in place.
 
+- **[Use OAuth2](https://docs.usebruno.com/auth/oauth2/overview) with Bruno**
 - Import `openapi.json` to a new collection
 
 [Rest Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client), [Postman](https://www.postman.com/)[^3], and [Insomnia](https://insomnia.rest/) are other options.
@@ -162,6 +163,10 @@ The only _downsides_ to using Bruno is **you've got to manually write your docum
 3. **Aim to keep your models, SQL, data, and code as simple as possible**
     - [Pydantic documentation](https://docs.pydantic.dev/latest/) is kind of narly and confusing. Some examples in the book are (already) outdated.
     - If you're unsure about something, possibly best to leave it out.
+4. **Is it wise to use `SQLModel` classes for request body?**
+    - Search `"using fastapi SQLModel as request body"` on Brave browser ...
+    - Understand if it's wiser to use `BaseModel` for your request body (and separate concerns).
+    - `SQLModel` is only usable if all fields in request body are provided (other than `Optional` ones). These seems suboptimal if user preferences _requires_ many fields!! Perhaps this could be handled client-side (enforce non-optional fields)?
 4. For `status_code=` the book uses `status.HTTP_403_FORBIDDEN` but I'm just using the `403` code by itself, as it's cleaner. This is debatable.
 5. `Depends()` is an important function that injects dependencies into our routes,
 forcing our route to handle something (such as `oauth3_scheme`) first.

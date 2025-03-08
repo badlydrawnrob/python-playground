@@ -6,19 +6,29 @@ meta {
 
 post {
   url: http://localhost:8000/user/signin
-  body: json
+  body: formUrlEncoded
   auth: none
 }
 
 body:json {
   {
-    "email": "lovely@bum.com",
+    "username": "agatha@allalong.com",
     "password": "strong!!!"
   }
+}
+
+body:form-urlencoded {
+  username: agatha@allalong.com
+  password: strong!!!
 }
 
 docs {
   # Sign in
   
-  This is a slight difference from `User()` as we only need `email` and `password`.
+  > We're now using a `urlencoded` form to submit our user sign-up data! This uses [OAuth2 `grant_type`](https://oauth.net/2/grant-types/) to authenticate.
+  
+  You can find the [FastApi documentation](https://fastapi.tiangolo.com/tutorial/security/simple-oauth2/) here. Find out more about `urlencoded` [here](https://www.restack.io/p/fastapi-answer-x-www-form-urlencoded-example). We only need email and password, but these are:
+  
+  1. `username` (email)
+  2. `password`
 }

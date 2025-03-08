@@ -54,23 +54,23 @@ hash_password = HashPassword()
 #    `response_model=` is required here (and not a return type).
 
 @user_router.post("/signup")
-async def sign_new_user(user: User, session=Depends(get_session)) -> dict:
+async def sign_new_user(data: User, session=Depends(get_session)) -> dict:
     # First check if user already exists
-    statement = select(User).where(User.email == user.email)
+    statement = select(User).where(User.email == data.email)
     user = session.exec(statement).first()
     
     if user: # This could be `None` if user doesn't exist
         raise HTTPException(status_code=409, detail="Username already exists")
 
     # Hash the password (using `user` which is a `UserSign` class)
-    hashed_password = hash_password.create_hash(user.password)
-    user.password = hashed_password
+    hashed_password = hash_password.create_hash(data.password)
+    data.password = hashed_password # replace request body password
 
     # Now add the user with their newly hashed password
-    session.add(User(email=user.email, password=user.password)) #! (1)
+    session.add(User(email=data.email, password=data.password)) #! (1)
     session.commit()
 
-    return { "message": f"User with {user.email} registered!" }
+    return { "message": f"User with {data.email} registered!" }
 
 
 @user_router.post("/signin", response_model=TokenResponse) #! (2)
@@ -85,7 +85,7 @@ async def sign_in_user(
     if db_user_exist is None:
         raise HTTPException(status_code=404, detail="User doesn't exist")
     if hash_password.verify_hash(user.password, db_user_exist.password):
-        access_token = create_access_token(user_exist.email)
+        access_token = create_access_token(db_user_exist.email)
         return {
             "access_token": access_token,
             "token_type": "Bearer"
