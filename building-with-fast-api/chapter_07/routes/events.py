@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Body, Depends, HTTPException, Request
 
+from auth.authenticate import authenticate
 from database.connection import get_session
 from models.events import Event, EventUpdate
 from sqlmodel import select, delete
@@ -31,6 +32,13 @@ from typing import List
 # ----------------------
 # > ⚠️ Wherever you `DELETE` data, be sure to prompt the user to confirm.
 #
+# Authentication
+# --------------
+# > ⚠️ Be sure to authenticate "risky" routes ...
+# 
+# These are things that should not be public facing, or possible to do
+# without an account. Also make sure that the _correct user_ is allowed to edit
+# _their_ posts, but not posts of other users.
 #
 # Questions
 # ---------
@@ -53,13 +61,19 @@ from typing import List
 #    - Keep your code clean and simple!
 # 9. Why do some examples use `await` and others don't?
 #    - SQLite is synchronous, so we don't need `await` here!
+#    - `await` is used for asynchronous code (like web requests)
 #
 # Bugs
 # ----
 # 1. ⭐ Duplicate `:id`s cause errors with SQL `POST`
+#    - Solution 1: Use a UUID instead of an integer
+#    - Solution 2: Check for duplicates before adding to the database
 # 2. Make sure all errors are handled.
 #    - See `chapter_03` for full checks, such as `[]` empty events, and
 #      duplicate `:id`s in the "database".
+#    - Map this out visually using potential inputs, but don't over plan!
+# 3. ⭐ Currently ANY authenticated user can update ANY event:
+#    - You should always check that an event "belongs" to the current user.
 
 event_router = APIRouter(
     tags=["Events"] # used for `/redoc` (menu groupings)
@@ -91,7 +105,7 @@ async def retrieve_event(id: int, session=Depends(get_session)) -> Event:
 
 @event_router.post("/new")
 #! Body() isn't needed? async def create_event(body: Event = Body(), session=Depends(get_session)) -> dict:
-async def create_event(body: Event, session=Depends(get_session)) -> dict:
+async def create_event(body: Event, user: str = Depends(authenticate), session=Depends(get_session)) -> dict:
     session.add(body) # Use the body argument with `Event` type
     session.commit() # Commit the `Event` to the database
     session.refresh(body) #! Refresh the `Event` object
@@ -100,7 +114,7 @@ async def create_event(body: Event, session=Depends(get_session)) -> dict:
 
 #! We've changed from `PUT` to `PATCH` here (see tag `1.10.4`, deprecated)
 @event_router.patch("/edit/{id}", response_model=Event)
-async def update_event(id: int, data: EventUpdate, session=Depends(get_session)) -> Event:
+async def update_event(id: int, data: EventUpdate, user: str = Depends(authenticate), session=Depends(get_session)) -> Event:
     event = session.get(Event, id) # Get the `Event` object from database
 
     if not event:
@@ -116,7 +130,7 @@ async def update_event(id: int, data: EventUpdate, session=Depends(get_session))
 
 
 @event_router.delete("/{id}")
-async def delete_event(id: int, session=Depends(get_session)) -> dict:
+async def delete_event(id: int, user: str = Depends(authenticate), session=Depends(get_session)) -> dict:
     event = session.get(Event, id)
 
     if event:
