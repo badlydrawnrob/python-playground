@@ -21,6 +21,14 @@ from database.database import Settings
 #
 # @ https://pypi.org/project/python-jose/
 # @ #! https://tinyurl.com/miguel-utcnow-deprecated
+#
+# ⭐ Decoders
+# -----------
+# > Our `payload` is simply `base64` encoded ...
+# > Our token, however won't decode (it needs the `SECRET_KEY`)
+#
+# Which means we can decode it with base64 too! For the `expires` value, we need
+# to use the `Time` module in Elm (with same method as it's encoded).
 
 settings = Settings() # Get the secret key
 
