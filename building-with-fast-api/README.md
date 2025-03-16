@@ -9,6 +9,7 @@ The FastApi documentation can sometimes be unclear, or overly complicated to fin
 - Backend servers require domain knowledge (and low-level detail)
 - They're something I'm personally not 100% comfortable with ...
 - It's wise to find an experienced dev to help out and check code.
+- `/auth` and `/database` and `/.env` are especially important to get right.
 
 I think it's wise to provide yourself **a clear learning frame**, by which I mean **drawing a clear line between what you're prepared to learn, and what you're not**. For example, getting a working and reliable email confirmation script is non-trivial!
 
