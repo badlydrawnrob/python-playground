@@ -2,48 +2,34 @@
 
 > A [brief overview](https://lyz-code.github.io/blue-book/fastapi/) of FastApi
 
-The only problem with Python as a http server is that it's slower than other languages. This might not be a problem. The book also uses MongoDB in later chapters, and I'm only interested in SQLite. Setting up MongoDB on a Mac was an uncomfortable and painful process, so I gave up.
+FastApi seems a decent `http` server that's quick (other languages are faster). The book uses MongoDB in later chapters, but I found it uncomfortable and painful to setup and use. For that reason, I prefer SQLite.
+
+The FastApi documentation can sometimes be unclear, or overly complicated to find what you need, and mould it to your requirements. This book has also fast become outdated (dependency hell), so watch out for changes and updates to FastApi. Authentication is relatively easy to use (with guidance) but email notifications aren't baked in.
+
+- Backend servers require domain knowledge (and low-level detail)
+- They're something I'm personally not 100% comfortable with ...
+- It's wise to find an experienced dev to help out and check code.
+
+I think it's wise to provide yourself **a clear learning frame**, by which I mean **drawing a clear line between what you're prepared to learn, and what you're not**. For example, getting a working and reliable email confirmation script is non-trivial!
+
+Personally, I'd prefer someone else to handle things like that, so unless there's a well-documented and stable plugin, I'm going to hire a professional. I prefer things as simple as possible; SQLite and FastApi routes are easy enough to understand the basics, but there can be a lot of moving parts! There's many ways to build out your app architecture, and I'm not sure there's a book out there that covers the best way to do things for _your_ app.
+
+So for prototypes: keep things simple, have a professional check your code, and delegate the hard stuff if you're not comfortable with it. There's so much to learn with programming it's good to set your own boundaries!
 
 
 ## Commands
 
 1. `uv run uvicorn api:app --port 8000 --reload` (or run from `.venv`)
 2. `uv run main.py` (if you've setup properly `__main__.py`)
+    - Or, `fastapi dev main.py` (seems to essentially be the same)
 3. `uv run pyright main.py` (run in strict mode, Pylance in VS Code)
 
-## Self-documenting (but use Bruno)
+## Your API is self-documenting (but use Bruno anyway)
 
 > `/docs` gives a JSON Schema documentation ...
+> `/redoc` provides alternative documentation.
 
-But to implement it looks like messy code. Things like `Annotated[]`, `"json_schema_extra"`, and so on. I'm finding that Bruno is pretty nice to work (as an alternative) with and does most of what I'd need.
-
-
-## Learning method
-
-> **It's safe to say I'm not comfortable with backend and servers**, so I want my experience and pleasant and **simple as possible**. SQLite is reasonably simple to use. Be very mindful of what you need to understand: **is this something I can outsource?**
-
-Remember that sometimes it's enough to know that it's working code that works. A high-level view of what the code does is helpful, otherwise you can view it as a
-"black box" that has an input and an output. Ask yourself "do I really need to understand this in detail" before diving down any rabbit holes.
-
-Some other things to consider are:
-
-1. Copilot and ChatGPT (it works!)
-    - Coding in the [age of Ai](https://github.com/badlydrawnrob/anki/issues/92)
-    - Watch out for Ai hallucinations!
-2. **Ai generated flashcards** (human in the loop)
-3. **Memorable examples (storify)**
-4. **Readability** (simple language, <s>academic writing</s>)
-    - Personally I find code hard to read at scale ...
-    - Or when each function has lots going on (multi-coloured!)
-5. **RRReduce the amount you learn** (or teach)
-    - **The Python learning journey is f* endless ...**
-    - Some things can be "they just are" without asking WHY.
-    - Stay in the shallows? Deep dive? It depends.
-
-Limit Ai to give a fun example of the code (block), with a view to create cards later, as well as clarifying things as a study partner. My general process is: read, make notes (per chapter), condense notes, generate flashcards, files and programs. Creating a small series of books could come later.
-
-- "Give me a fun example for scaffolded learning on ____"
-- "Give it to me as [draw!, missing, simple] data"
+But to implement these properly leads to messy code. Things like `Annotated[]`, `"json_schema_extra"` metadata, and so on. I'm finding that Bruno is pretty nice to work (as an alternative) with and does most of what I'd need.
 
 
 ## Chapters
@@ -107,7 +93,6 @@ You're going to need the following:
 - [Uvicorn](https://www.uvicorn.org/)
 - [VS Code Python plugin](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
 - [PyRight](https://microsoft.github.io/pyright/) (CLI in [strict mode](https://github.com/jackgene/reactive-word-cloud-python/blob/b48306f94e1038c26c7c70ab56337ab26fa2b719/pyproject.toml#L21-L23), Pylance in VS Code)
-- ~~[MyPy](https://mypy-lang.org/)~~ (optional, runs slowly)
 - [ORM](https://sqlmodel.tiangolo.com/) of some description
     - Be extra careful with [raw SQL](https://www.youtube.com/watch?v=Cp3bXHYp-bY).
 
@@ -116,7 +101,7 @@ You're going to need the following:
 > A great API test kit for Mac.
 > Much simpler than the alternatives (IMO)
 
-The only _downsides_ to using Bruno is **you've got to manually write your documentation and tests**. FastApi comes with `/docs` and `/redoc` which are pretty handy, but the API testing isn't as nice. However, doing things in Bruno means we can easily switch to a different API framework and keep all our tests in place.
+The only _downsides_ to using Bruno is **you've got to manually write your documentation and tests**. FastApi comes with `/docs` and `/redoc` which are pretty handy, but I prefer Bruno's way of writing documentation. Doing things in Bruno means we can easily switch to a different API framework and keep all our tests in place.
 
 - **[Use OAuth2](https://docs.usebruno.com/auth/oauth2/overview) with Bruno**
 - Import `openapi.json` to a new collection
@@ -146,8 +131,10 @@ The only _downsides_ to using Bruno is **you've got to manually write your docum
 > Also may have to consider the `json` and client code (w/ business logic)
 > Also handy is `user_version` which you can do [like this](https://github.com/sqlitebrowser/sqlitebrowser/issues/366).
 
-- For simple changes, consider [manually migrating](https://stackoverflow.com/a/998652)
-- You can also use [ORM tools](https://docs.peewee-orm.com/en/2.10.2/peewee/playhouse.html#migrate) or something like [alembic](https://alembic.sqlalchemy.org/en/latest/) (depending on what ORM you're using)
+FastApi doesn't come with data migration, so it might be wise to do this manually with SQLite, or find a solid tool (or Ai) to help you. [Alembic](https://alembic.sqlalchemy.org/) seems a bit difficult. In general the advice seems to be create new (column, table) and copy data over (from old column) before dropping the old. Practice on a dummy database first, and always backup first!!
+
+- Change the [`user version`](https://stackoverflow.com/a/998652)
+- Use [ORM tools](https://docs.peewee-orm.com/en/2.10.2/peewee/playhouse.html#migrate) if you prefer
 - GUIs like [Enso](https://ensoanalytics.com/) or [Ai](https://medium.com/@timothyjosephcw/enhancing-data-migration-testing-with-ai-in-2024-454537440ab3) might be helpful too!
 
 
