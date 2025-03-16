@@ -52,11 +52,18 @@ import uvicorn
 #
 # Wishlist
 # --------
-# 1. We only want to allow logged in `User`s to create and update events
-# 2. Our `Event` model should have a `User` field (for ownership)
-# 3. Reduce code duplication (for example, similar `SELECT` statements)
+# 1. We want to assure that the right logged in user edits their (and only their)
+#    events. They shouldn't be able to see or work with other people's events.
+# 2. We should have a `UUID` and a `ID` which is unique for each user.
+#    - The `UUID` is public and the `ID` is private
+#    - The `UUID` is used instead of the user's email address (in authenticate)
+# 3. Our `Event` model should have a `User` field (for ownership)
+#    - It may be a dumb idea to have a `User.events` list (as there could be many)
+#    - If you need `json` list of events, you could use a `User.events` method
+# 4. Reduce code duplication (for example, similar `SELECT` statements)
 #    - Abstract this into a function (or a class)
-# 4. Check which encryption and hashing is most secure
+# 5. Check which encryption and hashing is most secure (or secure enough)
+#    - For instance, create a better `SECRET_KEY` perhaps.
 #
 # Questions
 # ---------

@@ -35,6 +35,8 @@ from typing import List
 # Authentication
 # --------------
 # > ⚠️ Be sure to authenticate "risky" routes ...
+# > The `authenticate` function is used to check if a user is logged in.
+# > It'll return the user's email address if they are (from the `payload`)!
 # 
 # These are things that should not be public facing, or possible to do
 # without an account. Also make sure that the _correct user_ is allowed to edit
@@ -110,7 +112,10 @@ async def create_event(body: Event, user: str = Depends(authenticate), session=D
     session.commit() # Commit the `Event` to the database
     session.refresh(body) #! Refresh the `Event` object
 
-    return { "message": "Event created successfully" }
+    return {
+            "message": "Event created successfully",
+            "user": user #! Debugging only: this will return the user's email!
+            }
 
 #! We've changed from `PUT` to `PATCH` here (see tag `1.10.4`, deprecated)
 @event_router.patch("/edit/{id}", response_model=Event)
