@@ -33,6 +33,12 @@ curl -X 'POST' \
   -d 'grant_type=password&username=[email]&password=[password]&scope=&client_id=string&client_secret=string'
 ```
 
+```sql
+-- Chapter 07 code
+SELECT u.email, e.title FROM user AS u
+JOIN event AS e ON u.email = e.creator; -- inner join
+```
+
 ## Your API is self-documenting (but use Bruno anyway)
 
 > `/docs` gives a JSON Schema documentation ...

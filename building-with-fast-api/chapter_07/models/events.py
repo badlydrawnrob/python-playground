@@ -28,6 +28,7 @@ from typing import List, Optional
 # 4. #! Currently the `creator` is just a string, which we've converted to a
 #    foreign key. Our `/auth` function returns a `user.email`, so we'll use that.
 #    - Ideally the `User.id` field (UUID) would be used instead!
+#    - @ https://www.dittofi.com/learn/relationships-in-sql-complete-guide-with-examples
 #
 # Questions
 # ---------
