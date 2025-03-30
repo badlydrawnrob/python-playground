@@ -30,6 +30,26 @@ Personally, I'd prefer someone else to handle things like that, so unless there'
 There's so much to learn with programming it's good to set your own boundaries!
 
 
+## Chapters
+
+> [Some notes](https://github.com/astral-sh/uv/issues/10543#issuecomment-2587276856) on using `uv` and `venv` setup[^1]
+
+1. Hello World
+2. Routing (1.6.0 — 1.6.6)
+3. Response models and error handling (1.7.0 — 1.7.4)
+4. Templating with Jinja (1.8.0 — 1.8.2)
+    — **1.8.1** for `json` version
+5. Structuring FastApi applications (1.9.0 — 1.9.1)
+6. Working with the database
+    - SQLModel (1.10.0 — 1.10.6)
+    - ~~MongoDB~~[^2] (I'm sticking with SQLite)
+7. Securing FastApi applications (1.11.0 — 1.11.9)
+    - Hash and compare passwords
+    - Generating JWT tokens
+    - Securing routes (with authentication)
+    - CORS policy (middleware)
+
+
 ## Helful Commands
 
 1. `uv run uvicorn api:app --port 8000 --reload` (or run from `.venv`)
@@ -57,26 +77,6 @@ JOIN event AS e ON u.email = e.creator; -- inner join
 > `/redoc` provides alternative documentation.
 
 To implement these properly leads to messy code! Things like `Annotated[]`, `"json_schema_extra"` metadata, and so on. I'm finding that Bruno is pretty nice to work with (as an alternative) and does most of what I'd need.
-
-
-## Chapters
-
-> [Some notes](https://github.com/astral-sh/uv/issues/10543#issuecomment-2587276856) on using `uv` and `venv` setup[^1]
-
-1. Hello World
-2. Routing (1.6.0 — 1.6.6)
-3. Response models and error handling (1.7.0 — 1.7.4)
-4. Templating with Jinja (1.8.0 — 1.8.2)
-    — **1.8.1** for `json` version
-5. Structuring FastApi applications (1.9.0 — 1.9.1)
-6. Working with the database
-    - SQLModel (1.10.0 — 1.10.6)
-    - ~~MongoDB~~[^2] (I'm sticking with SQLite)
-7. Securing FastApi applications (1.11.0 — 1.11.9)
-    - Hash and compare passwords
-    - Generating JWT tokens
-    - Securing routes (with authentication)
-    - CORS policy (middleware)
 
 
 ## Silly errors (and things that don't work)
