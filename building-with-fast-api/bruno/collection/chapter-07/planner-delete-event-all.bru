@@ -1,0 +1,25 @@
+meta {
+  name: planner-delete-event-all
+  type: http
+  seq: 8
+}
+
+delete {
+  url: http://localhost:8000/event/
+  body: none
+  auth: none
+}
+
+docs {
+  # Event
+  
+  > `DELETE` all events
+  
+  ⚠️ This is destructive ... warn the user!
+  
+  ## 🐞 Bugs
+  
+  > Just use `SQL`!
+  
+  Proper authentication is needed, and in fact, removing it from the routes is probably the best option! (or create an `admin`)
+}

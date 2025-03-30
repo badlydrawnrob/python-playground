@@ -1,0 +1,32 @@
+meta {
+  name: planner-post-signup
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8000/user/signup
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "lovely@bum.com",
+    "password": "strong!!!"
+  }
+}
+
+docs {
+  # Sign up
+  
+  > We're currently using `User` for both request body **and** the SQL `add()` to database!
+  
+  Our `User.ID` and `User.events` are `Optional`.
+  
+  ## 🐞 Bugs
+  
+  > You might want to enforce fields on the client-side, say for user preferences. Or, you could create a `UserRequest` with `BaseModel`?
+  
+  This might not be the ideal way to do it, as it's not separating concerns between the API request and the SQL schema.
+}

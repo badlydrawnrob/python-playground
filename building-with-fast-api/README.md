@@ -1,30 +1,62 @@
 # README
 
 > A [brief overview](https://lyz-code.github.io/blue-book/fastapi/) of FastApi
+> For prototyping, keep things simple, get a professional to check your code ...
+> and delegate the hard stuff if you're not comfortable with it.
+
+FastApi seems a decent `http` server that's quick (other languages are faster). The book uses MongoDB in later chapters, but I found it uncomfortable and painful to setup and use. For that reason, I prefer SQLite.
+
+The FastApi documentation can sometimes be unclear, or overly complicated to find what you need, and mould it to your requirements.
+
+The book is good from a high-level view, but has many errors and continuity issues, so you'll have to fix things and check documentation. It's also fast becoming outdated (dependency hell) as FastApi evolves, so watch out for changes and updates. Authentication is easy(ish) to use (with guidance) but email notifications aren't baked in, and other nice-to-haves can be difficult:
+
+- Backend servers require domain knowledge (and low-level detail)
+- There's a lot that I'm personally not 100% comfortable with DIYing ...
+- It's wise to find an experienced dev to help out and double-check code.
+- `/auth`, `/database` and `/.env` are especially important to get right!
+- I'd prefer to treat parts of the server as a "black box" (set and forget)
+- Extra "defensive coding" and security advice may be needed ...
+- Error messaging is particularly frustrating (cryptic, verbose, incomplete)
 
 
-## Learning method
+## Setting yourself boundaries
 
-> Coding in the [age of Ai](https://github.com/badlydrawnrob/anki/issues/92)
-> Watch out for Ai hallucinations!
+> Have a clear goal, a clear learning frame
 
-1. Copilot and ChatGPT (it works!)
-2. **Ai generated flashcards** (human in the loop)
-3. **Memorable examples (storify)**
-4. **Readability** (simple language, <s>academic writing</s>)
-    - Personally I find code hard to read at scale ...
-    - Or when each function has lots going on (multi-coloured!)
-5. **RRReduce the amount you learn** (or teach)
-    - **The Python learning journey is f* endless ...**
-    - Some things can be "they just are" without asking WHY.
-    - Stay in the shallows? Deep dive? It depends.
+I think it's wise to provide yourself **a clear learning frame**, by which I mean **drawing a clear line between what you're prepared to learn, and what you're not**. For example, getting a working and reliable email confirmation script is non-trivial!
 
-Limit Ai to give a fun example of the code (block), with a view to create cards later, as well as clarifying things as a study partner. My general process is: read, make notes (per chapter), condense notes, generate flashcards, files and programs. Creating a small series of books could come later.
+Personally, I'd prefer someone else to handle things like that, so unless there's a well-documented and stable plugin, I'm going to hire a professional. **I prefer things as simple as possible;** SQLite and FastApi routes are easy enough to understand the basics, but there can be a lot of moving parts! There's many ways to build out your app architecture, and I'm not sure there's a book out there that covers the best way to do things for _your_ app.
 
-"Give me a fun example for scaffolded learning on ____"
-"Give it to me as [draw!, missing, simple] data"
+There's so much to learn with programming it's good to set your own boundaries!
 
-It's safe to say I'm not comfortable with backend and servers, so I want my experience and pleasant and simple as possible. SQLite is reasonable simple to use.
+
+## Helful Commands
+
+1. `uv run uvicorn api:app --port 8000 --reload` (or run from `.venv`)
+2. `uv run main.py` (if you've setup properly `__main__.py`)
+    - Or, `fastapi dev main.py` (seems to essentially be the same)
+3. `uv run pyright main.py` (run in strict mode, Pylance in VS Code)
+
+```terminal
+curl -X 'POST' \                                        
+  'http://localhost:8000/user/signin' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'grant_type=password&username=[email]&password=[password]&scope=&client_id=string&client_secret=string'
+```
+
+```sql
+-- Chapter 07 code
+SELECT u.email, e.title FROM user AS u
+JOIN event AS e ON u.email = e.creator; -- inner join
+```
+
+## Your API is self-documenting (but use Bruno anyway)
+
+> `/docs` gives a JSON Schema documentation ...
+> `/redoc` provides alternative documentation.
+
+To implement these properly leads to messy code! Things like `Annotated[]`, `"json_schema_extra"` metadata, and so on. I'm finding that Bruno is pretty nice to work with (as an alternative) and does most of what I'd need.
 
 
 ## Chapters
@@ -40,28 +72,30 @@ It's safe to say I'm not comfortable with backend and servers, so I want my expe
 6. Working with the database
     - SQLModel (1.10.0 — 1.10.6)
     - ~~MongoDB~~[^2] (I'm sticking with SQLite)
+7. Securing FastApi applications (1.11.0 — 1.11.9)
+    - Hash and compare passwords
+    - Generating JWT tokens
+    - Securing routes (with authentication)
+    - CORS policy (middleware)
 
 
-## Silly errors
-### And things that don't work
+## Silly errors (and things that don't work)
 
-> With SQLModel, some things that should be easy don't seem to be.
+> **The SQLModel documentation [isn't always great](https://github.com/badlydrawnrob/elm-playground/issues/45)**, and some things that should be
+> easy enough, don't seem to be. Compared to Elm lang, Python errors can be
+> a bit cryptic and using the REPL for "practice" or "discovery" isn't always easy
+> or possible with SQLModel setup.
 
 1. **`:id` not added** to the Bruno path parameters (getting `method not allowed`)
 2. **`count()`** fails hard: the alternative is [`first()`](https://sqlmodel.tiangolo.com/tutorial/one/) with SQLModel
 
 
-## Commands
-
-1. `uv run uvicorn api:app --port 8000 --reload` (or run from `.venv`)
-2. `uv run main.py` (if you've setup properly `__main__.py`)
-
-
 ## Errata
 
-> **The major rule is to always BE CONSISTENT!**
-> There's a lot of small mistakes and continuity errors ...
-> So use ⚠️ `#!` style comments for major breaking code! 
+> **The major rule for writing is ... BE CONSISTENT!**
+> - There's a lot of small mistakes and continuity errors ...
+> - So use ⚠️ `#!` style comments for major breaking code!
+> - A single source of truth for code (edits break things)
 
 For example, pg.131:
 
@@ -74,8 +108,10 @@ Also
 
 1. Make sure any required dependencies are introduced clearly!
     - `SQLModel` is imported, but no download is mentioned.
+    - `jose` has the same problem. Which `jose` package do you mean?!
 2. Some "upgrades", such as ~~`@app.on_event("startup")`~~ take time to learn
     - The app lifecycle, for example, requires [understanding](https://github.com/PacktPublishing/Building-Python-Web-APIs-with-FastAPI/issues/12#issue-2843134599) of `contextlib`.
+3. `grant_type=` missing the `password` keyword in the authentication curl call.
 
 
 ## Tools
@@ -87,15 +123,18 @@ You're going to need the following:
 - [Pydantic](https://pydantic.dev/)
 - [Uvicorn](https://www.uvicorn.org/)
 - [VS Code Python plugin](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
-- [MyPy](https://mypy-lang.org/) (optional, runs slowly)
+- [PyRight](https://microsoft.github.io/pyright/) (CLI in [strict mode](https://github.com/jackgene/reactive-word-cloud-python/blob/b48306f94e1038c26c7c70ab56337ab26fa2b719/pyproject.toml#L21-L23), Pylance in VS Code)
+- [ORM](https://sqlmodel.tiangolo.com/) of some description
+    - Be extra careful with [raw SQL](https://www.youtube.com/watch?v=Cp3bXHYp-bY).
 
 ### [Bruno](https://www.usebruno.com/)
 
 > A great API test kit for Mac.
 > Much simpler than the alternatives (IMO)
 
-The only _downsides_ to using Bruno is **you've got to manually write your documentation and tests**. FastApi comes with `/docs` and `/redoc` which are pretty handy, but the API testing isn't as nice. However, doing things in Bruno means we can easily switch to a different API framework and keep all our tests in place.
+The only _downsides_ to using Bruno is **you've got to manually write your documentation and tests**. FastApi comes with `/docs` and `/redoc` which are pretty handy, but I prefer Bruno's way of writing documentation. Doing things in Bruno means we can easily switch to a different API framework and keep all our tests in place.
 
+- **[Use OAuth2](https://docs.usebruno.com/auth/oauth2/overview) with Bruno**
 - Import `openapi.json` to a new collection
 
 [Rest Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client), [Postman](https://www.postman.com/)[^3], and [Insomnia](https://insomnia.rest/) are other options.
@@ -123,8 +162,10 @@ The only _downsides_ to using Bruno is **you've got to manually write your docum
 > Also may have to consider the `json` and client code (w/ business logic)
 > Also handy is `user_version` which you can do [like this](https://github.com/sqlitebrowser/sqlitebrowser/issues/366).
 
-- For simple changes, consider [manually migrating](https://stackoverflow.com/a/998652)
-- You can also use [ORM tools](https://docs.peewee-orm.com/en/2.10.2/peewee/playhouse.html#migrate) or something like [alembic](https://alembic.sqlalchemy.org/en/latest/) (depending on what ORM you're using)
+FastApi doesn't come with data migration, so it might be wise to do this manually with SQLite, or find a solid tool (or Ai) to help you. [Alembic](https://alembic.sqlalchemy.org/) seems a bit difficult. In general the advice seems to be create new (column, table) and copy data over (from old column) before dropping the old. Practice on a dummy database first, and always backup first!!
+
+- Change the [`user version`](https://stackoverflow.com/a/998652)
+- Use [ORM tools](https://docs.peewee-orm.com/en/2.10.2/peewee/playhouse.html#migrate) if you prefer
 - GUIs like [Enso](https://ensoanalytics.com/) or [Ai](https://medium.com/@timothyjosephcw/enhancing-data-migration-testing-with-ai-in-2024-454537440ab3) might be helpful too!
 
 
@@ -132,19 +173,29 @@ The only _downsides_ to using Bruno is **you've got to manually write your docum
 
 > I really don't want to use Python's OOP style very much.
 > The book is a bit sloppy in places with conflicting instructions.
+> Elm Lang just "feels" nicer: documentation, error messaging, and so on.
 
-1. `json` is preferrable to `.jinja` (at scale)[^4] (just use Elm?)
-2. Try to avoid "magic" Python that isn't transferable
+1. **`json` is preferrable to `.jinja`** (at scale)[^4] (just use Elm?)
+2. **Try to avoid Python "magic"** that isn't transferable
     - Features like `@classmethod`, `response_model=` are handy but not portable
-3. Aim to keep your models, SQL, data, and code as simple as possible
+3. **Aim to keep your models, SQL, data, and code as simple as possible**
+    - [Pydantic documentation](https://docs.pydantic.dev/latest/) is kind of narly and confusing. Some examples in the book are (already) outdated.
     - If you're unsure about something, possibly best to leave it out.
+4. **Is it wise to use `SQLModel` classes for request body?**
+    - Search `"using fastapi SQLModel as request body"` on Brave browser ...
+    - Understand if it's wiser to use `BaseModel` for your request body (and separate concerns).
+    - `SQLModel` is only usable if all fields in request body are provided (other than `Optional` ones). These seems suboptimal if user preferences _requires_ many fields!! Perhaps this could be handled client-side (enforce non-optional fields)?
+4. For `status_code=` the book uses `status.HTTP_403_FORBIDDEN` but I'm just using the `403` code by itself, as it's cleaner. This is debatable.
+5. `Depends()` is an important function that injects dependencies into our routes,
+forcing our route to handle something (such as `oauth3_scheme`) first.
+6. [Why use `response_model=`](https://github.com/fastapi/fastapi/discussions/8247) instead of a response type?
 
 
 ## Elm -vs- Python
 
 Whereas Elm has a central `Model` (generally) to work from and uses modules and functions, Python has instances of classes which (I think) are stateful. It feels like Python adds a whole lot of mess to the code base.
 
-A good example of this is FastAPI allows [generating API examples](https://tinyurl.com/fastapi-json-schema-extra) along with your models. I feel the model and **examples should be handled separately**, and Bruno does this perfectly:
+A good example of this is FastAPI allows [generating API examples](https://tinyurl.com/fastapi-json-schema-extra) along with your models. I feel the model and **examples should be handled separately**, as the code becomes messy. Better to let Bruno handle the documentation (and use `/docs` as-is), rather than this:
 
 ```python
 class ToDo(BaseModel):
@@ -165,12 +216,6 @@ class ToDo(BaseModel):
         }
     }
 ```
-
-### Self documentation
-
-> `/docs` gives a JSON Schema documentation ...
-
-But to implement it looks like messy code. Things like `Annotated[]`, `"json_schema_extra"`, and so on. I'm finding that Bruno is pretty nice to work (as an alternative) with and does most of what I'd need.
 
 
 ## Problems

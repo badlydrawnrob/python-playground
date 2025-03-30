@@ -1,0 +1,28 @@
+meta {
+  name: planner-get-event-by-id
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://localhost:8000/event/:id
+  body: none
+  auth: none
+}
+
+params:path {
+  id: 1
+}
+
+docs {
+  # Events
+  
+  > Get event by `:id`
+  
+  ## 🐞 Bugs
+  
+  1. Duplicate `:id` is currently allowed
+      - We'll be using `UUID`s eventually
+  2. Dictionary key order doesn't seem to be guaranteed?
+      - `"id"` is second last
+}

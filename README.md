@@ -46,8 +46,7 @@ It's also not at all type safe by default (and type annotations are awkward). Ev
 
 ### Python
 
-> [Declaration order](https://stackoverflow.com/a/758197) matters in Python!
-> See also [strongly typed](https://talks.jackleow.com/strongly-typed) talk.
+> [Declaration order](https://stackoverflow.com/a/758197) matters in Python! You might also want to [strongly type](https://talks.jackleow.com/strongly-typed) your code. It's also important to understand "[why functional programming](https://dev.to/cherryramatis/ending-the-war-or-continuing-it-lets-bring-functional-programming-to-oop-codebases-3mhd) over object-oriented?"?
 
 ```python
 from typing import List
@@ -76,6 +75,12 @@ niceTypes =
 ```terminal
 > niceTypes [1, 2, 3]
 ```
+
+### Other paradigm differences
+
+1. Classes and methods (rather than plain functions).
+2. [Keyword arguments](https://www.geeksforgeeks.org/args-kwargs-python/) and other Python magic.
+3. The concept of [`self`](https://how.dev/answers/what-is-self-in-python) (a pretty dumb idea in my opinion)
 
 
 ## The compiler
