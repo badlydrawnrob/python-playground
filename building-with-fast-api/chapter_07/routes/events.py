@@ -108,13 +108,15 @@ async def retrieve_event(id: int, session=Depends(get_session)) -> Event:
 @event_router.post("/new")
 #! Body() isn't needed? async def create_event(body: Event = Body(), session=Depends(get_session)) -> dict:
 async def create_event(body: Event, user: str = Depends(authenticate), session=Depends(get_session)) -> dict:
+    body.creator = user # Make the user (email) the creator of the event
     session.add(body) # Use the body argument with `Event` type
     session.commit() # Commit the `Event` to the database
     session.refresh(body) #! Refresh the `Event` object
 
     return {
             "message": "Event created successfully",
-            "user": user #! Debugging only: this will return the user's email!
+            "user": user, #! Debugging only: this will return the user's email!
+            "event": body #! Debugging only: this will return the `Event` object
             }
 
 #! We've changed from `PUT` to `PATCH` here (see tag `1.10.4`, deprecated)

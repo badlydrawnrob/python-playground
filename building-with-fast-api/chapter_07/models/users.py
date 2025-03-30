@@ -21,8 +21,8 @@ from uuid import UUID, uuid4
 #      accessing data from our request body, we can use `BaseModel` too.
 # 3. Following from (1) are there any errors using Pydantic for `UserSign`?
 #    - This is for sign-up and sign-in, just for testing purposes.
-# 4. See `Field()` settings, such as `index=` and `unique=`
-#    - @ https://sqlmodel.tiangolo.com/tutorial/indexes/#an-index-and-a-dictionary
+# 4. See `Field()` settings, such as `index=` and `unique=`:
+#    - @ ⭐ https://sqlmodel.tiangolo.com/tutorial/indexes/#an-index-and-a-dictionary
 #    - @ https://tinyurl.com/pydantic-default-factory (auto-generate)
 #    - @ https://github.com/fastapi/sqlmodel/issues/140#issuecomment-950569807 (UUID)
 #    - @ https://dev.to/rexosei/how-to-make-a-field-unique-with-sqlmodel-4km9
