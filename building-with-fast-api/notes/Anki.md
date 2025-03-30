@@ -8,14 +8,14 @@ There's quite a lot of minor (and perhaps major) errors in this book, so you've 
 ## Essentials
 
 1. Have a great **high-level view** of your API, architecture, data flow, etc.
-2. Treat some parts of the program as a black box (outsource these parts).
-3. Be extremely careful of your "learning line", the framing of "need to know".
+2. **Treat some parts of the program as a black box** (outsource these parts).
+3. Be extremely careful of **your "learning line", the framing of "need to know"**.
 4. What parts of our program (backend) are hidden from view? Is it necessary to
    hide the `Event.ID` from the general public, or not?
     - We want our events changeable by `ID`, which is visible in the `PATCH` url
     - But our "real" `User.ID` will be hidden from the user (we'll use `UUID`)
       in the url.
-5. "Defensive" coding:
+5. **"Defensive" coding:**
     - Positively or negatively check?
     - How many checks should we have? (just-enough, don't plan ahead)
     - Basic security rules (don't give too much away in errors/response)
@@ -87,6 +87,10 @@ You can rip a lot of this stuff from the book, but put it in very simple terms. 
 - **Structuring applications**
     - And best practices for comments, packages, etc
     - To an intermediate level.
+- **CORS Policy**
+    - By default, the FastApi when consumed by a frontend app, the browser will not allow cross-origin HTTP requests.
+    - FastApi gives us Middleware to change this.
+- **What is middleware?**
 
 
 ## Setup

@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from database.connection import conn
 from fastapi.responses import RedirectResponse
@@ -81,6 +82,7 @@ import uvicorn
 #    - @ https://stackoverflow.com/a/48804718
 # 3. What's the best and most user-friendly way to authenticate users?
 #    - #! This isn't something I feel comfortable setting up myself!
+# 4. What the fuck does "Middleware" mean?
 
 app = FastAPI()
 
@@ -89,6 +91,22 @@ app = FastAPI()
 
 app.include_router(user_router, prefix="/user")
 app.include_router(event_router, prefix="/event")
+
+# Middleware -------------------------------------------------------------------
+# A list of allowed CORS origins (by default only the same domain)
+# @ https://fastapi.tiangolo.com/tutorial/cors/
+
+origins = [
+    "http://localhost:8000" # a list of domains, or `"*"` wildcard for any origin
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 # Database build ---------------------------------------------------------------
 

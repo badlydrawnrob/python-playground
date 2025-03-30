@@ -1,24 +1,36 @@
 # README
 
 > A [brief overview](https://lyz-code.github.io/blue-book/fastapi/) of FastApi
+> For prototyping, keep things simple, get a professional to check your code ...
+> and delegate the hard stuff if you're not comfortable with it.
 
 FastApi seems a decent `http` server that's quick (other languages are faster). The book uses MongoDB in later chapters, but I found it uncomfortable and painful to setup and use. For that reason, I prefer SQLite.
 
-The FastApi documentation can sometimes be unclear, or overly complicated to find what you need, and mould it to your requirements. This book has also fast become outdated (dependency hell), so watch out for changes and updates to FastApi. Authentication is relatively easy to use (with guidance) but email notifications aren't baked in.
+The FastApi documentation can sometimes be unclear, or overly complicated to find what you need, and mould it to your requirements.
+
+The book is good from a high-level view, but has many errors and continuity issues, so you'll have to fix things and check documentation. It's also fast becoming outdated (dependency hell) as FastApi evolves, so watch out for changes and updates. Authentication is easy(ish) to use (with guidance) but email notifications aren't baked in, and other nice-to-haves can be difficult:
 
 - Backend servers require domain knowledge (and low-level detail)
-- They're something I'm personally not 100% comfortable with ...
-- It's wise to find an experienced dev to help out and check code.
-- `/auth` and `/database` and `/.env` are especially important to get right.
+- There's a lot that I'm personally not 100% comfortable with DIYing ...
+- It's wise to find an experienced dev to help out and double-check code.
+- `/auth`, `/database` and `/.env` are especially important to get right!
+- I'd prefer to treat parts of the server as a "black box" (set and forget)
+- Extra "defensive coding" and security advice may be needed ...
+- Error messaging is particularly frustrating (cryptic, verbose, incomplete)
+
+
+## Setting yourself boundaries
+
+> Have a clear goal, a clear learning frame
 
 I think it's wise to provide yourself **a clear learning frame**, by which I mean **drawing a clear line between what you're prepared to learn, and what you're not**. For example, getting a working and reliable email confirmation script is non-trivial!
 
-Personally, I'd prefer someone else to handle things like that, so unless there's a well-documented and stable plugin, I'm going to hire a professional. I prefer things as simple as possible; SQLite and FastApi routes are easy enough to understand the basics, but there can be a lot of moving parts! There's many ways to build out your app architecture, and I'm not sure there's a book out there that covers the best way to do things for _your_ app.
+Personally, I'd prefer someone else to handle things like that, so unless there's a well-documented and stable plugin, I'm going to hire a professional. **I prefer things as simple as possible;** SQLite and FastApi routes are easy enough to understand the basics, but there can be a lot of moving parts! There's many ways to build out your app architecture, and I'm not sure there's a book out there that covers the best way to do things for _your_ app.
 
-So for prototypes: keep things simple, have a professional check your code, and delegate the hard stuff if you're not comfortable with it. There's so much to learn with programming it's good to set your own boundaries!
+There's so much to learn with programming it's good to set your own boundaries!
 
 
-## Commands
+## Helful Commands
 
 1. `uv run uvicorn api:app --port 8000 --reload` (or run from `.venv`)
 2. `uv run main.py` (if you've setup properly `__main__.py`)
@@ -44,7 +56,7 @@ JOIN event AS e ON u.email = e.creator; -- inner join
 > `/docs` gives a JSON Schema documentation ...
 > `/redoc` provides alternative documentation.
 
-But to implement these properly leads to messy code. Things like `Annotated[]`, `"json_schema_extra"` metadata, and so on. I'm finding that Bruno is pretty nice to work (as an alternative) with and does most of what I'd need.
+To implement these properly leads to messy code! Things like `Annotated[]`, `"json_schema_extra"` metadata, and so on. I'm finding that Bruno is pretty nice to work with (as an alternative) and does most of what I'd need.
 
 
 ## Chapters
@@ -60,9 +72,11 @@ But to implement these properly leads to messy code. Things like `Annotated[]`, 
 6. Working with the database
     - SQLModel (1.10.0 — 1.10.6)
     - ~~MongoDB~~[^2] (I'm sticking with SQLite)
-7. Securing FastApi applications (1.11.0 — ...)
+7. Securing FastApi applications (1.11.0 — 1.11.9)
     - Hash and compare passwords
     - Generating JWT tokens
+    - Securing routes (with authentication)
+    - CORS policy (middleware)
 
 
 ## Silly errors (and things that don't work)
