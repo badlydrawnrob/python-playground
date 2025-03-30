@@ -5,6 +5,17 @@
 
 There's quite a lot of minor (and perhaps major) errors in this book, so you've got to take care to double check the code's validity.
 
+## Essentials
+
+1. Have a great **high-level view** of your API, architecture, data flow, etc.
+2. Treat some parts of the program as a black box (outsource these parts).
+3. Be extremely careful of your "learning line", the framing of "need to know".
+4. What parts of our program (backend) are hidden from view? Is it necessary to
+   hide the `Event.ID` from the general public, or not?
+    - We want our events changeable by `ID`, which is visible in the `PATCH` url
+    - But our "real" `User.ID` will be hidden from the user (we'll use `UUID`)
+      in the url.
+
 ## Notes
 
 > With this http server, and other backend code, there's SO MUCH to think about

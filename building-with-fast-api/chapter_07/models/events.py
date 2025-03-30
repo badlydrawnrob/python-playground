@@ -16,7 +16,7 @@ from typing import List, Optional
 #
 # SQL: general
 # ------------
-# 1. Does every table need a primary key, or `id` field? (unique identifier)
+# 1. Does every table need a primary key, or an `id` field? (unique identifier)
 #    - So `Optional` is probably not a good idea
 # 2. Creating connected tables with SQLModel:
 #    - @ https://sqlmodel.tiangolo.com/tutorial/connect/create-connected-tables/
@@ -29,6 +29,9 @@ from typing import List, Optional
 #    foreign key. Our `/auth` function returns a `user.email`, so we'll use that.
 #    - Ideally the `User.id` field (UUID) would be used instead!
 #    - @ https://www.dittofi.com/learn/relationships-in-sql-complete-guide-with-examples
+# 5. Our `EventUpdate` model is used for partial updates (PATCH) to our `Event`
+#    and for that reason we've got most of the fields as `Optional`.
+#    - ⚠️ This is an ARCHITECTURE decision. Is our frontend form optional?
 #
 # Questions
 # ---------

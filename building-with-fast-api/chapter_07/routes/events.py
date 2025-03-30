@@ -126,6 +126,12 @@ async def update_event(id: int, data: EventUpdate, user: str = Depends(authentic
 
     if not event:
         raise HTTPException(status_code=404, detail="Event not found!")
+    
+    if event.creator != user:
+        raise HTTPException(
+            status_code=400,
+            detail="You can only update events that you've created"
+        )
 
     event_data = data.model_dump(exclude_unset=True) # Using our `EventUpdate` body
     event.sqlmodel_update(event_data) # Update `Event` object with request body data

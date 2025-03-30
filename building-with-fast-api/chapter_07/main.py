@@ -64,6 +64,7 @@ import uvicorn
 #    - Abstract this into a function (or a class)
 # 5. Check which encryption and hashing is most secure (or secure enough)
 #    - For instance, create a better `SECRET_KEY` perhaps.
+# 6. A `private` option for our `Event` model (so only the user can see it)
 #
 # Questions
 # ---------
