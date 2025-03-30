@@ -7,12 +7,11 @@ meta {
 post {
   url: http://localhost:8000/event/new/
   body: json
-  auth: none
+  auth: inherit
 }
 
 body:json {
   {
-    "id": 1,
     "title": "FastApi book launch",
     "image": "https://linktomyimage.com/image.png",
     "description": "We will be discussing the contents of the FastApi book in this event. Ensure you come with your own copy to win gifts!",
@@ -26,7 +25,11 @@ docs {
   
   > Now posting to the `planner.db`
   
-  Post a new event. All fields are required.
+  Post a new event.
+  
+  - All fields are required ...
+  - But `id` is optional (primary key)
+      - It's set up to auto-generate and auto-increment
   
   ## 🐞 Bugs
   

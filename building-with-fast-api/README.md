@@ -25,6 +25,14 @@ So for prototypes: keep things simple, have a professional check your code, and 
     - Or, `fastapi dev main.py` (seems to essentially be the same)
 3. `uv run pyright main.py` (run in strict mode, Pylance in VS Code)
 
+```terminal
+curl -X 'POST' \                                        
+  'http://localhost:8000/user/signin' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  -d 'grant_type=password&username=[email]&password=[password]&scope=&client_id=string&client_secret=string'
+```
+
 ## Your API is self-documenting (but use Bruno anyway)
 
 > `/docs` gives a JSON Schema documentation ...
@@ -66,7 +74,8 @@ But to implement these properly leads to messy code. Things like `Annotated[]`, 
 
 > **The major rule for writing is ... BE CONSISTENT!**
 > - There's a lot of small mistakes and continuity errors ...
-> - So use ⚠️ `#!` style comments for major breaking code! 
+> - So use ⚠️ `#!` style comments for major breaking code!
+> - A single source of truth for code (edits break things)
 
 For example, pg.131:
 
@@ -82,6 +91,7 @@ Also
     - `jose` has the same problem. Which `jose` package do you mean?!
 2. Some "upgrades", such as ~~`@app.on_event("startup")`~~ take time to learn
     - The app lifecycle, for example, requires [understanding](https://github.com/PacktPublishing/Building-Python-Web-APIs-with-FastAPI/issues/12#issue-2843134599) of `contextlib`.
+3. `grant_type=` missing the `password` keyword in the authentication curl call.
 
 
 ## Tools

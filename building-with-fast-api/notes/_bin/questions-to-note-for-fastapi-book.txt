@@ -1,0 +1,53 @@
+# Questions
+
+> This basically sums up as:
+> What to use with SQLModel -vs- Raw SQL -vs- different ORM
+
+I would probably say raw SQL is fine for read-only, but poor for others, as it
+means manually formatting the data on read and write.
+
+1. Understand the session `yield` function a bit better
+2. How well does the API handle multiple connections? (test with Bruno)
+    - @ https://stackoverflow.com/a/10387821
+    - `async` with SQLite is not desirable: why?
+        - @ https://charlesleifer.com/blog/asyncio/
+    - When should I consider using a queuing mechanism?
+3. Best way to write and maintain SQL:
+    - Migrations
+    - Dropping/Adding columns
+    - and so on
+
+
+## Simplifying data (perhaps)
+
+> These are ARCHITECTURE considerations:
+> You only need to store lists if your API requires it:
+> An example is OpenLibrary which has a `/book` and `/cover` API!
+
+The book asks you to store a `List Event` in the `User` model, but I don't think
+this is a particularly great idea, because you'll have to maintain that list,
+rather than pulling a `join` from the database on the `Event.UserId`. If you did
+want to do this, it'd probably look like:
+
+1. Store events properly with data normalisation
+2. Cycle through events per user and ...
+3. Store them in a user.eventsList json blob?
+
+Someone mentioned doing things schema-less where possible, for example using a
+`json` blob to store an event list, then migrating this data to ACID compliant
+later. Those migrations might be difficult, however.
+
+
+## UI
+
+1. Undoing a recent delete, and notifying "are you absolutely sure?"
+    - I've accidentally deleted or refreshed the page before
+    - This is probably a frontend problem
+
+
+## A different ORM
+
+> Brave "peewee environment variables"
+
+1. How to handle CRUD operations (replacing SQLModel)
+2. How to format data (might be difficult with raw sql)

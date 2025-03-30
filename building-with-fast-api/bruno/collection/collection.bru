@@ -2,3 +2,23 @@ headers {
   accept: application/json
   Content-Type: application/json
 }
+
+auth {
+  mode: oauth2
+}
+
+auth:oauth2 {
+  grant_type: password
+  access_token_url: http://localhost:8000/user/signin
+  username: agatha@allalong.com
+  password: Strong!!!
+  client_id: 
+  client_secret: 
+  scope: 
+}
+
+script:post-response {
+  if (res.body.access_token) {
+    bru.setVar("oauth_access_token", res.body.access_token)
+  }
+}
