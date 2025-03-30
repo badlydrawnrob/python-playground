@@ -65,6 +65,11 @@ import uvicorn
 # 5. Check which encryption and hashing is most secure (or secure enough)
 #    - For instance, create a better `SECRET_KEY` perhaps.
 # 6. A `private` option for our `Event` model (so only the user can see it)
+# 7. Are results cached? (for performance)
+#    - @ https://github.com/long2ice/fastapi-cache
+#    - @ https://www.powersync.com/blog/sqlite-optimizations-for-ultra-high-performance
+# 8. Remove all `/admin` routes, such as:
+#    - `/admin/events` (for deleting all events)
 #
 # Questions
 # ---------

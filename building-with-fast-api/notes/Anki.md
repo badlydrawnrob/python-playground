@@ -15,6 +15,10 @@ There's quite a lot of minor (and perhaps major) errors in this book, so you've 
     - We want our events changeable by `ID`, which is visible in the `PATCH` url
     - But our "real" `User.ID` will be hidden from the user (we'll use `UUID`)
       in the url.
+5. "Defensive" coding:
+    - Positively or negatively check?
+    - How many checks should we have? (just-enough, don't plan ahead)
+    - Basic security rules (don't give too much away in errors/response)
 
 ## Notes
 

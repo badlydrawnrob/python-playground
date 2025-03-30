@@ -127,6 +127,7 @@ async def update_event(id: int, data: EventUpdate, user: str = Depends(authentic
     if not event:
         raise HTTPException(status_code=404, detail="Event not found!")
     
+    #! Positively check or negatively check?
     if event.creator != user:
         raise HTTPException(
             status_code=400,
@@ -145,6 +146,13 @@ async def update_event(id: int, data: EventUpdate, user: str = Depends(authentic
 @event_router.delete("/{id}")
 async def delete_event(id: int, user: str = Depends(authenticate), session=Depends(get_session)) -> dict:
     event = session.get(Event, id)
+
+    #! Positively check or negatively check?
+    if event.creator != user:
+        raise HTTPException(
+            status_code=404,
+            detail="Event not found" #! This is a lie, but it's more secure
+        )
 
     if event:
         session.delete(event)
