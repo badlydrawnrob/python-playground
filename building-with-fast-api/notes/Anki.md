@@ -7,6 +7,8 @@ There's quite a lot of minor (and perhaps major) errors in this book, so you've 
 
 ## Essentials
 
+> Getting through the book has been quite a slow process. Just imagine doing this from scratch in a different language! **Do not take that journey lightly**, as it's liable to take 2-3 months.
+
 1. Have a great **high-level view** of your API, architecture, data flow, etc.
 2. **Treat some parts of the program as a black box** (outsource these parts).
 3. Be extremely careful of **your "learning line", the framing of "need to know"**.

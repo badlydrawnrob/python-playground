@@ -73,6 +73,10 @@ import uvicorn
 #    - `/admin/events` (for deleting all events)
 # 9. Mock data that's super easy to setup and teardown
 #    - @ https://sqlite-utils.datasette.io/en/stable/ (could be super handy)
+# 10. A `User` could have a role assigned to them
+#    - @ https://fastapi.tiangolo.com/advanced/security/oauth2-scopes/
+# 11. Understand type safety with Python a bit better:
+#    - @ https://talks.jackleow.com/strongly-typed#slide-23
 #
 # Questions
 # ---------
