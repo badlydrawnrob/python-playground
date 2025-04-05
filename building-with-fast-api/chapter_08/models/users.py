@@ -12,8 +12,11 @@ from uuid import UUID, uuid4
 # ---------
 # > We're now using `TokenResponse` for our `/signin` route.
 #
-# 1. There are no `List` types in SQLModel, so we convert this to a JSON field.
-#    - We really don't need this list however, as we can use a `join` instead.
+# 1. ⭐ There are no `List` types in SQLModel, so in `chapter_07` we used JSON field.
+#    - However, we REALLY DON'T NEED this list in our `User` model. Use a join!
+#    - Working with `JSON` data is a pain, and we need to use `JSONB` instead,
+#      but the ORMs make this tricky to work with. Much easier with raw SQL. See
+#      our WISHLIST in `main.py` for more details.
 # 2. When to use `BaseModel` and when to use `SQLModel`?
 #    - I feel that you can use `BaseModel` unless directly working with the
 #      database table type (such as `add(Event)` or `delete(Event)`)
@@ -42,7 +45,8 @@ class User(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True, index=True, nullable=False)
     email: EmailStr # We could force a unique constraint here ...
     password: str
-    events: Optional[List[int]] = Field(sa_column=Column(JSON)) #! see `chapter_07`
+    #! See `chapter_07` and `Q1` for more info
+    #! events: Optional[List[int]] = Field(sa_column=Column(JSON))
 
 class TokenResponse(BaseModel):
     access_token: str

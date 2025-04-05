@@ -49,6 +49,7 @@ There's so much to learn with programming it's good to set your own boundaries!
     - Generating JWT tokens
     - Securing routes (with authentication)
     - CORS policy (middleware)
+8. Testing (1.12.0 - ...)
 
 
 ## Helful Commands

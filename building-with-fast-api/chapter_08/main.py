@@ -79,14 +79,23 @@ import uvicorn
 #    - As mentioned above, it's currently an email.
 #    - Joins are quicker with an `Int ID` than a `String` (email)
 # 4. Add a `private` option for our `Event` model (so only the user can see it)
-# 5. We currently have a `User.events` relationship, a `List ID` of events.
-#    - There's many ways to build the app architecture, and you've got to consider
-#      carefully "why do I need this feature?" and "how will it be used?"
-#    - If we had a public Event API (like OpenLibrary) this might be worthwhile
-#    - But in general we want a `User` profile page with a list of events, and
-#      for that we may as well just use a `join` query to get the events.
+# 5. ⭐ Our `User.events` relationship, which is now `JSON` data is used for a
+#    `List ID` of events. However, it's FAR MORE COMPLICATED to use than when we
+#    had a simple `List Int` when our `Event` was a `BaseModel` (not a SQLModel).
+#    See the links below to see what I mean.
+#    - ⭐ You have many routes for app architecture. Ask "why do I need this?"
+#      and "how will it be used?". There's no real need for a `List Event.id` as
+#      you can simply `join` on the events to the user! That's WAY EASIER!
+#    - A `List Event.id` would be handy if it's a public API (like OpenLibrary),
+#      where you'd want to `.andThen` to the Events API to get the events. But
+#      that's not really needed for this app.
 #     - To edit events we could have a `GET` request to `/user/{id}/events`
-#       and a `POST` request to `/user/{id}/events/{event_id}`. Ditto for `DELETE`.
+#       and a `POST` request to `/user/{id}/events/{event_id}` (or `DELETE`).
+#     - @ https://stackoverflow.com/q/70567929 (using json columns)
+#     - @ https://stackoverflow.com/q/79091886 (mutating a json column) but search
+#       Brave with "Replacing JSON Column FastAPI" for better options.
+#     - @ https://tinyurl.com/sqlite-peewee-and-json-data (it's even pretty
+#       complicated with Peewee ORM)
 # 6. Use abstraction to reduce code duplication.
 # 7. Is the current encryption and hashing the most secure?
 #    - Create a better `SECRET_KEY` perhaps.
