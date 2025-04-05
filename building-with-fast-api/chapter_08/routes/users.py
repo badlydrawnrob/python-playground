@@ -1,10 +1,15 @@
+from auth.authenticate import authenticate
 from auth.hash_password import HashPassword
 from auth.jwt_handler import create_access_token
+
 from database.connection import get_session
+
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
-from models.users import User, TokenResponse
 from sqlmodel import select
+
+from models.users import User, TokenResponse
+from models.events import Event
 
 # ------------------------------------------------------------------------------
 # Our USERS routes
@@ -95,3 +100,18 @@ async def sign_in_user(
     
     # User exists but hashed password isn't working ("403 vs 401 wrong password")
     raise HTTPException(status_code=401, detail="Invalid password")
+
+
+@user_router.get("/me")
+async def get_user_me(user: str = Depends(authenticate), session=Depends(get_session)) -> dict:
+    # Task 1: Get the specific user events where user.emal == events.creator
+    # Task 2: Get the full `User` and `join` on the `Event` table
+    # Do it in SQLite first, then check how SQLModel and Peewee do it.
+    # @ https://sqlmodel.tiangolo.com/tutorial/connect/read-connected-data/
+    # @ https://docs.peewee-orm.com/en/latest/peewee/querying.html
+    statement = select(User, Event).where(Event.creator == User.email)
+    result = session.exec(statement) # Not `first()` but all rows!
+
+    #! Currently no guards or error checking!
+    
+    return result
