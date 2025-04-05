@@ -22,6 +22,7 @@ The book is good from a high-level view, but has many errors and continuity issu
 ## Setting yourself boundaries
 
 > Have a clear goal, a clear learning frame
+> Use [BORING technology](https://boringtechnology.club/) wherever possible!
 
 I think it's wise to provide yourself **a clear learning frame**, by which I mean **drawing a clear line between what you're prepared to learn, and what you're not**. For example, getting a working and reliable email confirmation script is non-trivial!
 
@@ -81,10 +82,7 @@ To implement these properly leads to messy code! Things like `Annotated[]`, `"js
 
 ## Silly errors (and things that don't work)
 
-> **The SQLModel documentation [isn't always great](https://github.com/badlydrawnrob/elm-playground/issues/45)**, and some things that should be
-> easy enough, don't seem to be. Compared to Elm lang, Python errors can be
-> a bit cryptic and using the REPL for "practice" or "discovery" isn't always easy
-> or possible with SQLModel setup.
+> **The SQLModel documentation [isn't always great](https://github.com/badlydrawnrob/elm-playground/issues/45)**, and some things that should be easy enough, don't seem to be. Elm Lang is way better than Python for error messages. Python can be cryptic and hard to track down. It's also not as easy to use the REPL for "practice" or "discovery" with the SQLModel setup.
 
 1. **`:id` not added** to the Bruno path parameters (getting `method not allowed`)
 2. **`count()`** fails hard: the alternative is [`first()`](https://sqlmodel.tiangolo.com/tutorial/one/) with SQLModel

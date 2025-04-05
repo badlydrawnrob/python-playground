@@ -9,71 +9,72 @@ from sqlmodel import select
 # ------------------------------------------------------------------------------
 # Our USERS routes
 # ==============================================================================
-# ⚠️ Our password is plain text over the wire, but gets hashed on signup. I'm not
-# sure if there's a way to hide the password before it's hashed. In production,
-# you never want to store the password as plain text.
+# > ⭐ Our `User` routes should be treat like a black box.
+# > See `chapter_07` for more details.
+# 
+# Our password hashing, authentication, and other functions can be treated as a 
+# "black box", where we hire a professional to worry about that for us, and all
+# we've got to do is write our `Depends(authenticate)` and hashing methods and
+# not worry about it! No need to understand what `Oauth2PasswordRequestForm` is.
 #
-# Notes
-# -----
-# We're now adding our user directly into the database, so we'll remove the
-# `users` variable. We give them an email as their username, and if their
-# password checks out we return a bearer token (JWT). We strictly follow the
-# OAuth spec using the `OAuth2PasswordRequestForm` and our `/auth` functions.
+# Our user has an `email` and `password`. The `username` is their `email`. You
+# should have a high-level view of how this works:
+#    @ https://tinyurl.com/fastapi-oauth2-depends
+#
+#
+# Invite only
+# -----------
+# > Building a proper authentication system is hard.
+# > We're currently using JWT Bearer tokens (in the header).
+#
+# So in general your app could be invite-only, and you manually create the user
+# accounts on their behalf. Once you've got a bit of cash, you can hire a
+# professional do build a solid login system for you!
 #
 # Wishlist
 # --------
-# 1. Hashing can be slow. How can it be speeded up?
-# 2. What about `+test` type email addresses?
-#    - Should these be disallowed?
-# 3. Which encryption package is best?
-#    - Should I use an alternative method to `python-jose`?
+# 1. Hashing can be slow. Can it be speeded up?
+# 2. We should probably disallow `+test` type email addresses.
+#    - Although these are useful for testing.
+# 3. Are there better encryption methods than `python-jose`?
+#    - This "isn't my job", but I should understand the options.
+# 4. The expiry time is currently hard-coded to 1 hour.
+#    - Should this be an `.env` variable setting?
+#    - We need to write a function to extend the expiry time.
+# 5. Change our `User` model to use `UUID` AND an `Int Id`
+# 6. Do we need a separate `User` and `UserSign` class?
+#    - Otherwise all our `User`s will have `Optional` (`None`) fields.
 
 user_router = APIRouter(
     tags=["User"]  # used for `/redoc` (menu groupings)
 )
 
 # Hashing password -------------------------------------------------------------
-# We're using a `HashPassword` class to hash our passwords.
 
 hash_password = HashPassword()
 
-# JWT --------------------------------------------------------------------------
-# Comprises the user ID and an expiry time before encoding into a long string.
-# I'm not sure if there's a way to store further information (like auth group)
-
 # Routes -----------------------------------------------------------------------
-# Our database users should have a unique ID, which is a number or UUID. We'll
-# create this automatically and use our `User.email` to check against on sign-up.
-#
-# 1. #! I used to be using `UserSign`, which had only the `str` for `email` and
-#    `password`. This felt a little fragile, but using the `User` class with an
-#    optional `events` field, which can be set to `None` to begin with.
-#    - @ ... see the old version here
-# 2. @ https://tinyurl.com/fastapi-oauth2-depends and we're now using the user's
-#    email as their USERNAME on sign-in. Go figure. See also `README.md` for why
-#    `response_model=` is required here (and not a return type).
 
 @user_router.post("/signup")
 async def sign_new_user(data: User, session=Depends(get_session)) -> dict:
-    # First check if user already exists
-    statement = select(User).where(User.email == data.email)
-    user = session.exec(statement).first()
+    statement = select(User).where(User.email == data.email) # Does user exist?
+    user = session.exec(statement).first() # There should be ONE row
     
-    if user: # This could be `None` if user doesn't exist
+    if user: # `None` if user doesn't exist
         raise HTTPException(status_code=409, detail="Username already exists")
 
-    # Hash the password (using `user` which is a `UserSign` class)
+    # Secure the password
     hashed_password = hash_password.create_hash(data.password)
-    data.password = hashed_password # replace request body password
+    data.password = hashed_password # Replace request body password
 
-    # Now add the user with their newly hashed password
-    session.add(User(email=data.email, password=data.password)) #! (1)
+    # Finally, add the user to database
+    session.add(User(email=data.email, password=data.password))
     session.commit()
 
     return { "message": f"User with {data.email} registered!" }
 
 
-@user_router.post("/signin", response_model=TokenResponse) #! (2)
+@user_router.post("/signin", response_model=TokenResponse) #! What's this?
 async def sign_in_user(
         user: OAuth2PasswordRequestForm = Depends(),
         session=Depends(get_session)
@@ -84,6 +85,7 @@ async def sign_in_user(
 
     if db_user_exist is None:
         raise HTTPException(status_code=404, detail="User doesn't exist")
+    
     if hash_password.verify_hash(user.password, db_user_exist.password):
         access_token = create_access_token(db_user_exist.email)
         return {
@@ -91,5 +93,5 @@ async def sign_in_user(
             "token_type": "Bearer"
         }
     
-    # if hashed password doesn't work ... ("403 vs 401 wrong password")
+    # User exists but hashed password isn't working ("403 vs 401 wrong password")
     raise HTTPException(status_code=401, detail="Invalid password")
