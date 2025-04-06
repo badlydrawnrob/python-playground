@@ -4,19 +4,34 @@
 > For prototyping, keep things simple, get a professional to check your code ...
 > and delegate the hard stuff if you're not comfortable with it.
 
-FastApi seems a decent `http` server that's quick (other languages are faster). The book uses MongoDB in later chapters, but I found it uncomfortable and painful to setup and use. For that reason, I prefer SQLite.
+FastApi is a decent `http` server that's quick (other languages are faster). The book uses MongoDB in later chapters, but I found it uncomfortable and painful to setup and use. For that reason, I prefer SQLite.
 
-The FastApi documentation can sometimes be unclear, or overly complicated to find what you need, and mould it to your requirements.
+## The programming style
 
-The book is good from a high-level view, but has many errors and continuity issues, so you'll have to fix things and check documentation. It's also fast becoming outdated (dependency hell) as FastApi evolves, so watch out for changes and updates. Authentication is easy(ish) to use (with guidance) but email notifications aren't baked in, and other nice-to-haves can be difficult:
+I'm not a fan of the Python style however; the FastApi (or SQLModel) documentation can be longwinded, at times unclear, a bit complicated to figure out how to get things done. Going from [an article like this](https://fastapi.tiangolo.com/tutorial/security/get-current-user/), understanding the types, grasping it's component parts (inputs, outputs, dependency functions) and migrating that code to a version using SQLModel is confusing to me. The fact SQLModel is an abstraction of an abstraction (SQLAlchemy) is also worrying.
 
-- Backend servers require domain knowledge (and low-level detail)
-- There's a lot that I'm personally not 100% comfortable with DIYing ...
-- It's wise to find an experienced dev to help out and double-check code.
-- `/auth`, `/database` and `/.env` are especially important to get right!
-- I'd prefer to treat parts of the server as a "black box" (set and forget)
-- Extra "defensive coding" and security advice may be needed ...
-- Error messaging is particularly frustrating (cryptic, verbose, incomplete)
+The FastApi book is a good high-level view, but has many errors and continuity issues, so you'll have to fix things and check documentation. It's also fast becoming outdated (dependency hell) as FastApi evolves, so watch out for changes and updates. Authentication is easy(ish) to use (with guidance) but email notifications aren't baked in, and other nice-to-haves can be difficult.
+
+### Black box
+
+> I prefer to treat parts of this http server as a "black box".
+> That is to say, areas where I don't have to understand how it works!
+
+Some things can be set-and-forget. They involve a lot of domain knowledge and low-level detail, which I'm personally not 100% comfortable with. It's wise to find an experienced developer to mentor you and double-check code.
+
+`/auth`, `/database` modules are especially important to get right!
+
+### Errors
+
+> Compared to Elm, Python's error messaging is AWFUL.
+
+Python error messaging is particularly frustrating (cryptic, verbose, incomplete), but you can use Pydantic and Pyright to help out with types.
+
+### Limitations
+
+> "SQLModel is designed to have the best developer experience in a narrow set of very common use cases."
+
+For that reason, you might find yourself better off with a different ORM. SQLAlchemy is too complicated for my preferences, so I'd plum for something which is easier and as close to SQL as possible. [Peewee](https://docs.peewee-orm.com/en/latest/index.html) seems to fit this bill.
 
 
 ## Setting yourself boundaries

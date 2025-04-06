@@ -137,6 +137,13 @@ import uvicorn
 # 19. Set SQLite to strict mode (and PRAGMA settings) on launch.
 #    - I might remove the `conn()` function and setup the schema manually.
 #    - The models are still handy, as this gives a high-level view of the schema.
+# 20. Fix `.utcnow` to datetime (deprecated in `jwt_handler.py`)
+# 21. Begin creating some simple tests for `join`s:
+#    - Task 1: Get the specific user events where user.email == events.creator
+#    - Task 2: Get the full `User` and `join` on the `Event` table
+#    - @ https://stackoverflow.com/questions/21975920/peewee-model-to-json
+#    - @ https://sqlmodel.tiangolo.com/tutorial/connect/read-connected-data/
+#    - @ https://docs.peewee-orm.com/en/latest/peewee/querying.html
 
 app = FastAPI()
 

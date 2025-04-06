@@ -8,6 +8,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import select
 
+from typing import List
+from uuid import UUID
+
 from models.users import User, TokenResponse
 from models.events import Event
 
@@ -103,15 +106,40 @@ async def sign_in_user(
 
 
 @user_router.get("/me")
-async def get_user_me(user: str = Depends(authenticate), session=Depends(get_session)) -> dict:
-    # Task 1: Get the specific user events where user.emal == events.creator
-    # Task 2: Get the full `User` and `join` on the `Event` table
-    # Do it in SQLite first, then check how SQLModel and Peewee do it.
+async def get_user_me(
+    user: str = Depends(authenticate),
+    session=Depends(get_session),
+    response_model=tuple[User,Event]
+    ):
+    # You need to use the `response_model=` or the return type to tell FastApi
+    # how to render your results. When `session.exec(statement).all()` it's
+    # giving us 
+
     # @ https://sqlmodel.tiangolo.com/tutorial/connect/read-connected-data/
-    # @ https://docs.peewee-orm.com/en/latest/peewee/querying.html
-    statement = select(User, Event).where(Event.creator == User.email)
-    result = session.exec(statement) # Not `first()` but all rows!
+    # 
+    # NO IDEA why the docs use this example, as it's the equivalent of running:
+    #
+    # ```
+    # SELECT user.id, user.email, event.id, event.creator (etc)
+    # FROM user, event
+    # WHERE user.email = event.creator;
+    # ```
+    #
+    # Which returns all the rows with duplicate information:
+    #
+    # `cdb194405db64ffeaed9c82ee1b49253|lovely@bum.com|1|lovely@bum.com`
+    statement = select(User, Event).where(Event.creator == user)
+    results = session.exec(statement).all()
+    # [(User(password='$2b$12$25mRszZMp71Gulk3sFHyRundN7WeKLp.AnUJGSvp2xHxQNGMVnJFm', id=UUID('cdb19440-5db6-4ffe-aed9-c82ee1b49253'), email='lovely@bum.com'),
+    #   Event(creator='lovely@bum.com', image='https://somegood.com/song.jpg', location='Live', description="Ed Sheeran singing his best song 'Class A Team'!", title='Glastonbury', id=1, tags=['music', 'adults', 'event'])
+    # )]
+    # list = []
+    # for result in results:
+    #     list.append(result.model_dump_json)
+
+
 
     #! Currently no guards or error checking!
     
-    return result
+    # return {"data": list}
+    return {"success": results}
