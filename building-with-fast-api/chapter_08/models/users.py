@@ -51,3 +51,8 @@ class User(SQLModel, table=True):
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str
+
+class UserProfile(SQLModel):
+    id: UUID
+    email: EmailStr
+    title: str
