@@ -66,3 +66,7 @@ class EventUpdate(SQLModel):
     description: Optional[str]
     location: Optional[str]
     tags: Optional[List[str]]
+
+class EventWithUser(SQLModel):
+    pass
+    # I don't know what the fuck I should put here!
