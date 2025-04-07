@@ -8,10 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import select
 
-from typing import List
-from uuid import UUID
-
-from models.users import User, TokenResponse, UserProfile
+from models.users import User, TokenResponse
 from models.events import Event
 
 # ------------------------------------------------------------------------------
@@ -52,6 +49,34 @@ from models.events import Event
 # 5. Change our `User` model to use `UUID` AND an `Int Id`
 # 6. Do we need a separate `User` and `UserSign` class?
 #    - Otherwise all our `User`s will have `Optional` (`None`) fields.
+#
+# ⚠️ FastApi and SQLModel problems
+# --------------------------------
+# > @ https://tinyurl.com/sqlmodel-join-a-table-on
+# > TLDR: I fucking give up with SQLModel.
+#
+# I really dislike the way FastApi and SQLModel work together, when it comes
+# to anything more complicated than rendering a single table. The syntax doesn't
+# make sense to me, and the documentation isn't clear enough.
+#
+# It's taken me half a day to figure out how SQLModel `join` works, and doesn't
+# seem to be the way you'd expect (compared to SQL statements). It returns a
+# `Tuple`, which kind of makes sense as they're rows/tables, but questions like
+# "how the fuck to I utilise SQLModel models to render my queries?", or "why the
+# hell isn't this `join` giving me any results?" are coming up.
+#
+# It also seems like other ORMs (like PeeWee) require converting from model
+# objects (rows) into a dictionary or json structure, but has methods to convert
+# the data structures from one form to another. I'm fairly sure FastApi/SQLModel
+# has similar, but my early mess around with PeeWee quickstart felt a lot more
+# solid than trying to understand how SQLModel types are working.
+# 
+# @ https://stackoverflow.com/a/21979166 (PeeWee -> dict)
+# @ https://tinyurl.com/fastapi-jsonable-convertor (Pydantic -> Json)
+#
+# Again SQLModel is an abstraction of an abstraction, and some say it's better 
+# to separate the API (and data validation) from the database layer. I'm beginning
+# to agree.
 
 user_router = APIRouter(
     tags=["User"]  # used for `/redoc` (menu groupings)
@@ -110,6 +135,8 @@ async def get_user_me(
     user: str = Depends(authenticate),
     session=Depends(get_session)
     ):
+    # (1) Selecting `User` and `Event` columns
+    # ----------------------------------------
     # This is the first part of documentation here:
     # You're basically returning a `Tuple` of `(User, Event)` objects that
     # match the user's email. In SQL it'd look like:
@@ -118,8 +145,10 @@ async def get_user_me(
     #
     # Notice the duplication there? That's because it isn't a proper join.
     #
+    # ```
     # statement = select(User, Event).where(Event.creator == user)
     # results = session.exec(statement).all()
+    # ```
     #
     # The problem is these haven't been serialised as json yet. You could use
     # `response_model=` but I'm not sure how that should look. Or, you can create
@@ -127,15 +156,64 @@ async def get_user_me(
     # for every join.
     #
     # The alternative is to convert the rows to json.
+    #
+    # (2) Second attempt using a `join`
     # --------------------------------------------------------------------------
-    # This version is using a join:
-    statement = select(User, Event).join(Event).where(Event.creator == user)
+    # This version is using a join, but I can't figure out how the fuck to get
+    # back what I want, which is the `Event` rows with `Event.creator` joined
+    # onto the `User` details. Do I have to create another `models.event` for this?
+    # See `EventWithUser`: what do I put here?
+    #
+    # ```
+    # statement = select(Event, User).join(User).where(Event.creator == user)
+    # results = session.exec(statement).all()
+    # ```
+    # The code above currently outputs:
+    #
+    # ('lovely@bum.com',)
+    #
+    # Calling `results` again reveals it's type:
+    # `<sqlalchemy.engine.result.ChunkedIteratorResult object at 0x103fa3d00>`
+    #
+    # @ https://stackoverflow.com/a/78832114
+    # Which should be callable with `all()`, `first()`, or `one()`
+    #
+    # However it RETURNS NO RESULTS, just an empty `[]` list.
+    #
+    # The docs say we shouldn't need to use `ON` keyword, as it's inferred by
+    # `foreign_key=` in the `models.events` package ... but we get nothing!
+    #
+    # FYI, in SQL it'd look something like:
+    #
+    # ```
+    # SELECT * FROM event
+    # JOIN user ON event.creator = user.email
+    # WHERE event.creator = 'lovely@bum.com';
+    # ```
+    # 
+    # Which DOES return something (split onto new lines):
+    #
+    # ```
+    # 1|lovely@bum.com|Glastonbury|https://somegood.com/song.jpg|
+    # Ed Sheeran singing his best song 'Class A Team'!|Live|["music", "adults", "event"]|
+    # cdb194405db64ffeaed9c82ee1b49253|lovely@bum.com|$2b$12$25mRszZMp71Gulk3sFHyRundN7WeKLp.AnUJGSvp2xHxQNGMVnJFm
+    # ```
+    #
+    # (3) Third attempt (a basic `join`)
+    # ----------------------------------
+    # > Returns a `List Tuple(Event, User)` object (# of rows depends on DB)
+    statement = select(Event, User).join(User) #! How do I narrow down to ONE user?!
     results = session.exec(statement).all()
 
+    # We need to unpack the `Tuple` (why is it a `Tuple`?)
+    list = []
+    
+    for event, user in results:
+        list.append(event.title)
+        list.append(event.creator)
+        list.append(event.tags)
+        list.append(user.id)
 
 
     #! Currently no guards or error checking!
-    
-    # return {"data": list}
-    # return {"data": results}
-    return results
+    return {"data": list}
