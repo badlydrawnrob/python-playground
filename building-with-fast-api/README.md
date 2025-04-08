@@ -203,6 +203,8 @@ FastApi doesn't come with data migration, so it might be wise to do this manuall
 5. `Depends()` is an important function that injects dependencies into our routes,
 forcing our route to handle something (such as `oauth3_scheme`) first.
 6. [Why use `response_model=`](https://github.com/fastapi/fastapi/discussions/8247) instead of a response type?
+7. Are Pydantic types really necessary? (It depends)
+8. Do you want to tightly couple your API models with your SQL model? (probably NO!)
 
 
 ## Elm -vs- Python
