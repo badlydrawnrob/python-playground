@@ -26,6 +26,11 @@ There's quite a lot of minor (and perhaps major) errors in this book, so you've 
     - Do a little more research and some basic tests.
     - Or just stick with relational data.
     - **It seems to be easier to deal with atomic data, as in, one route for each simple model (like `/event` and `/user` and `/user/event/id` and so on)**
+7. **How necessary is it to use typing for SQL return values?**
+    - You've got your SQL models
+    - You've got your API models
+    - Your SQL values should be pretty predictable?
+    - It adds quite a bit of code bloat.
 
 ## Notes
 
