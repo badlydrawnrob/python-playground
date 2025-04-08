@@ -70,3 +70,24 @@ class EventUpdate(SQLModel):
 class EventWithUser(SQLModel):
     pass
     # I don't know what the fuck I should put here!
+    # I imagine to return a `[(User, Event)]` as in `get_user_me`
+    # a NEW data structure must be created(?) and do the following:
+    #
+    # 1. Call the database with `join` on `Event`
+    # 2. Extract the `Tuple`
+    # 3. Create a `EventWithUser` object
+    #    - Use the extracted tuple data to populate kwargs
+    #
+    # I'm not convinced that it's a good idea to create such a model
+    # as we could use the raw data and validate it with Python typing
+    # if absolutely necessary, like so:
+    #
+    # `get_user_event() -> dict`
+    #
+    # I'm not sure how important it is to be more specific than that. If
+    # our SQL models are correct, the return types should be predictable.
+    # If absolutely necessary, you could use Pydantic `BaseModel` or a
+    # `TypedDict` @ https://mypy.readthedocs.io/en/stable/typed_dict.html
+    #
+    # I guess it's personal preference and just how strict you want things.
+    # You could always write tests (or use Bruno) to check return values.
