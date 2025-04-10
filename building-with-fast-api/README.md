@@ -33,6 +33,10 @@ Python error messaging is particularly frustrating (cryptic, verbose, incomplete
 
 For that reason, you might find yourself better off with a different ORM. SQLAlchemy is too complicated for my preferences, so I'd plum for something which is easier and as close to SQL as possible. [Peewee](https://docs.peewee-orm.com/en/latest/index.html) seems to fit this bill.
 
+I didn't like the way SQLModel handled joins (returns a `Tuple User Event`) and Peewee makes a bit more sense `Event` with `User` joined on (`Event.User`). However Peewee doesn't do async, but by default neither does SQLite, so we can remove our `async` keywords. That's fine for a few hundred (or thousand?) users at once, but you might want to find an async ORM like [Tortoise](https://tortoise.github.io/) or [IceAxe](https://github.com/piercefreeman/iceaxe). Optimise when it makes sense to, not prematurely.
+
+We'll keep the API models and the data models separate.
+
 
 ## Setting yourself boundaries
 

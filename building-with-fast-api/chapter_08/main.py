@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from database.connection import conn
+# from database.connection import conn
 from fastapi.responses import RedirectResponse
 
 from routes.users import user_router
@@ -11,56 +11,79 @@ import uvicorn
 # ------------------------------------------------------------------------------
 # A PLANNER app (SQLModel)
 # ==============================================================================
-# See earlier chapters for full instructions on FastApi etc. We have models,
-# an ORM for SQLite, and performing CRUD operations on our routes. Some of those
-# routes are protected by authentication, for which we use JWT tokens that get
-# passed to our routes with a Bearer token header (after login). Some parts of
-# the app can now be viewed as a "black box", where we only need surface-level
-# knowledge of what it does (not how, we hire a professional for that).
+# See earlier chapters for full instructions on FastApi etc. I like to treat some
+# parts of the app as a "black box" (I don't need to know how it works, only that
+# it works!), but it's best to get a senior (or book) to help you with this.
 #
-# There really is a LOT to learn with FastApi, http servers, REST APIs, and SQL.
-# If you're feeling overwhelmed, better to find a good mentor! As always, it's a
-# good idea to develop a "learning frame" to know when to say "cool, I'll learn
-# that", and when to say "that's not my job" and skip/delegate it.
+# 1. FastApi with models and routes (API layer)
+# 2. PeeWee ORM (data layer) for CRUD operations
+# 3. JWT tokens for authentication
 #
-# For example, "that's not my job" could be:
+# There's LOTS of things to learn, so it's easy to feel overwhelmed. I find it
+# helpful to use a REPL to test out code snippets, and have a solid "learning
+# frame", meaning knowing when to learn, and when to delegate. It's find to tell
+# yourself "that's not for me, not my job". For me that's:
 #
-# - How to deploy a FastApi app to production (performance, DBA, etc)
-# - Email verification and signup (with an SMS authenticator)
-# - Settings up JWT tokens and authentication routes
+# 1. How to deploy a FastApi app to production (performance, DBA, etc)
+#     - @ https://tinyurl.com/fastapi-preparing-production
+# 2. Email verification and signup (with an SMS authenticator)
+#     - This is non-trivial! I don't want to handle this.
+# 3. Setting up JWT tokens, password hashing, and authentication
+#    - All I want to know is how to write the `depends()` in the routes.
+#
+# ⚠️ Warnings
+# --------
+# > Changing ORMs and databases can be tricky!
+# > Are your schema and models compatible?
+#
+# You need to make sure your schema and ORM are compatible! It might help to
+# manually setup your schema and simply use the ORM for rows -> objects.
+#
+# > API layer and DATA layer splitting can be a little confusing.
+# > Have a high-level view, somewhere so everything makes sense ...
+# > Especially as you grow your team!
+#
+# For example, `Event.id` is handled by PeeWee, NOT Pydantic!
+#
+# > FastApi and SQLModel problems
+#
+# - We're now using PeeWee to handle our database layer
+# - SQLModel joins I found to be far from intuitive, and the docs not great ...
+# - @ https://tinyurl.com/sqlmodel-join-a-table-on (see commit `1.12.4` full notes)
+#
 #
 # Notes
 # -----
-# > Some say you should separate your API and ORM models.
-# > Tightly coupling them means it's harder to switch to another ORM.
+# > We're now separating our API and ORM models. Some say this is better.
+# > If you tightly couple them, it's harder to switch to another ORM later!
 #
-# 1. Each ORM does things a bit differently, so try to separate concerns where
-#    possible. For example, migrations could be handled manually (rather than
-#    using Alembic)
-# 2. Try to be consistent: for example, I'm using slightly different `.select()`
-#    methods in each function. Abstract your functions and simplify.
-# 3. ORMs can create problems with your SQL statements (or schema) at scale. Keep
-#    things simple for now with SQLModel. Consider other options later:
-#    - You'll need to translate database rows to data models whatever you choose,
-#      and this is tricker to do when working with raw SQL rows. Use `SQLAlchemy
-#      text` or `sqlite3` directly, but protect agains malicious SQL injections.
-#    - Lightweight query packages like PyPika and Pony ORM are also worth a look.
-#    - @ https://tinyurl.com/object-relational-mapping-sql (nice article)
-# 4. `__init.py__` is a dumb idea (it's a Python thing). Indicates a package dir.
+# 1. For now, I handle migrations manually with raw SQL.
+# 2. I try to be consistent with my function, and abstract where possible.
+# 3. ORMs can create problems with your SQL statements (or schema) at scale.
+#    - However you manage this, database rows need to be translated ...
+#    - Meaning, row data needs to be converted to data models (or objects).
+#    - If you choose to use raw SQL, be careful of malicious SQL injections.
+# 4. `__init.py__` is a daft idea. It's a Python thing.
 #    - @ https://stackoverflow.com/a/48804718
+# 5. Decide if you need a `PUT` or `PATCH` request.
+#    - Does your client send ALL the data or just some?
+#
+# I also don't like Python OOP style. Check out Elm Lang for typed functional
+# style programming. Where possible, I'll use that style.
+#
 #
 # Security
 # --------
-# > If you're not comfortable dealing with security (like me) hire a professional
-# > to double check your code, or prevent hacks for you. There's many other
-# > ways to keep your API secure (such as email verification).
+# > I'm not very confident with security, so I always have someone I trust check
+# > over my code. It's important to protect yourself against hacks and keep your
+# > API secure (things like email verification help).
 #
-# 1. Protect yourself from malicious SQL injections
-# 2. Dependency Injection is a design pattern to force a function to run before
-#    performing the main body of the function. Auth is a good example of this.
-#    FastApi can use a function or a class for this.
-# 3. Bearer tokens (JWT) are a way to authenticate users. Use `Dependency()` to 
-#    force authenticated user login (on routes) before the function can run.
+# Things to consider:
+# 
+# 1. Malicious SQL injections and DDOS attacks.
+# 2. Authentication and authorization (we use dependency injection).
+# 3. Bearer tokens (JWT) for authentication. These are checked on each route.
+#
 #
 # Wishlist
 # --------
@@ -144,6 +167,9 @@ import uvicorn
 #    - @ https://stackoverflow.com/questions/21975920/peewee-model-to-json
 #    - @ https://sqlmodel.tiangolo.com/tutorial/connect/read-connected-data/
 #    - @ https://docs.peewee-orm.com/en/latest/peewee/querying.html
+# 22. Some way to manage our data points from a high-level view
+#    - For example, which FastApi fields are `Optional()`?
+#    - Which are automatically handled (or handled) by PeeWee?
 
 app = FastAPI()
 
@@ -170,10 +196,11 @@ app.add_middleware(
 )
 
 # Database build ---------------------------------------------------------------
+#! Is there a way to automatically build our database schema with PeeWee?
 
 @app.on_event("startup")
 def on_startup():
-    conn()
+    pass
 
 # Routes -----------------------------------------------------------------------
     

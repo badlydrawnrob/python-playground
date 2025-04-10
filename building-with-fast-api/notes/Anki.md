@@ -54,6 +54,10 @@ isn't always clear either, and the book has LOTS of mistakes.
 3. If you already know something reasonably well (and have study notes) ...
     - It's OK to skip it and let the code speak for itself.
     - However, if you forget in future, a link to notes would be helpful.
+4. **Some docs on SQLModel [are useful](https://sqlmodel.tiangolo.com/tutorial/indexes/#create-an-index-with-sql)**, like understanding indexes (comparing to dictionaries)
+    - But he's mixing SQL knowledge (how joins work IRL) ...
+    - With SQLModel knowledge (how to join with SQLModel) ...
+    - Which sometimes works, and sometimes makes things WAY too verbose and hard to find at-a-glance.
 
 
 ## Terminology

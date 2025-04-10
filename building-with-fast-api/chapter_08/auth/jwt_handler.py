@@ -2,7 +2,7 @@ import time
 from datetime import datetime
 from fastapi import HTTPException
 from jose import jwt, JWTError
-from database.database import Settings
+from database.settings import Settings
 
 # ------------------------------------------------------------------------------
 # JWT Token handler
@@ -38,13 +38,13 @@ def create_access_token(user: str) -> str:
         "expires": time.time() + 3600 # Expires in 1 hour
     }
     
-    token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
+    token = jwt.encode(payload, Settings.SECRET_KEY, algorithm="HS256")
     return token
 
 
 def verify_access_token(token: str) -> dict:
     try:
-        data = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
+        data = jwt.decode(token, Settings.SECRET_KEY, algorithms=["HS256"])
         expire = data.get("expires")
 
         # No token was supplied?

@@ -2,7 +2,8 @@ from auth.authenticate import authenticate
 from auth.hash_password import HashPassword
 from auth.jwt_handler import create_access_token
 
-from database.connection import get_session
+# from database.connection import get_session
+from database.connection import sqlite_db
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
@@ -15,7 +16,7 @@ from models.events import Event
 # Our USERS routes
 # ==============================================================================
 # > ⭐ Our `User` routes should be treat like a black box.
-# > See `chapter_07` for more details.
+# > See `chapter_07` for more details on the authentication functions.
 # 
 # Our password hashing, authentication, and other functions can be treated as a 
 # "black box", where we hire a professional to worry about that for us, and all
@@ -32,51 +33,26 @@ from models.events import Event
 # > Building a proper authentication system is hard.
 # > We're currently using JWT Bearer tokens (in the header).
 #
-# So in general your app could be invite-only, and you manually create the user
-# accounts on their behalf. Once you've got a bit of cash, you can hire a
-# professional do build a solid login system for you!
+# Your app could be invite-only, and you manually create the user accounts on
+# their behalf. If you need a fully fledged authentication system, you'll have to
+# look elsewhere, as our `/signup` route isn't fully secure (no email verification).
+#
 #
 # Wishlist
 # --------
-# 1. Hashing can be slow. Can it be speeded up?
-# 2. We should probably disallow `+test` type email addresses.
+# 1. We should probably disallow `+test` type email addresses.
 #    - Although these are useful for testing.
-# 3. Are there better encryption methods than `python-jose`?
-#    - This "isn't my job", but I should understand the options.
-# 4. The expiry time is currently hard-coded to 1 hour.
+# 2. The expiry time is currently hard-coded to 1 hour.
 #    - Should this be an `.env` variable setting?
 #    - We need to write a function to extend the expiry time.
-# 5. Change our `User` model to use `UUID` AND an `Int Id`
-# 6. Do we need a separate `User` and `UserSign` class?
+# 3. Do we need a separate `User` and `UserSign` class?
 #    - Otherwise all our `User`s will have `Optional` (`None`) fields.
 #
-# ⚠️ FastApi and SQLModel problems
-# --------------------------------
-# > @ https://tinyurl.com/sqlmodel-join-a-table-on
-# > TLDR: I fucking give up with SQLModel.
-#
-# I really dislike the way FastApi and SQLModel work together, when it comes
-# to anything more complicated than rendering a single table. The syntax doesn't
-# make sense to me, and the documentation isn't clear enough.
-#
-# It's taken me half a day to figure out how SQLModel `join` works, and doesn't
-# seem to be the way you'd expect (compared to SQL statements). It returns a
-# `Tuple`, which kind of makes sense as they're rows/tables, but questions like
-# "how the fuck to I utilise SQLModel models to render my queries?", or "why the
-# hell isn't this `join` giving me any results?" are coming up.
-#
-# It also seems like other ORMs (like PeeWee) require converting from model
-# objects (rows) into a dictionary or json structure, but has methods to convert
-# the data structures from one form to another. I'm fairly sure FastApi/SQLModel
-# has similar, but my early mess around with PeeWee quickstart felt a lot more
-# solid than trying to understand how SQLModel types are working.
-# 
-# @ https://stackoverflow.com/a/21979166 (PeeWee -> dict)
-# @ https://tinyurl.com/fastapi-jsonable-convertor (Pydantic -> Json)
-#
-# Again SQLModel is an abstraction of an abstraction, and some say it's better 
-# to separate the API (and data validation) from the database layer. I'm beginning
-# to agree.
+# Not my job
+# ----------
+# 1. Are there better encryption methods than `python-jose`?
+# 2. Hashing can be slow. Can it be speeded up?
+
 
 user_router = APIRouter(
     tags=["User"]  # used for `/redoc` (menu groupings)
@@ -87,9 +63,11 @@ user_router = APIRouter(
 hash_password = HashPassword()
 
 # Routes -----------------------------------------------------------------------
+# Here we're converting from FastApi Pydantic (API layer) to PeeWee (Database layer)
 
 @user_router.post("/signup")
-async def sign_new_user(data: User, session=Depends(get_session)) -> dict:
+async def sign_new_user(data: User) -> dict:
+    """Convert a `User` to a `UserData` object and add to database."""
     statement = select(User).where(User.email == data.email) # Does user exist?
     user = session.exec(statement).first() # There should be ONE row
     
@@ -121,6 +99,9 @@ async def sign_in_user(
     
     if hash_password.verify_hash(user.password, db_user_exist.password):
         access_token = create_access_token(db_user_exist.email)
+
+        # Our response type `models.users.TokenResponse`. We could've
+        # also used a `TypedDict` here, but this is a bit cleaner.
         return {
             "access_token": access_token,
             "token_type": "Bearer"

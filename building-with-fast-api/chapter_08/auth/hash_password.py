@@ -1,3 +1,5 @@
+from passlib.context import CryptContext
+
 # ------------------------------------------------------------------------------
 # Password hashing
 # ==============================================================================
@@ -10,7 +12,6 @@
 # reverse when we want to compare the password during sign-in. Our `verify_hash`
 # function compares the password with the hash and returns a boolean value.
 
-from passlib.context import CryptContext
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class HashPassword:
