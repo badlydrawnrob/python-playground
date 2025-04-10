@@ -16,6 +16,12 @@ from settings import Settings
 #
 #    @ https://docs.peewee-orm.com/en/latest/peewee/database.html#executing-queries
 #
+# If you're looking for ASYNC, there's this (old) tutorial, but see also the
+# PeeWee GitHub repository for issues on FastApi + PeeWee (the alternative is
+# `gevent` or queuing.):
+#
+#    @ https://fastapi.xiniushu.com/uk/advanced/sql-databases-peewee
+#
 # Security
 # --------
 # 1. We use an environment variable to store our secrets:

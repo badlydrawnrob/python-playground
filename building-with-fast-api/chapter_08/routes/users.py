@@ -66,7 +66,7 @@ hash_password = HashPassword()
 # Here we're converting from FastApi Pydantic (API layer) to PeeWee (Database layer)
 
 @user_router.post("/signup")
-async def sign_new_user(data: User) -> dict:
+def sign_new_user(data: User) -> dict:
     """Convert a `User` to a `UserData` object and add to database."""
     statement = select(User).where(User.email == data.email) # Does user exist?
     user = session.exec(statement).first() # There should be ONE row
@@ -86,7 +86,7 @@ async def sign_new_user(data: User) -> dict:
 
 
 @user_router.post("/signin", response_model=TokenResponse) #! What's this?
-async def sign_in_user(
+def sign_in_user(
         user: OAuth2PasswordRequestForm = Depends(),
         session=Depends(get_session)
     ):
@@ -112,7 +112,7 @@ async def sign_in_user(
 
 
 @user_router.get("/me")
-async def get_user_me(
+def get_user_me(
     user: str = Depends(authenticate),
     session=Depends(get_session)
     ):

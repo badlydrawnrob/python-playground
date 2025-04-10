@@ -32,7 +32,18 @@ import uvicorn
 #    - All I want to know is how to write the `depends()` in the routes.
 #
 # ⚠️ Warnings
-# --------
+# -----------
+# > FastApi is ASYNC, but PeeWee is NOT ...
+# > See `database.connection` for more info.
+# 
+# See the following example on how to fix this (as well as the many Github issues
+# on PeeWee repo (the alternative is
+# `gevent` or queuing).
+#    @ https://fastapi.xiniushu.com/uk/advanced/sql-databases-peewee
+#
+# The producer of PeeWee has this to say about async!
+#    @ https://charlesleifer.com/blog/asyncio/
+#
 # > Changing ORMs and databases can be tricky!
 # > Are your schema and models compatible?
 #
@@ -205,7 +216,7 @@ def on_startup():
 # Routes -----------------------------------------------------------------------
     
 @app.get("/")
-async def home():
+def home():
     return RedirectResponse(url="/event/")
 
 # Run our app ------------------------------------------------------------------

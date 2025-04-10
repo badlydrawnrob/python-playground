@@ -15,6 +15,15 @@ from typing import List
 # return a different model type (sans sensitive information). SQLModel is bleeding
 # edge and a bit of a risk. Use boring technology where possible.
 #
+# Warning
+# -------
+# > PeeWee isn't compatible with `async` by default ...
+# > See `database.connection` for how to fix this ...
+# 
+# For now, we'll remove the `async` from FastApi, which kind of defeats the
+# purpose, but it'll do for a thousand users, and we can change our ORM later
+# to an async one, or fix the connection with PeeWee.
+#
 # Questions
 # ---------
 # > How many concurrent connections can SQLite handle?
@@ -97,13 +106,13 @@ event_router = APIRouter(
 # 4. You'll also need to understand the other commands (add, commit, refresh)
 
 @event_router.get("/", response_model=List[Event])
-async def retrieve_all_events(session=Depends(get_session)) -> List[Event]:
+def retrieve_all_events(session=Depends(get_session)) -> List[Event]:
     statement = select(Event) #! 'SELECT * FROM Event'
     events = session.exec(statement).all() # Run statement
     return events # FastApi converts `Event` objects to JSON automatically
 
 @event_router.get("/{id}", response_model=Event)
-async def retrieve_event(id: int, session=Depends(get_session)) -> Event:
+def retrieve_event(id: int, session=Depends(get_session)) -> Event:
     event = session.get(Event, id)
 
     if event:
@@ -115,7 +124,7 @@ async def retrieve_event(id: int, session=Depends(get_session)) -> Event:
 
 
 @event_router.post("/new")
-async def create_event(body: Event, user: str = Depends(authenticate), session=Depends(get_session)) -> dict:
+def create_event(body: Event, user: str = Depends(authenticate), session=Depends(get_session)) -> dict:
     body.creator = user # `User` email is creator of event
     session.add(body) # `Event` type added to session
     session.commit() # Commit `Event` to the database
@@ -129,7 +138,7 @@ async def create_event(body: Event, user: str = Depends(authenticate), session=D
             }
 
 @event_router.patch("/edit/{id}", response_model=Event)
-async def update_event(id: int, data: EventUpdate, user: str = Depends(authenticate), session=Depends(get_session)) -> Event:
+def update_event(id: int, data: EventUpdate, user: str = Depends(authenticate), session=Depends(get_session)) -> Event:
     event = session.get(Event, id) # Get `Event` object from database
 
     if not event: # is `None` if event doesn't exist
@@ -152,7 +161,7 @@ async def update_event(id: int, data: EventUpdate, user: str = Depends(authentic
 
 
 @event_router.delete("/{id}")
-async def delete_event(id: int, user: str = Depends(authenticate), session=Depends(get_session)) -> dict:
+def delete_event(id: int, user: str = Depends(authenticate), session=Depends(get_session)) -> dict:
     event = session.get(Event, id)
 
     if event.creator != user:
