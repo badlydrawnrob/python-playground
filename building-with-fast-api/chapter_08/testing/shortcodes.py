@@ -53,17 +53,27 @@ loop = 100 # Number of times the function is run
 # the average time per test is that number divided by the number argument,
 # which defaults to 1 million! The unit value is a `Float` (for seconds)
 
+# Eg: 3jtFC6LdSMxxdeuBaTrMnR
 result = timeit.timeit(lambda: shortuuid.uuid(), number=loop)
 print(shortuuid.uuid())
 print(result / loop)
 print("-------------------------")
 
+# Eg: bhTKVVAAwRRmTI5HPbvNz (sometimes returns a `-` spacer)
 result = timeit.timeit(lambda: nanoid.generate(), number=loop)
 print(nanoid.generate())
 print(result / loop)
 print("-------------------------")
 
+# Eg: 2vabSIZVJNHJnpJDMop2e0xCuMD (contains datetime/timestamp)
+#     2025-04-11 15:45:22+00:00
+#     1744386322.0                (why the decimal point?!)
+#                                 @ https://github.com/svix/python-ksuid/issues/24
 result = timeit.timeit(lambda: ksuid.Ksuid(), number=loop)
 id = ksuid.Ksuid()
-print(f'id: {id}, date:{id.datetime}')
+print(f'id: {id}, date: {id.datetime}, time: {id.timestamp}')
 print(result / loop)
+print("-------------------------")
+base64 = ksuid.Ksuid.from_base62("2vadVZMYop8t5x49gwG5UfCjDcc")
+print(f'You can convert from a string, too: {base64}')
+print(f"Here's the date from that string: {base64.datetime}")

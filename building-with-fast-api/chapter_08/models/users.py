@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
-from uuid import UUID, uuid4
+import nanoid
 
 # ------------------------------------------------------------------------------
 # Our USER model
@@ -19,11 +19,12 @@ from uuid import UUID, uuid4
 #    - Better to use data normalisation where possible.
 # 3. We're generating a `nanoid` with `default_factory=` automatically. We're now
 #     using a shorter code, rather than a long `UUID`. It's very URL friendly.
-#    - LOTS of unique ID generators to choose from:
-#        - `shortuuid`, `nanoid`, `ksuid` (which can be sorted by generation
-#          time), `uuid`, and so on.
-#        - Time how long each function runs with the following methods:
-#          @ https://builtin.com/articles/timing-functions-python
+#    - Unfortunately we can't use a proper type here like `UUID`!
+#    - Currently a `nanoid` could include a `-` which may not be ideal.
+#    - There's LOTS of unique ID generators to choose from:
+#        - See `testing/shortcodes.py` for the three that work well, and how
+#          long each takes to run.
+#        - A `ksuid` is pretty interesting, as it generates a timestamp too!
 #    - Make sure to CHECK COLLISIONS (how likely two `nanoid`s will clash?)
 #      @ https://zelark.github.io/nano-id-cc/
 # 4. Search Brave browser to check how to mark a field as `Optional` but use the
@@ -34,7 +35,7 @@ from uuid import UUID, uuid4
 
 class User(BaseModel):
     id: Optional[int] #! Generate automatically with PeeWee
-    public: UUID = Field(default_factory=uuid4) #! Handled by Pydantic (3), (4)
+    public: str = Field(default_factory=nanoid.generate()) #! Handled by Pydantic (3), (4)
     email: EmailStr #! This should be unique
     password: str
     # events: Optional[List[int]] #! (1), (2)
