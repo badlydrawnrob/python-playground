@@ -69,6 +69,8 @@ There's so much to learn with programming it's good to set your own boundaries!
     - Securing routes (with authentication)
     - CORS policy (middleware)
 8. Testing (1.12.0 - ...)
+    - Original version with SQLModel for database (1.12.4)
+    - Finished version with PeeWee for database, no `async` (...)
 
 
 ## Helful Commands

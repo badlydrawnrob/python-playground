@@ -25,7 +25,7 @@ import nanoid
 #        - See `testing/shortcodes.py` for the three that work well, and how
 #          long each takes to run.
 #        - A `ksuid` is pretty interesting, as it generates a timestamp too!
-#    - Make sure to CHECK COLLISIONS (how likely two `nanoid`s will clash?)
+#    - ⚠️ Make sure to CHECK COLLISIONS (how likely two `nanoid`s will clash?)
 #      @ https://zelark.github.io/nano-id-cc/
 # 4. Search Brave browser to check how to mark a field as `Optional` but use the
 #    default factory pattern: "pydantic mark as optional with default factory"
