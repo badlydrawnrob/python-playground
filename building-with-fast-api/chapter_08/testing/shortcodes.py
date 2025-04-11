@@ -6,9 +6,18 @@ import timeit
 # ------------------------------------------------------------------------------
 #  Test the speed of generating a unique id
 # ==============================================================================
-# @https://builtin.com/articles/timing-functions-python
+# > TLDR; Stop worrying about speed (performance can come later)
+# > What's going to look best to your users? Is a timestamp useful?
 #
-# See commit `e21106494` for alternative method `perf_counter()`
+# @ https://builtin.com/articles/timing-functions-python
+# @ https://note.nkmk.me/en/python-timeit-measure/
+#
+# In general, for a single user, the speed really is negligable. There's not a
+# huge amount of difference between them. It's miliseconds. So, use whatever
+# is prettyist, shortest, whatever it is you're looking for!
+#
+#
+# See commit `e21106494` for alternative method `perf_counter()`.
 #
 # `shortuuid` has 2k+ stars on Github, it's slower
 # `nanoid` is older, with fewer stars, ↓ no typing (but seems stable)
@@ -22,11 +31,12 @@ import timeit
 # 2. nanoid  -> 2.7990000035060802e-05 (1 cycle)
 # 3. shortid -> 8.074199968177709e-05  (1 cycle)
 #
-# When using `elapsed1 = finish1 - start1` and `print(f"time: {elapsed1:.6f} ")`:
+# When using `elapsed1 = finish1 - start1` and `print(f"time: {elapsed1:.6f} ")`.
+# The times are (again) variable:
 #
-# 1. ...
-# 2. ...
-# 3. ...
+# 1. nanoid -> 0.000026
+# 2. shortid -> 0.000074
+# 3. ksuid -> 0.000465
 #
 # When using the `timeit` function (100 cycles, then divide by 100)
 #
@@ -36,7 +46,12 @@ import timeit
 #
 # NanoId is generally slower than Ksuid here.
 
-loop = 100 # Timeit will run function this many times
+
+loop = 100 # Number of times the function is run
+
+# Return value is total time taken to run the test (not counting the setup)
+# the average time per test is that number divided by the number argument,
+# which defaults to 1 million! The unit value is a `Float` (for seconds)
 
 result = timeit.timeit(lambda: shortuuid.uuid(), number=loop)
 print(shortuuid.uuid())
