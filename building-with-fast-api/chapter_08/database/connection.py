@@ -18,9 +18,10 @@ from settings import Settings
 #
 # If you're looking for ASYNC, there's this (old) tutorial, but see also the
 # PeeWee GitHub repository for issues on FastApi + PeeWee (the alternative is
-# `gevent` or queuing.):
+# `gevent` or queuing):
 #
 #    @ https://fastapi.xiniushu.com/uk/advanced/sql-databases-peewee
+#    @ https://fastapi.tiangolo.com/async/ (or, just don't use `async` keyword)
 #
 # Security
 # --------

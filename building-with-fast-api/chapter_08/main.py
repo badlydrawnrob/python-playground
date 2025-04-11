@@ -40,6 +40,7 @@ import uvicorn
 # on PeeWee repo (the alternative is
 # `gevent` or queuing).
 #    @ https://fastapi.xiniushu.com/uk/advanced/sql-databases-peewee
+#    @ https://fastapi.tiangolo.com/async/ (or, just don't use `async` keyword)
 #
 # The producer of PeeWee has this to say about async!
 #    @ https://charlesleifer.com/blog/asyncio/
