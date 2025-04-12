@@ -106,13 +106,13 @@ event_router = APIRouter(
 # 4. You'll also need to understand the other commands (add, commit, refresh)
 
 @event_router.get("/", response_model=List[Event])
-def retrieve_all_events(session=Depends(get_session)) -> List[Event]:
+def retrieve_all_events() -> List[Event]:
     statement = select(Event) #! 'SELECT * FROM Event'
     events = session.exec(statement).all() # Run statement
     return events # FastApi converts `Event` objects to JSON automatically
 
 @event_router.get("/{id}", response_model=Event)
-def retrieve_event(id: int, session=Depends(get_session)) -> Event:
+def retrieve_event(id: int) -> Event:
     event = session.get(Event, id)
 
     if event:
@@ -124,7 +124,7 @@ def retrieve_event(id: int, session=Depends(get_session)) -> Event:
 
 
 @event_router.post("/new")
-def create_event(body: Event, user: str = Depends(authenticate), session=Depends(get_session)) -> dict:
+def create_event(body: Event, user: str = Depends(authenticate)) -> dict:
     body.creator = user # `User` email is creator of event
     session.add(body) # `Event` type added to session
     session.commit() # Commit `Event` to the database
@@ -138,7 +138,7 @@ def create_event(body: Event, user: str = Depends(authenticate), session=Depends
             }
 
 @event_router.patch("/edit/{id}", response_model=Event)
-def update_event(id: int, data: EventUpdate, user: str = Depends(authenticate), session=Depends(get_session)) -> Event:
+def update_event(id: int, data: EventUpdate, user: str = Depends(authenticate)) -> Event:
     event = session.get(Event, id) # Get `Event` object from database
 
     if not event: # is `None` if event doesn't exist
@@ -161,7 +161,7 @@ def update_event(id: int, data: EventUpdate, user: str = Depends(authenticate), 
 
 
 @event_router.delete("/{id}")
-def delete_event(id: int, user: str = Depends(authenticate), session=Depends(get_session)) -> dict:
+def delete_event(id: int, user: str = Depends(authenticate)) -> dict:
     event = session.get(Event, id)
 
     if event.creator != user:

@@ -112,10 +112,7 @@ def sign_in_user(
 
 
 @user_router.get("/me")
-def get_user_me(
-    user: str = Depends(authenticate),
-    session=Depends(get_session)
-    ):
+def get_user_me(user: str = Depends(authenticate)):
     # (1) Selecting `User` and `Event` columns
     # ----------------------------------------
     # This is the first part of documentation here:
