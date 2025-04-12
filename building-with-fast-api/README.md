@@ -1,5 +1,7 @@
 # README
 
+> **This page needs skimming over and revising!**
+>
 > A [brief overview](https://lyz-code.github.io/blue-book/fastapi/) of FastApi
 > For prototyping, keep things simple, get a professional to check your code ...
 > and delegate the hard stuff if you're not comfortable with it.
@@ -7,6 +9,9 @@
 FastApi is a decent `http` server that's quick (other languages are faster). The book uses MongoDB in later chapters, but I found it uncomfortable and painful to setup and use. For that reason, I prefer SQLite.
 
 ## The programming style
+
+> **We should also make a point in BIG ASS LETTERS that Elm bosses the error messaging which is _far_ superior to Python** and PyLance's shitty error messages,
+which are sometimes indecipherable. A good REPL and good errors for refactoring are an absolute god-send.
 
 I'm not a fan of the Python style however; the FastApi (or SQLModel) documentation can be longwinded, at times unclear, a bit complicated to figure out how to get things done. Going from [an article like this](https://fastapi.tiangolo.com/tutorial/security/get-current-user/), understanding the types, grasping it's component parts (inputs, outputs, dependency functions) and migrating that code to a version using SQLModel is confusing to me. The fact SQLModel is an abstraction of an abstraction (SQLAlchemy) is also worrying.
 

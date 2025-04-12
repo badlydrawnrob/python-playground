@@ -5,6 +5,9 @@
 
 There's quite a lot of minor (and perhaps major) errors in this book, so you've got to take care to double check the code's validity.
 
+**We should also make a point in BIG ASS LETTERS that Elm bosses the error messaging which is _far_ superior to Python** and PyLance's shitty error messages,
+which are sometimes indecipherable.
+
 ## Essentials
 
 > Getting through the book has been quite a slow process. Just imagine doing this from scratch in a different language! **Do not take that journey lightly**, as it's liable to take 2-3 months.
