@@ -4,6 +4,7 @@ from auth.jwt_handler import create_access_token
 
 # from database.connection import get_session
 from database.connection import sqlite_db
+from database.models import UserData, EventData
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
@@ -47,6 +48,14 @@ from models.events import Event
 #    - We need to write a function to extend the expiry time.
 # 3. Do we need a separate `User` and `UserSign` class?
 #    - Otherwise all our `User`s will have `Optional` (`None`) fields.
+# 4. Fix the `session=Depends(get_session)` problem. We're not abstracting with
+#    PeeWee and have to `db.connect()` and `db.close()` for every route!
+#    - Add this to `database.connection` later, if it's possible (commit `1.12.7`)
+# 5. We could've used a `TypedDict` here, but `response_model=` converts our `dict`
+#    to a `TokenResponse`, which is slightly cleaner.
+# 6. How do we make sure PyLance recognises our types?
+#    - PeeWee `Field` typing is a bit off for `.get()` and `.create()`
+#    - It's also not recognising our `UserData` field types on retrieval.
 #
 # Not my job
 # ----------
@@ -67,52 +76,76 @@ hash_password = HashPassword()
 
 @user_router.post("/signup")
 def sign_new_user(data: User) -> dict:
-    """Convert a `User` to a `UserData` object and add to database."""
-    statement = select(User).where(User.email == data.email) # Does user exist?
-    user = session.exec(statement).first() # There should be ONE row
+    """Convert `User` -> `UserData` object, then add it to the database."""
+    sqlite_db.connect()
+    user = UserData.get(UserData.email == data.email) # Does user exist?
     
     if user: # `None` if user doesn't exist
         raise HTTPException(status_code=409, detail="Username already exists")
 
-    # Secure the password
+    # Secure the password and replace `User.password` with hash
     hashed_password = hash_password.create_hash(data.password)
-    data.password = hashed_password # Replace request body password
+    data.password = hashed_password
 
-    # Finally, add the user to database
-    session.add(User(email=data.email, password=data.password))
-    session.commit()
+    # Add user to database (`User` -> `UserData`)
+    # 1. Convert `User` to a dictionary (excluding `None` key/values)
+    # 2. Create a `UserData` object (with `**kwargs`)
+    # 3. Save it to the database (similar to SQLModel's `commit()`)
+    new_user = UserData.create(**data.model_dump())
+    new_user.save() # should return `1` affected row
 
-    return { "message": f"User with {data.email} registered!" }
+    #! Close the connection (4)
+    sqlite_db.close()
+
+    return { "message": f"User with {new_user.email} registered!" }
 
 
-@user_router.post("/signin", response_model=TokenResponse) #! What's this?
-def sign_in_user(
-        user: OAuth2PasswordRequestForm = Depends(),
-        session=Depends(get_session)
-    ):
-    # Does a user already exist?
-    statement = select(User).where(User.email == user.username)
-    db_user_exist = session.exec(statement).first()
-
-    if db_user_exist is None:
-        raise HTTPException(status_code=404, detail="User doesn't exist")
+@user_router.post("/signin", response_model=TokenResponse) #! dict -> model (5)
+def sign_in_user(data: OAuth2PasswordRequestForm = Depends()):
+    """Checks if: `User` exists? correct details? Return `token`
     
-    if hash_password.verify_hash(user.password, db_user_exist.password):
-        access_token = create_access_token(db_user_exist.email)
+    #! Types are a bit fucked up as `Oauth...` is used, and it doesn't
+       know which type it is.
+    """
+    sqlite_db.connect()
+    user = UserData.get(UserData.email == data.username)
 
-        # Our response type `models.users.TokenResponse`. We could've
-        # also used a `TypedDict` here, but this is a bit cleaner.
+    if user is None:
+        raise HTTPException(status_code=404, detail="User doesn't exist")
+
+    if hash_password.verify_hash(data.password, user.password):
+        access_token = create_access_token(user.email) #! Change to `public` id
+
         return {
-            "access_token": access_token,
+            "access_token": access_token, # (5)
             "token_type": "Bearer"
         }
     
-    # User exists but hashed password isn't working ("403 vs 401 wrong password")
+    # `UserData` exists but hashed password isn't working
+    # Search Brave for "403 vs 401 wrong password"
     raise HTTPException(status_code=401, detail="Invalid password")
 
 
 @user_router.get("/me")
 def get_user_me(user: str = Depends(authenticate)):
+    """Get all `Event`s with the `UserData.id` joined on
+    
+    I struggled to understand this with SQLModel, which is the main reason
+    I switched over to PeeWee (taking the hit on no `async` functionality).
+    The raw SQL query should look something like this:
+
+    ```sql
+    SELECT * FROM event
+    JOIN user ON event.creator = user.email
+    WHERE event.creator = 'lovely@bum.com';
+    ```
+
+    You can use raw SQL with PeeWee if you like, but we'll do it the safe way.
+    """
+
+
+
+
     # (1) Selecting `User` and `Event` columns
     # ----------------------------------------
     # This is the first part of documentation here:

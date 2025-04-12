@@ -34,8 +34,12 @@ from database.settings import Settings
 #
 # Wishlist
 # --------
+# > Currently the data models aren't named very well. Could improve this, but
+# > there's a risk that API model names and Data model names clash!
+#
 # 1. Auto-create the database (similar to the `conn()` function)
-# 2. Ask a professional if there's anyway to do a `get_session()` function
+# 2. Ask a professional if there's anyway to do a `get_session()` function!
+#    - Add this to this package later, if it's possible (commit `1.12.7`)
 # 3. Consider connection pooling, too.
 # 4. Set SQLite tables to `STRICT` mode (must be performed manually?)
 #    - @ https://sqlite.org/stricttables.html

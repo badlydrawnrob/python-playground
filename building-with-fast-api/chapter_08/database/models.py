@@ -2,9 +2,22 @@ from database.connection import sqlite_db
 from peewee import *
 from playhouse.sqlite_ext import JSONField
 
-# SQLite (general info)
-# ---------------------
-# > Terminology
+# ------------------------------------------------------------------------------
+# PeeWee Data Models (SQLite)
+# ==============================================================================
+# > The DATA models are thrown together quickly, so this mightn't be the best
+# > way to name them, or place them in the app directories.
+#
+# We could have `data.User` and `api.User` namespaces, but that might look a bit
+# ugly when importing. You could also write it like:
+#
+# ```
+# from data.User as D
+# from api.User as A
+# ```
+#
+# Notes on SQL terminology
+# ------------------------
 #
 # 1. Understand what a primary key is.
 # 2. Understand what a foreign key is.
@@ -13,34 +26,37 @@ from playhouse.sqlite_ext import JSONField
 # 5. Understand what a check constraint is.
 # 6. Understand the difference between columns and fields.
 #
+#
 # PeeWee
 # ------
 # > Different apps do architecture differently.
-# > Gmail, for example has a single form for each `User` data point.
-# > This might be simpler for a `PATCH`, but it's SO many clicks for the user.
+# > Gmail, for example has a single form for each `User` data point. This might
+# > be simpler for a `PATCH`, but it's SO many clicks for the user.
 #
 # 1. `ID` is automatically created and incremented
-# 2. Consider whether data is a `PATCH` or a `PUT`
+# 2. Fields are `null`able by default (add `null=False` to make them required)
+# 3. Consider whether data is a `PATCH` or a `PUT`
 #    - Does your client want to sent all data or just some?
 #    - How will this affect your Elm architecture (forms)?
-# 3. Field types that convert into SQLite field types:
+# 4. Field types that convert into SQLite field types:
 #    - @ https://zetcode.com/python/peewee/ (table)
-# 4. Field types must be written _with_ the `()` parens, otherwise you're pointing
+# 5. Field types must be written _with_ the `()` parens, otherwise you're pointing
 #    to class type (not instance of class). They should also be
 #    allocated as a _variable_ (not with a `:` colon). This is a bit different
 #    than SQLModel's Pydantic style fields ...
 #    - fieldname = CharField() (correct)
 #    - fieldname: CharField (incorrect)
 #
-# unique constraint on the email field
-#
-# > Peewee SQLite extensions
+# PeeWee extensions
+# -----------------
 # > @ https://docs.peewee-orm.com/en/latest/peewee/sqlite_ext.html#sqlite-json1
 # 
 # You could convert a `List String` to a `CharField` string, and then convert
 # that with Elm on the client side, but we can use a plugin for SQLite.
 #
 #
+# General info about ORMs
+# -----------------------
 # It also seems like other ORMs (like PeeWee) require converting from model
 # objects (rows) into a dictionary or json structure, but has methods to convert
 # the data structures from one form to another. I'm fairly sure FastApi/SQLModel
@@ -49,31 +65,20 @@ from playhouse.sqlite_ext import JSONField
 # 
 # @ https://stackoverflow.com/a/21979166 (PeeWee -> dict)
 # @ https://tinyurl.com/fastapi-jsonable-convertor (Pydantic -> Json)
-#
-# > `null` is on by default for fields
-#
-# Wishlist
-# --------
-# > By default PeeWee only supports certain data types
-# > You'll need to use a plugin to support JSON blobs.
-#
-# 1. You'll need `SqliteExtDatabase` for `List[str]` and `JSONField`
-#    - @ https://docs.peewee-orm.com/en/latest/peewee/sqlite_ext.html
-#    - @ https://docs.peewee-orm.com/en/latest/peewee/sqlite_ext.html#sqlite-json1
 
 class DataModel(Model):
     class Meta:
         database = sqlite_db
 
-class User(DataModel):
+class UserData(DataModel):
     #! `ID` is automatically created and incremented
     public = UUIDField(unique=True, null=False)
-    email = CharField(unique=True, null=False)
+    email = CharField(unique=True, null=False) # Should be unique!
     password = CharField(null=False)
 
-class Event(DataModel):
+class EventData(DataModel):
     #! `ID` is automatically created and incremented
-    creator = ForeignKeyField(User, backref='event')
+    creator = ForeignKeyField(UserData, backref='event')
     title = CharField(null=False)
     image = CharField()
     description = TextField()

@@ -19,6 +19,10 @@ import uvicorn
 # 2. PeeWee ORM (data layer) for CRUD operations
 # 3. JWT tokens for authentication
 #
+# We're now splitting our API layer from our DATA layer, so we have models for
+# each. This might actually work out for the best, as we can switch out to a
+# different ORM or API framework a tiny bit quicker (SQLModel is tightly connected)
+#
 # There's LOTS of things to learn, so it's easy to feel overwhelmed. I find it
 # helpful to use a REPL to test out code snippets, and have a solid "learning
 # frame", meaning knowing when to learn, and when to delegate. It's find to tell

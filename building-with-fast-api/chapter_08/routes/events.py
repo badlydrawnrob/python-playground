@@ -24,6 +24,7 @@ from typing import List
 # purpose, but it'll do for a thousand users, and we can change our ORM later
 # to an async one, or fix the connection with PeeWee.
 #
+#
 # Questions
 # ---------
 # > How many concurrent connections can SQLite handle?
@@ -83,7 +84,9 @@ from typing import List
 # 
 # Set these all in one place? Search Brave with "fastapi always run the session"
 #
-# 1. All routes use `session=Depends(get_session)` to get a database session
+# 1. Fix the `session=Depends(get_session)` problem. We're not abstracting with
+#    PeeWee and have to `db.connect()` and `db.close()` for every route!
+#    - Add this to `database.connection` later, if it's possible (commit `1.12.7`)
 # 2. Some routes use `user: str = Depends(authenticate)` to get the user
 #
 # > Admin and roles

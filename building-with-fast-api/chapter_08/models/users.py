@@ -9,6 +9,11 @@ import nanoid
 #
 # Using Pydantic
 # --------------
+# 1. If a value is `Optional`, it must be a `None` value. If it's optional without
+#    `None`, Pydantic throws an error.
+#    - `{ id: None }` on creation, and `model_dump(exclude_none=True)` will
+#      remove it, ready to `UserData(**kwargs)` the dictionary and create a
+#      data model object.
 # 1. Some APIs have a `List ID`, such as `List Image`, for example:
 #    - This depends on the app architecture, and if it's a public API. A list
 #      of images would help you `andThen` grab each `/image/{id}` route.
@@ -35,7 +40,9 @@ import nanoid
 #    - This is used for our `/signin` route.
 
 class User(BaseModel):
-    id: Optional[int] #! Generate automatically with PeeWee
+    #! `UserData.id` generated automatically with PeeWee! So our request body
+    #! doesn't require it. However, `None` must be set or Pydantic will complain.
+    id: Optional[int] = None 
     public: str = Field(default_factory=nanoid.generate) #! Handled by Pydantic (3), (4)
     email: EmailStr #! This should be unique
     password: str
