@@ -19,6 +19,7 @@ import nanoid
 #    - Better to use data normalisation where possible.
 # 3. We're generating a `nanoid` with `default_factory=` automatically. We're now
 #     using a shorter code, rather than a long `UUID`. It's very URL friendly.
+#    - ⚠️ You seem to have to use the method NAME, not an instance of the method.
 #    - Unfortunately we can't use a proper type here like `UUID`!
 #    - Currently a `nanoid` could include a `-` which may not be ideal.
 #    - There's LOTS of unique ID generators to choose from:
@@ -35,7 +36,7 @@ import nanoid
 
 class User(BaseModel):
     id: Optional[int] #! Generate automatically with PeeWee
-    public: str = Field(default_factory=nanoid.generate()) #! Handled by Pydantic (3), (4)
+    public: str = Field(default_factory=nanoid.generate) #! Handled by Pydantic (3), (4)
     email: EmailStr #! This should be unique
     password: str
     # events: Optional[List[int]] #! (1), (2)

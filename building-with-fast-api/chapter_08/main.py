@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# from database.connection import conn
+from database.connection import sqlite_db
 from fastapi.responses import RedirectResponse
 
 from routes.users import user_router
@@ -182,6 +182,9 @@ import uvicorn
 # 22. Some way to manage our data points from a high-level view
 #    - For example, which FastApi fields are `Optional()`?
 #    - Which are automatically handled (or handled) by PeeWee?
+# 23. Change `.env` settings to something simpler!
+#    - By default `.env` files don't handle dictionaries.
+#    - You store it as a `json` string, then convert to a dictionary
 
 app = FastAPI()
 
@@ -208,11 +211,14 @@ app.add_middleware(
 )
 
 # Database build ---------------------------------------------------------------
-#! Is there a way to automatically build our database schema with PeeWee?
+#! This should build automatically, but there's a minor issue with indexes in
+# some cases.
 
 @app.on_event("startup")
 def on_startup():
-    pass
+    sqlite_db.connect()
+    sqlite_db.create_tables([User, Event], safe=True)
+    sqlite_db.close()
 
 # Routes -----------------------------------------------------------------------
     

@@ -1,6 +1,7 @@
+import json
 from peewee import *
 from logging import getLogger, StreamHandler, DEBUG
-from settings import Settings
+from database.settings import Settings
 
 # ------------------------------------------------------------------------------
 # Our DATABASE connection
@@ -40,13 +41,16 @@ from settings import Settings
 #    - @ https://sqlite.org/stricttables.html
 #
 
+# Settings ---------------------------------------------------------------------
+
+settings = Settings()
 
 # Database ---------------------------------------------------------------------
 # We're using SQLite here, with settings in our `.env` file.
 
 sqlite_db = SqliteDatabase(
-    Settings.DATABASE,
-    pragmas=Settings.PRAGMA_SETTINGS,
+    settings.DATABASE,
+    pragmas=json.loads(settings.PRAGMA_SETTINGS),
     autoconnect=False #! Have a professional check this! (1), (2), (3)
     )
 

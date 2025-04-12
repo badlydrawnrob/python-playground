@@ -18,9 +18,18 @@ from typing import Optional
 # @ https://pypi.org/project/python-decouple/ (an alternative to Pydantic)
 # @ https://youtu.be/0_seNFCtglk?t=1282 (tutorial to use `python-decouple`)
 # @ https://tinyurl.com/a-note-on-env-security (not relying on `.env` files)
+#
+# Notes
+# -----
+# > Fucking programming is so annoying ..
+#
+# 1. For some reason, dictionaries aren't allowed in `.env` files ...
+#    - So serialize  (convert) dictionary to a `json` string
+#    - And decode with `json` where it's needed 
+#    - Make sure negative numbers are valid in JSON
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')
     DATABASE: Optional[str] = None
-    PRAGMA_SETTINGS: Optional[dict] = None
+    PRAGMA_SETTINGS: Optional[str] = None #! `.env` files don't do dictionaries (1)
     SECRET_KEY: Optional[str] = None #! Our functions don't allow `None` (strict)
