@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Body, Depends, HTTPException
 
 from auth.authenticate import authenticate
-from database.connection import get_session
-from models.events import Event, EventUpdate
-from sqlmodel import select, delete
+from database.connection import sqlite_db
+from database.models import EventData
+from models.events import Event, EventUpdate, EventJustTitle
+
+from playhouse.shortcuts import model_to_dict
 
 from typing import List
 
@@ -27,7 +29,7 @@ from typing import List
 #
 # Questions
 # ---------
-# > How many concurrent connections can SQLite handle?
+# > ⭐ How many concurrent connections can SQLite handle?
 #
 # 1. Understand the difference between a response type and a `response_model=`
 #    - And why `response_model=` is used in some cases and not others.
@@ -36,25 +38,19 @@ from typing import List
 # 3. ⭐ Understand what a path, query, request parameters are.
 # 4. Understand named keyword arguments (`session=Depends(get_session)`)
 # 5. Why `data.model_dump(exclude_unset=True)`?
+#    - This removes any `None` values that haven't been set.
 #    - `data.dict()` is deprecated
 # 6. Why `PATCH` instead of `PUT`? (see tag `1.10.4`)
 #    - @ https://sqlmodel.tianglo.com/tutorial/fastapi/update
-# 7. "SQLModel has no attribute 'count'"
-#    - Using `.first()` or `.one()` is the recommended way to get a single row
-#    - @ https://github.com/fastapi/sqlmodel/issues/280
-#    - @ https://sqlmodel.tiangolo.com/tutorial/one/
-# 8. We're often using the `SQLModel` class to access/input data:
-#    - e.g: `statement = delete(Event)`
-#    - Understand this a little deeper (core ORM concepts)
-# 9. Don't need to understand them, but know that `Body()` and `Request()` exist.
-# 10. SQLite doesn't really allow `await`, but understant it exists. (AsyncIO)
-# 11. Can we use `session.add()` instead of `.sqlmodel_update()`?
-#    - `.sqlmodel_update()` is a method of `SQLModel` that updates the object,
-#      but it's pretty hard to find in the documentation.
-#    - Alternatively you could provide all values explicitly, then use `.add()`
-#      as you would when creating a new event. This might not work too well as
-#      there's no way to know _which_ data is present (because it's a `PATCH`).
-# 12. Using `PUT` instead of `PATCH` (following on from Q6 and Q11)
+# 7. Don't need to understand them, but know that `Body()` and `Request()` exist.
+# 8. SQLite doesn't really allow `await`, but understant it exists. (AsyncIO)
+# 9. Understand that a `PATCH` call could have any number of `Optional` fields
+#    that have not been set.
+#    - How does this affect our DATA models. Do we want to use `PUT` instead?
+#    - With `PATCH` there's no way of knowing which data is present, so we'd need
+#      PeeWee to be flexible with it's update function (I think we can just change
+#      the fields in the object `User.name = "Name"`)
+# 10. Using `PUT` instead of `PATCH` (following on from Q6 and Q11)
 #    - Using `.add()` would be better with a `PUT` where all data is present.
 #    - @ https://fastapi.tiangolo.com/tutorial/body-updates/#update-replacing-with-put
 #    - @ https://sqlmodel.tiangolo.com/tutorial/update/#add-the-hero-to-the-session
@@ -108,18 +104,35 @@ event_router = APIRouter(
 # 3. `.session.exec()` executes the supplied `statement`
 # 4. You'll also need to understand the other commands (add, commit, refresh)
 
-@event_router.get("/", response_model=List[Event])
-def retrieve_all_events() -> List[Event]:
-    statement = select(Event) #! 'SELECT * FROM Event'
-    events = session.exec(statement).all() # Run statement
-    return events # FastApi converts `Event` objects to JSON automatically
+@event_router.get("/", response_model=List[EventJustTitle])
+def retrieve_all_events() -> List[EventJustTitle]:
+    """Return a simple list of event titles
+    
+    A little different than our book example, but just to show the flexibility
+    and speed of a Pythonic solution. I generally type in an Elm-style, but this
+    is quite graceful!
+    """
+    sqlite_db.connect()
+    query = EventData.select() #! 'SELECT * FROM Event'
+    sqlite_db.close()
+
+    return [user.title for user in query] # List comprehension
+
 
 @event_router.get("/{id}", response_model=Event)
 def retrieve_event(id: int) -> Event:
-    event = session.get(Event, id)
+    sqlite_db.connect()
+    event = EventData.get(EventData.id == id)
 
     if event:
-        return event
+        return model_to_dict(event)
+    
+    # Should alway close connection OUTSIDE of the `if` statement?
+    # unless the connection is opened within the `if` ... but should
+    # it come after the `raise`? I don't like `try/except/finally` blocks
+    # which is the other option (`finally` closes the connection)
+    sqlite_db.close()
+
     raise HTTPException(
         status_code=404,
         detail=f"Event with ID: {id} does not exist"
@@ -128,44 +141,56 @@ def retrieve_event(id: int) -> Event:
 
 @event_router.post("/new")
 def create_event(body: Event, user: str = Depends(authenticate)) -> dict:
+    """Create a new event
+    
+    Our `Depends(authenticate)` function will run before this route, and will
+    fail if user is not logged in. There's no need to check that again within the
+    body function.
+    """
     body.creator = user # `User` email is creator of event
-    session.add(body) # `Event` type added to session
-    session.commit() # Commit `Event` to the database
-    session.refresh(body) #! Refresh the `Event` object
+    sqlite_db.connect()
+
+    # Our `EventData.id` field is auto-generated by PeeWee and
+    # not set in our `Event` request body, so ...
+    # User either `exclude_none=True` or the setting below
+    post = EventData(**body.model_dump(exclude_unset=True))
+    post.save() # You could also use `EventData.create(**kwargs)`
+    sqlite_db.close()
 
     #! Debugging only: we don't need to return `user` or `body`
     return {
             "message": "Event created successfully",
-            "user": user, #! Debug
-            "event": body #! Debug
+            "user": user,                #! Debug
+            "event": model_to_dict(post) #! Debug
             }
 
-@event_router.patch("/edit/{id}", response_model=Event)
-def update_event(id: int, data: EventUpdate, user: str = Depends(authenticate)) -> Event:
-    event = session.get(Event, id) # Get `Event` object from database
 
-    if not event: # is `None` if event doesn't exist
-        raise HTTPException(status_code=404, detail="Event not found!")
+# @event_router.patch("/edit/{id}", response_model=Event)
+# def update_event(id: int, data: EventUpdate, user: str = Depends(authenticate)) -> Event:
+#     event = session.get(Event, id) # Get `Event` object from database
+
+#     if not event: # is `None` if event doesn't exist
+#         raise HTTPException(status_code=404, detail="Event not found!")
     
-    #! Positively check or negatively check? (preference)
-    if event.creator != user: # Check if user is creator of event
-        raise HTTPException(
-            status_code=400,
-            detail="You can only update events that you've created"
-        )
+#     #! Positively check or negatively check? (preference)
+#     if event.creator != user: # Check if user is creator of event
+#         raise HTTPException(
+#             status_code=400,
+#             detail="You can only update events that you've created"
+#         )
 
-    event_data = data.model_dump(exclude_unset=True) # EventUpdate(BaseModel) could be used instead
-    event.sqlmodel_update(event_data) # Update new `Event` object (see Q11)
-    session.add(event)
-    session.commit()
-    session.refresh(event)
+#     event_data = data.model_dump(exclude_unset=True) # EventUpdate(BaseModel) could be used instead
+#     event.sqlmodel_update(event_data) # Update new `Event` object (see Q11)
+#     session.add(event)
+#     session.commit()
+#     session.refresh(event)
 
-    return event # If you don't return something you'll get `Internal Server Error`!
+#     return event # If you don't return something you'll get `Internal Server Error`!
 
 
 @event_router.delete("/{id}")
 def delete_event(id: int, user: str = Depends(authenticate)) -> dict:
-    event = session.get(Event, id)
+    event = EventData.get(EventData.id == id)
 
     if event.creator != user:
         raise HTTPException(
@@ -174,9 +199,9 @@ def delete_event(id: int, user: str = Depends(authenticate)) -> dict:
         )
 
     if event:
-        session.delete(event)
-        session.commit()
-        return { "message": f"Event with ID: {id} has been deleted!" }
+        row = event.delete_instance
+
+        return { "message": f"{row} Event deleted with ID# {id}!" }
     
     raise HTTPException(
         status_code=404,

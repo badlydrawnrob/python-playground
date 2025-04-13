@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from database.connection import sqlite_db
+from database.models import UserData, EventData
 from fastapi.responses import RedirectResponse
 
 from routes.users import user_router
@@ -221,7 +222,7 @@ app.add_middleware(
 @app.on_event("startup")
 def on_startup():
     sqlite_db.connect()
-    sqlite_db.create_tables([User, Event], safe=True)
+    sqlite_db.create_tables([UserData, EventData], safe=True)
     sqlite_db.close()
 
 # Routes -----------------------------------------------------------------------

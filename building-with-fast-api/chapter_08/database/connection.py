@@ -24,9 +24,40 @@ from database.settings import Settings
 #    @ https://fastapi.xiniushu.com/uk/advanced/sql-databases-peewee
 #    @ https://fastapi.tiangolo.com/async/ (or, just don't use `async` keyword)
 #
+# Finally, PeeWee uses Active Record style, which is different to SQLAlchemy.
+# SQLAlchemy uses Data Mapping style. I don't fully understand the difference,
+# but Active Record pattern encapsulates both data and behavior within a single
+# object. For CRUD tasks, I don't think the difference really matters much.
+#
+#    @ https://www.thoughtfulcode.com/orm-active-record-vs-data-mapper/
+#
+# Basically, the object persists AFTER the `db.close()` connection is closed. I'm
+# not sure what repurcusions this would have, as any connection to the route will
+# replace the object.
+#
+# Ideally I'll probably move the whole damn thing into a more Elm-like static
+# typed system in the future:
+#
+#    @ https://aantron.github.io/dream/
+#    @ https://discuss.ocaml.org/t/what-is-currently-best-orm-in-ocaml-world/10057
+#
+#
+# Python's quirks
+# ---------------
+# > Compared to statically typed functional languages ...
+#
+# 1. A `Person.create()` or `Person.get()` will return an object, whereas in
+#    Racket it'd be a `struct`, Elm a `record`. You'd be able to access all
+#    key value pairs right away! That's annoying when debugging.
+#    - In Python you'd get `<Person: 1>`, or for their `Pet`s, you'd get an
+#      object to loop over, `<peewee.ModelSelect object at 0x104261d50>`
+#    - You can do `pprint(vars(bob))` but it's ugly as fuck.
+#      @ https://stackoverflow.com/a/193539
+#
+#
 # Security
 # --------
-# 1. We use an environment variable to store our secrets:
+# 1. We use `.env`ironment variables to store our secrets:
 #    - This could be a secret key, API key, etc. Don't hardcode these values,
 #      or store them in your GitHub repo!
 #    - We can also use it to automatically set the database for local/live

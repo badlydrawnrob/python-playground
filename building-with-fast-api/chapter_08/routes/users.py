@@ -2,16 +2,16 @@ from auth.authenticate import authenticate
 from auth.hash_password import HashPassword
 from auth.jwt_handler import create_access_token
 
-# from database.connection import get_session
 from database.connection import sqlite_db
-from database.models import UserData, EventData
+from database.models import UserData
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlmodel import select
 
 from models.users import User, TokenResponse
 from models.events import Event
+
+# from peewee import *
 
 # ------------------------------------------------------------------------------
 # Our USERS routes
@@ -76,9 +76,16 @@ hash_password = HashPassword()
 
 @user_router.post("/signup")
 def sign_new_user(data: User) -> dict:
-    """Convert `User` -> `UserData` object, then add it to the database."""
+    """Convert `User` -> `UserData` object, then add it to the database.
+    
+    `.get()` "does this user exist" problem by default throws an exception if
+    row doesn't exist. To make it handle similar to SQLModel's `None` if does not
+    exist, we use the `get_or_none()` method. Otherwise we get a load of
+    traceback error nonsense we have to `try` and catch. Hate `None`, but it's
+    easier to work with in this case (rather than `user.exists()`)
+    """
     sqlite_db.connect()
-    user = UserData.get(UserData.email == data.email) # Does user exist?
+    user = UserData.get_or_none(UserData.email == data.email) # Does user exist?
     
     if user: # `None` if user doesn't exist
         raise HTTPException(status_code=409, detail="Username already exists")
@@ -141,90 +148,42 @@ def get_user_me(user: str = Depends(authenticate)):
     ```
 
     You can use raw SQL with PeeWee if you like, but we'll do it the safe way.
+
+    Converting to `json`
+    --------------------
+    > @ https://stackoverflow.com/a/58931596 (model -> json)
+    > @ https://docs.peewee-orm.com/en/2.10.2/peewee/playhouse.html#shortcuts
+
+    PeeWee has a really handy `model_to_dict()` function (for single records),
+    or `.dicts()` for multiple records. For now we'll loop manually, but you
+    could get the same result with:
+
+    ```python
+    list(bob.pets.dicts())
+    ```
+
+    Errors
+    ------
+    > There's currently not many guards or error checking.
+
+    - We should probably add an "if no user" clause.
+    - Our `authenticate()` function raises an error if token isn't valid
     """
 
+    # Grab the user again ...
+    user = UserData.get(UserData.email == user) #! Change to `public` id
+    # Now we can work with the `user` object to get their events.
+    user.events #! This is a backref we wrote
 
-
-
-    # (1) Selecting `User` and `Event` columns
-    # ----------------------------------------
-    # This is the first part of documentation here:
-    # You're basically returning a `Tuple` of `(User, Event)` objects that
-    # match the user's email. In SQL it'd look like:
-    #
-    # `cdb194405db64ffeaed9c82ee1b49253|lovely@bum.com|1|lovely@bum.com` etc
-    #
-    # Notice the duplication there? That's because it isn't a proper join.
-    #
-    # ```
-    # statement = select(User, Event).where(Event.creator == user)
-    # results = session.exec(statement).all()
-    # ```
-    #
-    # The problem is these haven't been serialised as json yet. You could use
-    # `response_model=` but I'm not sure how that should look. Or, you can create
-    # another model for the response, but that seems like A LOT of work to do
-    # for every join.
-    #
-    # The alternative is to convert the rows to json.
-    #
-    # (2) Second attempt using a `join`
-    # --------------------------------------------------------------------------
-    # This version is using a join, but I can't figure out how the fuck to get
-    # back what I want, which is the `Event` rows with `Event.creator` joined
-    # onto the `User` details. Do I have to create another `models.event` for this?
-    # See `EventWithUser`: what do I put here?
-    #
-    # ```
-    # statement = select(Event, User).join(User).where(Event.creator == user)
-    # results = session.exec(statement).all()
-    # ```
-    # The code above currently outputs:
-    #
-    # ('lovely@bum.com',)
-    #
-    # Calling `results` again reveals it's type:
-    # `<sqlalchemy.engine.result.ChunkedIteratorResult object at 0x103fa3d00>`
-    #
-    # @ https://stackoverflow.com/a/78832114
-    # Which should be callable with `all()`, `first()`, or `one()`
-    #
-    # However it RETURNS NO RESULTS, just an empty `[]` list.
-    #
-    # The docs say we shouldn't need to use `ON` keyword, as it's inferred by
-    # `foreign_key=` in the `models.events` package ... but we get nothing!
-    #
-    # FYI, in SQL it'd look something like:
-    #
-    # ```
-    # SELECT * FROM event
-    # JOIN user ON event.creator = user.email
-    # WHERE event.creator = 'lovely@bum.com';
-    # ```
-    # 
-    # Which DOES return something (split onto new lines):
-    #
-    # ```
-    # 1|lovely@bum.com|Glastonbury|https://somegood.com/song.jpg|
-    # Ed Sheeran singing his best song 'Class A Team'!|Live|["music", "adults", "event"]|
-    # cdb194405db64ffeaed9c82ee1b49253|lovely@bum.com|$2b$12$25mRszZMp71Gulk3sFHyRundN7WeKLp.AnUJGSvp2xHxQNGMVnJFm
-    # ```
-    #
-    # (3) Third attempt (a basic `join`)
-    # ----------------------------------
-    # > Returns a `List Tuple(Event, User)` object (# of rows depends on DB)
-    statement = select(Event, User).join(User) #! How do I narrow down to ONE user?!
-    results = session.exec(statement).all()
-
-    # We need to unpack the `Tuple` (why is it a `Tuple`?)
     list = []
-    
-    for event, user in results:
-        list.append(event.title)
-        list.append(event.creator)
-        list.append(event.tags)
-        list.append(user.id)
 
+    for event in user.events:
+        e = { "creator": event.creator
+            , "event": event.title
+            , "tags": event.tags
+            }
+        
+        list.append(e)
 
     #! Currently no guards or error checking!
     return {"data": list}

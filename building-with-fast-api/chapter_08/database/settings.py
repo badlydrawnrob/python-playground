@@ -27,9 +27,17 @@ from typing import Optional
 #    - So serialize  (convert) dictionary to a `json` string
 #    - And decode with `json` where it's needed 
 #    - Make sure negative numbers are valid in JSON
+# 2. We also have `Optional` and `None` here, I think because I was getting
+#    errors from the `SECRET_KEY` when just using `str`.
+
+# class Settings(BaseSettings):
+#     model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')
+#     DATABASE: Optional[str] = None
+#     PRAGMA_SETTINGS: Optional[str] = None #! `.env` files don't do dictionaries (1)
+#     SECRET_KEY: Optional[str] = None #! Our functions don't allow `None` (strict)
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')
-    DATABASE: Optional[str] = None
-    PRAGMA_SETTINGS: Optional[str] = None #! `.env` files don't do dictionaries (1)
-    SECRET_KEY: Optional[str] = None #! Our functions don't allow `None` (strict)
+    DATABASE: str
+    PRAGMA_SETTINGS: str #! `.env` files don't do dictionaries (1)
+    SECRET_KEY: str

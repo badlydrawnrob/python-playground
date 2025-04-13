@@ -49,8 +49,11 @@ class EventUpdate(BaseModel):
     location: Optional[str]    #! (4)
     tags: Optional[List[str]]  #! (4)
 
+class EventJustTitle(BaseModel):
+    title: str
 
-# Response Model ---------------------------------------------------------------
+
+# Response Models --------------------------------------------------------------
 # > Do we _really_ need typing for our return values?
 # > I'm not so convinced it's a good idea!
 #
@@ -61,7 +64,7 @@ class EventUpdate(BaseModel):
 # 1. Unpacking the `request` type `Event` (Pydantic)
 # 2. Calling the database with `EventData` model (PeeWee)
 # 3. Convert `EventData` -> `EventWithUser` object ..
-# 4. Or, use the `response_model=` to validate the `dict` to object
+# 4. Or, `model_to_dict(event)` and validate it with `response_model=`
 #
 # That's a lot of work! It makes our code base more complicated. If it were a
 # typed functional language, like Elm, then sure. But Python's not that solid
@@ -69,6 +72,8 @@ class EventUpdate(BaseModel):
 # a lot of work for little gain.
 #
 # @ https://tinyurl.com/pydantic-peewee-example
-    
-class EventWithUser(SQLModel):
-    pass
+#
+# ```
+# class EventWithUser(BaseModel):
+#   pass
+# ```

@@ -46,6 +46,11 @@ from playhouse.sqlite_ext import JSONField
 #    than SQLModel's Pydantic style fields ...
 #    - fieldname = CharField() (correct)
 #    - fieldname: CharField (incorrect)
+# 6. Backref is set which allows you to access the tweets that refer to a given
+#    user. So, rather than running the full query, you can simply write:
+#    - @ https://github.com/coleifer/peewee/issues/2027
+#    - `user.events` is a shortcut for the full join query. You'll need to have
+#      done a `User.create()` or `User.get()` first.
 #
 # PeeWee extensions
 # -----------------
@@ -78,7 +83,7 @@ class UserData(DataModel):
 
 class EventData(DataModel):
     #! `ID` is automatically created and incremented
-    creator = ForeignKeyField(UserData, backref='event')
+    creator = ForeignKeyField(UserData, backref='events')
     title = CharField(null=False)
     image = CharField()
     description = TextField()
