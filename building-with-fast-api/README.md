@@ -12,6 +12,10 @@ FastApi is a decent `http` server that's quick (other languages are faster). The
 ## High level stuff
 
 1. I have a feeling SQLModel is a bit slower (speed test the add user function)
+2. I'm not sure I like active record. PeeWee creates `<Person 1>` object ...
+    - Which needs to be converted to data in some way `person = object.name`
+    - And you MUST do this before you `db.close()` as you'll not be able to call
+      the `object` itself once connection is closed with some calls.
 
 
 

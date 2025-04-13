@@ -50,6 +50,14 @@ import uvicorn
 # The producer of PeeWee has this to say about async!
 #    @ https://charlesleifer.com/blog/asyncio/
 #
+#
+# > ⭐ CLOSE YOUR CONNECTION for every route's function body
+# > `db.connect()` and `db.close()` EVERY time.
+# 
+# When I didn't do this on `/signin` I got a `Error, database connection not opened`
+# massive fail. So it seems it's running on a single thread, and the thread must
+# be managed carefully!
+#
 # > Changing ORMs and databases can be tricky!
 # > Are your schema and models compatible?
 #

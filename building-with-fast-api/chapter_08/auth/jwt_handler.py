@@ -29,6 +29,14 @@ from database.settings import Settings
 #
 # Which means we can decode it with base64 too! For the `expires` value, we need
 # to use the `Time` module in Elm (with same method as it's encoded).
+#
+#
+# Wishlist
+# --------
+# > We need a public id that's short enough for a URL ...
+#
+# 1. But we could use a `token.uuid` and `token.shortuuid` and serve both for
+#    our public/private IDs (encode/decode with `base57`)
 
 settings = Settings() # Get the secret key
 
@@ -38,13 +46,13 @@ def create_access_token(user: str) -> str:
         "expires": time.time() + 3600 # Expires in 1 hour
     }
     
-    token = jwt.encode(payload, Settings.SECRET_KEY, algorithm="HS256")
+    token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
     return token
 
 
 def verify_access_token(token: str) -> dict:
     try:
-        data = jwt.decode(token, Settings.SECRET_KEY, algorithms=["HS256"])
+        data = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
         expire = data.get("expires")
 
         # No token was supplied?

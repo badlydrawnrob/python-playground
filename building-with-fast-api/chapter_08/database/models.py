@@ -34,6 +34,11 @@ from playhouse.sqlite_ext import JSONField
 # > be simpler for a `PATCH`, but it's SO many clicks for the user.
 #
 # 1. `ID` is automatically created and incremented
+#    - `PUBLIC` id is created (currently) by `nanoid`, so we can't use a
+#      `UUIDField()` anymore. We'll use `CHARFIELD()` instead.
+#    - You could use `shortuuid` and translate it from/to a `uuid`, but you'd
+#      have to do this potentially for every call of `Depends(authenticate)` (or
+#      maybe only once, as it's stored in a token)
 # 2. Fields are `null`able by default (add `null=False` to make them required)
 # 3. Consider whether data is a `PATCH` or a `PUT`
 #    - Does your client want to sent all data or just some?
@@ -77,7 +82,7 @@ class DataModel(Model):
 
 class UserData(DataModel):
     #! `ID` is automatically created and incremented
-    public = UUIDField(unique=True, null=False)
+    public = TextField(unique=True, null=False) # Was `UUIDField()`
     email = CharField(unique=True, null=False) # Should be unique!
     password = CharField(null=False)
 

@@ -128,6 +128,11 @@ def sign_in_user(data: OAuth2PasswordRequestForm = Depends()):
             "token_type": "Bearer"
         }
     
+    #! Should this go AFTER the `raise`?
+    #! ⚠️ If you don't close this, and your next route ping runs, you'll get a
+    #! `Error, database connection not opened` error!
+    sqlite_db.close()
+    
     # `UserData` exists but hashed password isn't working
     # Search Brave for "403 vs 401 wrong password"
     raise HTTPException(status_code=401, detail="Invalid password")
@@ -169,7 +174,8 @@ def get_user_me(user: str = Depends(authenticate)):
     - We should probably add an "if no user" clause.
     - Our `authenticate()` function raises an error if token isn't valid
     """
-
+    sqlite_db.connect()
+    
     # Grab the user again ...
     user = UserData.get(UserData.email == user) #! Change to `public` id
     # Now we can work with the `user` object to get their events.
@@ -184,6 +190,8 @@ def get_user_me(user: str = Depends(authenticate)):
             }
         
         list.append(e)
+    
+    sqlite_db.close()
 
     #! Currently no guards or error checking!
     return {"data": list}

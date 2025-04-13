@@ -16,8 +16,13 @@ from typing import List, Optional
 # Using Pydantic
 # --------------
 # 1. `Optional` is useful when one of the data points isn't required.
+#    - You MUST supply the fallback value, unfortunately ...
+#    - @ https://fastapi.tianglo/tutorial/body/ `= None` or `| None = None`
+#    - @ https://stackoverflow.com/q/76466468 (for the reason why)
 # 2. It's easier to NOT nest models (it's errored for me before).
 # 3. Some data points need to be handled by PeeWee (like `id`).
+#    - For this we MUST provide a default value `None` (though why `Optional`
+#      doesn't handle this for us I've no idea) (see (1))
 # 4. For `EventUpdate`, we could do a `PATCH` or a `PUT` request.
 #    - As our example is a `PATCH` request, all fields are optional.
 #
@@ -33,8 +38,8 @@ from typing import List, Optional
 #    - @ https://mypy.readthedocs.io/en/stable/typed_dict.html
 
 class Event(BaseModel):
-    id: Optional[int] #! Generate automatically with PeeWee (3)
-    creator: Optional[int] #! Create a foreign key with `User.Id` (PeeWee) (3)
+    id: Optional[int] = None #! Generate automatically with PeeWee (1) (3)
+    creator: Optional[int] = None #! Create a foreign key with `User.Id` (PeeWee) (3)
     title: str
     image: str
     description: str
