@@ -88,7 +88,7 @@ class UserData(DataModel):
 
 class EventData(DataModel):
     #! `ID` is automatically created and incremented
-    creator = ForeignKeyField(UserData, backref='events')
+    creator = ForeignKeyField(UserData, backref='events') #! Should be EMAIL!
     title = CharField(null=False)
     image = CharField()
     description = TextField()
