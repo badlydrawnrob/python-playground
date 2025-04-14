@@ -56,6 +56,10 @@ from playhouse.sqlite_ext import JSONField
 #    - @ https://github.com/coleifer/peewee/issues/2027
 #    - `user.events` is a shortcut for the full join query. You'll need to have
 #      done a `User.create()` or `User.get()` first.
+# 7. `ForeignKeyField` uses an `id` (primary key) and I can't seem to find a way
+#    to change this behaviour. An `int` is a faster join than a `string` anyway.
+#    - `column_name=` is require, as by default PeeWee ads `_id` to field name if
+#      it's a foreign key. We'll change it to be the same as book.
 #
 # PeeWee extensions
 # -----------------
@@ -88,7 +92,7 @@ class UserData(DataModel):
 
 class EventData(DataModel):
     #! `ID` is automatically created and incremented
-    creator = ForeignKeyField(UserData, backref='events') #! Should be EMAIL!
+    creator = ForeignKeyField(UserData, column_name = 'creator', backref='events') #! (7)
     title = CharField(null=False)
     image = CharField()
     description = TextField()

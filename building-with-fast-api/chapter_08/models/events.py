@@ -38,8 +38,10 @@ from typing import List, Optional
 #    - @ https://mypy.readthedocs.io/en/stable/typed_dict.html
 
 class Event(BaseModel):
-    id: Optional[int] = None #! Generate automatically with PeeWee (1) (3)
-    creator: Optional[int] = None #! Create a foreign key with `User.Id` (PeeWee) (3)
+    # We automatically generate `id` and `creator` with PeeWee ... (1) (3)
+    # - `id` is ommited from the request, as is `creator` (foreign key `User.Id`)
+    id: Optional[int] = None # `None` is a fallback value
+    creator: Optional[int] = None
     title: str
     image: str
     description: str
