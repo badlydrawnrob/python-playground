@@ -37,8 +37,9 @@ import uvicorn
 #    - All I want to know is how to write the `depends()` in the routes.
 #
 # ⚠️ Warnings
-# -----------
-# > About ASYNC:
+# ===========
+# Async
+# -----
 # > FastApi is async, but PeeWee is NOT ... see `database.connection` for info.
 # 
 # See the following example on how to fix this (as well as the many Github issues
@@ -46,10 +47,24 @@ import uvicorn
 #    @ https://fastapi.xiniushu.com/uk/advanced/sql-databases-peewee
 #    @ https://fastapi.tiangolo.com/async/ (or, just don't use `async` keyword)
 #
-# The producer of PeeWee has this to say about async!
+# The producer of PeeWee has this to say about async! I have to agree that
+# scattering your program with `await` and `async` keywords feels ugly, when
+# other programming languages do this by default.
 #    @ https://charlesleifer.com/blog/asyncio/
 #
+# There's also this thread that advises (eventually) not to use PeeWee, or at
+# least to take care with it. For example, hitting the `/signin` route, then
+# the `/new/event` route gives a `peewee.OperationalError: Connection already opened`
+# error. Run the event route again a couple of times, that error vanishes:
 #
+#    - ⚠️ From early tests the connection is not reliable! Apparently FastApi
+#      uses `async` under the hood, even if you get rid of ALL `async` keywords.
+#    - And (I think) I'm doing everything right and `.close()`ing any open
+#      connection within the route function body.
+#    - @ https://github.com/fastapi/fastapi/discussions/8049 (explains why)
+#
+# Managing connections
+# --------------------
 # > Make sure you CONNECT and CLOSE, every time.
 # > PeeWee requires opening and closing for every route function
 # 
@@ -57,6 +72,8 @@ import uvicorn
 # massive fail. So it seems it's running on a single thread, and the thread must
 # be managed carefully!
 #
+# Speed
+# -----
 # > PeeWee may be SLOWER than SQLModel (but the cache is quick)
 # > On first load it can be quite slow.
 #
@@ -65,6 +82,8 @@ import uvicorn
 # > Changing ORMs and databases can be tricky!
 # > Are your schema and models compatible?
 #
+# Compatibility
+# -------------
 # You need to make sure your schema and ORM are compatible! It might help to
 # manually setup your schema and simply use the ORM for rows -> objects.
 #
@@ -74,6 +93,8 @@ import uvicorn
 #
 # For example, `Event.id` is handled by PeeWee, NOT Pydantic!
 #
+# Why I changed from SQLModel to PeeWee 
+# -------------------------------------
 # > FastApi and SQLModel problems
 #
 # - We're now using PeeWee to handle our database layer

@@ -165,8 +165,7 @@ def retrieve_event(id: int) -> Event:
 @event_router.post("/new")
 def create_event(
     body: Event,
-    user: str = Depends(authenticate),
-    response_model=EventWithCreator):
+    user: str = Depends(authenticate)) -> EventWithCreator:
     """Create a new event
     
     Our `Depends(authenticate)` function will run before this route, and will
