@@ -33,7 +33,7 @@ from auth.jwt_handler import verify_access_token
 # Tells the application that a security scheme is present
 oauth_scheme = OAuth2PasswordBearer(tokenUrl="/user/signin")
 
-async def authenticate(token: str = Depends(oauth_scheme)) -> str:
+def authenticate(token: str = Depends(oauth_scheme)) -> str:
     if not token:
         raise HTTPException(
             status_code=403,
