@@ -9,9 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 
 from models.users import User, TokenResponse
-from models.events import Event
-
-# from peewee import *
+# We're not using the API `Event` model here for return type.
 
 # ------------------------------------------------------------------------------
 # Our USERS routes

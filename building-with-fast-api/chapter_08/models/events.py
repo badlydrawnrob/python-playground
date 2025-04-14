@@ -56,15 +56,15 @@ class EventUpdate(BaseModel):
     location: Optional[str]    #! (4)
     tags: Optional[List[str]]  #! (4)
 
-class EventJustTitle(BaseModel):
-    title: str
-
 
 # Response Models --------------------------------------------------------------
-# > Do we _really_ need typing for our return values?
-# > I'm not so convinced it's a good idea!
+# > What's the benefit of `response_model=` or response types?
 #
-# Our SQL models are already typed, and the return values should be very
+# Do we _really_ need typing for our return values? I'm not so convinced it's a
+# good idea! Where it _is_ useful however, is when you've got sensitive details
+# that would otherwise need a lot of manual boilerplate code to remove.
+#
+# Our SQL models are already typed with PeeWee, so return values should be very
 # predictable. A `get_user_event() -> dict` could be enough! If we _did_ decide
 # to use typing for return values, it'd mean:
 #
@@ -80,7 +80,28 @@ class EventJustTitle(BaseModel):
 #
 # @ https://tinyurl.com/pydantic-peewee-example
 #
-# ```
-# class EventWithUser(BaseModel):
-#   pass
-# ```
+# Below is one usecase that could be useful. It removes sensitive `UserData`
+# fields from the response. However:
+#
+#! ⚠️ For some reason `response_model=` doesn't work with `EventWithCreator`.
+#! ⚠️ It works if you use it as the _return type_ of the function. So, it might
+#! ⚠️ be better to just be explicit and do this manually.
+    
+class EventJustTitle(BaseModel):
+    title: str
+
+class Creator(BaseModel):
+    # id: int
+    public: str
+    email: str
+    # password: str
+
+class EventWithCreator(BaseModel):
+    # id: int
+    creator: Creator
+    title: str
+    image: str
+    description: str
+    location: str
+    tags: List[str]
+

@@ -38,12 +38,11 @@ import uvicorn
 #
 # ⚠️ Warnings
 # -----------
-# > FastApi is ASYNC, but PeeWee is NOT ...
-# > See `database.connection` for more info.
+# > About ASYNC:
+# > FastApi is async, but PeeWee is NOT ... see `database.connection` for info.
 # 
 # See the following example on how to fix this (as well as the many Github issues
-# on PeeWee repo (the alternative is
-# `gevent` or queuing).
+# on PeeWee repo (the alternative is `gevent` or queuing).
 #    @ https://fastapi.xiniushu.com/uk/advanced/sql-databases-peewee
 #    @ https://fastapi.tiangolo.com/async/ (or, just don't use `async` keyword)
 #
@@ -51,12 +50,17 @@ import uvicorn
 #    @ https://charlesleifer.com/blog/asyncio/
 #
 #
-# > ⭐ CLOSE YOUR CONNECTION for every route's function body
-# > `db.connect()` and `db.close()` EVERY time.
+# > Make sure you CONNECT and CLOSE, every time.
+# > PeeWee requires opening and closing for every route function
 # 
 # When I didn't do this on `/signin` I got a `Error, database connection not opened`
 # massive fail. So it seems it's running on a single thread, and the thread must
 # be managed carefully!
+#
+# > PeeWee may be SLOWER than SQLModel (but the cache is quick)
+# > On first load it can be quite slow.
+#
+# How might we speed up the first load?
 #
 # > Changing ORMs and databases can be tricky!
 # > Are your schema and models compatible?

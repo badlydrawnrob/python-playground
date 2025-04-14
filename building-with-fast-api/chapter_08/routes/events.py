@@ -3,7 +3,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException
 from auth.authenticate import authenticate
 from database.connection import sqlite_db
 from database.models import EventData, UserData
-from models.events import Event, EventUpdate, EventJustTitle
+from models.events import Event, EventUpdate, EventJustTitle, EventWithCreator
 
 from playhouse.shortcuts import model_to_dict
 
@@ -114,7 +114,10 @@ event_router = APIRouter(
 
 @event_router.get("/", response_model=List[EventJustTitle])
 def retrieve_all_events() -> List[EventJustTitle]:
-    """Return a simple list of event titles
+    """Return a simple list of event titles!
+
+    > Pick _either_ a `response_model=` OR a response type, not both!
+    > Unless there's a very good reason to do so ... (I don't think there is)
     
     A little different than our book example, but just to show the flexibility
     and speed of a Pythonic solution. I generally type in an Elm-style, but this
@@ -123,7 +126,7 @@ def retrieve_all_events() -> List[EventJustTitle]:
     sqlite_db.connect()
 
     query = EventData.select() #! 'SELECT * FROM Event'
-    events = [user.title for user in query] # List comprehension
+    events = [{"title": user.title} for user in query] # List comprehension
 
     sqlite_db.close()
 
@@ -132,16 +135,25 @@ def retrieve_all_events() -> List[EventJustTitle]:
 
 @event_router.get("/{id}", response_model=Event)
 def retrieve_event(id: int) -> Event:
+    """Retrieve a single event by ID
+    
+    Should we always close connection OUTSIDE of the `if` statement? PeeWee holds
+    on to the object, even if the connection has been closed. I guess the next
+    call will recycle the `event` variable (Python is mutable).
+
+    I don't like `try/except/finally` blocks (`finally` closes the connection),
+    so we're avoding that with the `get_or_none()` function, which makes behaviour
+    similar to SQLModel.
+    
+    Otherwise we get a big exception we'd need to deal with, if there are no
+    results for the database query.
+    """
     sqlite_db.connect()
     event = EventData.get_or_none(EventData.id == id) #! See (1) in Qs
 
     if event:
         return model_to_dict(event)
     
-    # Should alway close connection OUTSIDE of the `if` statement?
-    # unless the connection is opened within the `if` ... but should
-    # it come after the `raise`? I don't like `try/except/finally` blocks
-    # which is the other option (`finally` closes the connection)
     sqlite_db.close()
 
     raise HTTPException(
@@ -151,7 +163,10 @@ def retrieve_event(id: int) -> Event:
 
 
 @event_router.post("/new")
-def create_event(body: Event, user: str = Depends(authenticate)) -> dict:
+def create_event(
+    body: Event,
+    user: str = Depends(authenticate),
+    response_model=EventWithCreator):
     """Create a new event
     
     Our `Depends(authenticate)` function will run before this route, and will
@@ -165,6 +180,12 @@ def create_event(body: Event, user: str = Depends(authenticate)) -> dict:
     We may as well let PeeWee do the work for us, and just supply a `User` object,
     and it'll extract the `id` for us. This feels a bit icky to me coming from
     a statically typed (I'd rather explicitly set the `id`), but it works.
+    
+    Speed
+    -----
+    > ⚠️ The first time I ran this function, it was pretty slow ...
+    
+    Subsequent calls were much faster. I don't know why this is.
     """    
     sqlite_db.connect()
     username = UserData.get(UserData.email == user) #! Create a `UserData` object
@@ -185,27 +206,19 @@ def create_event(body: Event, user: str = Depends(authenticate)) -> dict:
     query = EventData(creator=username, **body.model_dump(exclude_none=True))
     query.save() # You could've used `EventData.create(**kwargs)` instead
     
-    event = model_to_dict(query)
     sqlite_db.close()
 
-    #! Debugging only: we don't need to return `user` or `body`
-    #! I think `query` requires a PROPER `USER` rather than a simple
-    #! `id` integer value, as `event` below throws an error ...
-    #! `database.models.UserDataDoesNotExist` ...
-    #! or I'm trying to use the `email` for Event.creator rather than
-    #! `User.id` which I think it's expecting ...
+    #! Debugging ONLY. NEVER expose sensitive details in production.
     #!
-    #! So I think I've gotta grab the user (from email) create the user
-    #! object and then generate the query. Alternatively, just use the email
-    #! as the foreign key (but you'll likely get `<Event None>` because it expects
-    #! a `User` OBJECT
+    #! In order to hide our `UserData.email` and `UserData.password`,
+    #! (I think) we MUST do this manually, unlike SQLModel, which can
+    #! have a model that excludes sensitive data.
     #!
-    #! Not a huge fan of having to use objects in this way. Easier just a record id.
-    return {
-            "message": "Event created successfully",
-            "user": user,                #! Debug
-            "event": event #! Debug
-            }
+    #! We could also use FastApi's `response_model=` to exclude sensitive data.
+    #! Preparing for other frameworks however, it's not a bad idea to do things
+    #! manually, as I imagine OCaml and Elm would do it like that. 
+
+    return model_to_dict(query) # You could write this _before_ `close()`
 
 
 # @event_router.patch("/edit/{id}", response_model=Event)

@@ -83,6 +83,7 @@ from playhouse.sqlite_ext import JSONField
 class DataModel(Model):
     class Meta:
         database = sqlite_db
+        # Add strict mode to prevent creating new columns
 
 class UserData(DataModel):
     #! `ID` is automatically created and incremented
