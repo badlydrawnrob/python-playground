@@ -2,7 +2,7 @@
 
 > This repo is my working copy of the book [Building Python APIs with FastAPI](https://www.packtpub.com/en-us/product/building-python-web-apis-with-fastapi-9781801074513)
 
-The book goes into detail on building a http server API with the [FastAPI](https://fastapi.tiangolo.com/). In general it's a good book, but there's a lot of errors, or areas where you've got to interpret and fix things for yourself. FastAPI has also made a lot of changes since the book was published (dependency hell). It actually took me quite a bit of time (months) to get through, as I had to re-familiarise myself with Python, and FastAPI isn't always obvious.
+**The book goes into detail on building a http server API with the [FastAPI](https://fastapi.tiangolo.com/).** In general it's a good book, but there's a lot of errors, or areas where you've got to interpret and fix things for yourself. FastAPI has also made a lot of changes since the book was published (dependency hell). It actually took me quite a bit of time (months) to get through, as I had to re-familiarise myself with Python, and FastAPI isn't always obvious.
 
 As I've written before, I'm [not a huge fan](https://github.com/badlydrawnrob/python-playground?tab=readme-ov-file#coding-style) of Python, but it's a handy scripting language and you get used to it. Errors and typing are _especially_ annoying — a simple typo, missing word, or rogue piece of code can torpedo your program and be _extremely_ difficult to track down with FastAPI and Python.
 
@@ -17,10 +17,10 @@ As I've written before, I'm [not a huge fan](https://github.com/badlydrawnrob/py
 4. Human readable is better (documentation)
 5. Boring is better! (aim for stability)
 
-If I can handle 3k users on a simple server, I'm happy. I'm not out to build an all-singing, all-dancing app, and the goal is to validate a business model, then build out a technical team if it's successful! Things like queuing, sharding, email validation, and so on, are not my concern right now.
+**If I can handle 3k users on a simple server, I'm happy.** I'm not out to build an all-singing, all-dancing app, and the goal is to validate a business model, then build out a technical team if it's successful! Things like queuing, sharding, email validation, and so on, are not my concern right now.
 
-- My learning frame is a personal "do" and "don't do" list
-- Things I'm happy to take on (and learn); stuff I don't add to my to-do list.
+- **My learning frame** is a personal "do" and "don't do" list
+- **Things I'm happy to take on (and learn);** stuff I don't add to my to-do list.
 
 Learning to program is a _never-ending_ task. It can be quite overwhelming, so having a mentor to hold your hand and keep you right is super helpful. I don't enjoy low-level detail![^7]
 
@@ -47,7 +47,7 @@ The downsides ...
 ## Chapters
 
 > The tags relate to important stages in our app's development ...
-> Use the REPL to practice and discovery functionality quickly!
+> Use the REPL to practice and discover functionality quickly!
 
 1. Hello World
 2. Routing (`1.60` — `1.6.6`)
@@ -86,7 +86,7 @@ Also:
     - `SQLModel` is imported but no download is mentioned
     - Which `jose` package do you mean? There's more than one in pypi!
 2. Some upgrades are needed, but tricky to learn:
-    - ~~`@app.on_event("startup")` is now app lifecycle but requires an understanding of `contextlib`.
+    - ~~`@app.on_event("startup")`~~ is now app lifecycle but requires an understanding of `contextlib`.
 3. `grant_type=` missing the `password` keyword in the authentication `curl` call.
 
 Be careful with your routes:
@@ -155,7 +155,7 @@ pprint(vars(your_object))
     - You might want to split your API layer from your DATA layer.
 2. **If things are too complicated for you, hire.**[^4]
     - Have a professional look over your code ...
-    - Or, have them do it for you, and treat things as a [black box](#!black-box).
+    - Or, have them do it for you, and treat things as a [black box](#a-black-box).
     - Stick to a narrow problem set that suits your capabilities.
 3. **Pick tools where you understand 50-70% of the language.**
     - The 5 finger rule means avoiding texts that are too difficult for you.
@@ -172,7 +172,7 @@ pprint(vars(your_object))
 > Some things can be set-and-forget.
 > There's simply too much to learn with programming!
 
-Some things I want to treat as an input and output. I don't want to worry about their internal mechanisms.
+Some things I want to treat as an input and output: I don't want to worry about their internal mechanisms.
 
 1. I don't want to learn some things (my learning frame)
 2. I'd rather hand over a low-level task to a collegue (email validation)
@@ -188,7 +188,7 @@ We're not worrying about it too much in this book, but it's worthwhile mentionin
 All API architecture should consider the end-user and their needs/experience. Consider also which data points should be _public_ and which _private_. It might be fine to expose an `Event.id` but a `User.id` is better private. A data scraper can easily increment the `Event.id` however, so maybe a `shortuuid` is better.
 
 
-## Choosing an ORM
+## Choosing an ORM
 
 > SQLModel is fine for single table `select()`s but a bit confusing for joins.
 
