@@ -12,13 +12,13 @@
 3. Minimal backend code
 4. Minimal server setup
 
-That's about it. I need something that interfaces with a simple database, keeping things light. It's for prototypes, and will probably be replaced by another programming language at some stage. [Roc](https://www.roc-lang.org/) looks promising, but I'm not a heavy coding guy, so might have a team by then!
+That's about it. I need something that interfaces with a simple database, keeping things light. It's for prototypes, and will probably be replaced by another programming language at some stage. [Roc](https://www.roc-lang.org/) looks promising, but I'm not a heavy coding guy, so might have a team by then![^]
 
 
 ## On writing ...
 
 > Some books have:
-> 1. Minor or major errors in the code[^1]
+> 1. Minor or major errors in the code[^2]
 > 2. Outdated dependencies (how many does yours have?)
 > 3. Academic language (or verbose terminology)
 > 4. Not enough visuals (or poorly labelled ones)
@@ -81,9 +81,11 @@ niceTypes =
 > These can be avoided wherever necessary
 
 1. `Class()`es and `Class.method()`s (rather than plain functions).
-2. Stateful applications (rather than stateless)
-2. [`**Kwargs`](https://www.geeksforgeeks.org/args-kwargs-python/) and other Python magic.
-3. The concept of [`self`](https://how.dev/answers/what-is-self-in-python) (a pretty dumb idea in my opinion)
+2. Stateful applications (rather than stateless and functional)
+3. A `list` can be _mutable_, and changed _anywhere_ in the program. That's bad!
+4. [`**Kwargs`](https://www.geeksforgeeks.org/args-kwargs-python/) and other Python magic.
+5. The concept of [`self`](https://how.dev/answers/what-is-self-in-python) (a pretty dumb idea in my opinion)
+6. Declaration order can be important (Pydantic nested class should come before it's use).
 
 
 ## The compiler
@@ -192,7 +194,7 @@ Hint: Try using String.fromInt to convert it to a string?
 
 - [UV in production?](https://pythonspeed.com/articles/uv-python-production/)
 - [UV commands](https://docs.astral.sh/uv/reference/cli/) (a quick overview)
-- [Thonny](https://thonny.org/) — a beginner IDE[^2]
+- [Thonny](https://thonny.org/) — a beginner IDE[^3]
 - [VS Code](https://code.visualstudio.com/docs/python/python-tutorial) setup tutorial
 
 
@@ -200,7 +202,9 @@ Hint: Try using String.fromInt to convert it to a string?
 
 | Command                                    | Does this                            |
 | ------------------------------------------ | -------------------------------------|
-| `pip install -r /path/to/requirements.txt` | Install requirements[^3]             |
+| `activate`                                 | `source .venv/bin/activate` alias in `.zshrc` file |
+| `pip freeze`                               | A list of currently installed packages |
+| `pip install -r /path/to/requirements.txt` | Install requirements[^4]             |
 | `uv init [folder-name]`                    | Start `uv` project                   |
 | `uv python install [version]`              | Install a Python version (or latest) |
 | `uv python list`                           | List all Python versions installed   |
@@ -211,16 +215,18 @@ Hint: Try using String.fromInt to convert it to a string?
 | `uv add [package]`                         | Download and install a package       |
 | `uv tree`                                  | List all dependencies (as a tree)    |
 | `uv run [command]`                         | Run the server, run a file, etc      |
-| `uv sync`                                  | Sets up a project's "stuff"[^4]      |
-| `uv run uvicorn src.main:app --reload`     | Run command for subfolder file[^5]   |
+| `uv sync`                                  | Sets up a project's "stuff"[^5]      |
+| `uv run uvicorn src.main:app --reload`     | Run command for subfolder file[^6]   |
 
 
-[^1]: This is likely to happen when you're making regular changes to the book. But you've really got to have a good editor (or using Ai) to triple check your changes for continuity errors. For the beginner, it's highly likely they'll get stuck, and there's nothing in the book to keep them right other than context and the student's initiative.
+[^1]: Personally, I'd prefer someone else to handle the heavy-lifting for some areas of the program. Ideally a stable and well-documented package, or have someone build it for me. Some areas of Python programs have a LOT of moving parts, and I'd prefer to stick to areas I'm good at (ui, ux, marketing, etc).
 
-[^2]: You can't run this app while there's a virtual environment running in the terminal. You can set the virtual environment by going to `Tools -> Options ... -> Interpreter -> Python executable` and selecting the path or symlink in your `venv-folder-name`.
+[^2]: This is likely to happen when you're making regular changes to the book. But you've really got to have a good editor (or using Ai) to triple check your changes for continuity errors. For the beginner, it's highly likely they'll get stuck, and there's nothing in the book to keep them right other than context and the student's initiative.
 
-[^3]: If you're using stock Python commands, you'll probably need to preface with `python3 -m`, such as `python3 -m pip install [package]`. If you're using `uv` you don't need to worry about this (just use `uv run` etc). You also won't need to worry about `PATH` or any of that shit (I think `uv` does that for you).
+[^3]: You can't run this app while there's a virtual environment running in the terminal. You can set the virtual environment by going to `Tools -> Options ... -> Interpreter -> Python executable` and selecting the path or symlink in your `venv-folder-name`.
 
-[^4]: From scratch. Environment, dependencies, and so on. I think this needs a `pyproject.toml` file (and maybe a `.python-version` file). Lookup the docs for more info.
+[^4]: If you're using stock Python commands, you'll probably need to preface with `python3 -m`, such as `python3 -m pip install [package]`. If you're using `uv` you don't need to worry about this (just use `uv run` etc). You also won't need to worry about `PATH` or any of that shit (I think `uv` does that for you).
 
-[^5]: It seems that the `uv` command **must** be run from the parent directory that the virtual server lives in. You also need to use the `module-folder.dot_format.py` to call a [subfolder's file](https://stackoverflow.com/a/62934660).
+[^5]: From scratch. Environment, dependencies, and so on. I think this needs a `pyproject.toml` file (and maybe a `.python-version` file). Lookup the docs for more info.
+
+[^6]: It seems that the `uv` command **must** be run from the parent directory that the virtual server lives in. You also need to use the `module-folder.dot_format.py` to call a [subfolder's file](https://stackoverflow.com/a/62934660).

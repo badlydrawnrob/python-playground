@@ -1,104 +1,128 @@
 # README
 
-> **This page needs skimming over and revising!**
->
-> A [brief overview](https://lyz-code.github.io/blue-book/fastapi/) of FastApi
-> For prototyping, keep things simple, get a professional to check your code ...
-> and delegate the hard stuff if you're not comfortable with it.
+> This repo is my working copy of the book [Building Python APIs with FastAPI](https://www.packtpub.com/en-us/product/building-python-web-apis-with-fastapi-9781801074513)
 
-FastApi is a decent `http` server that's quick (other languages are faster). The book uses MongoDB in later chapters, but I found it uncomfortable and painful to setup and use. For that reason, I prefer SQLite.
+The book goes into detail on building a http server API with the [FastAPI](https://fastapi.tiangolo.com/). In general it's a good book, but there's a lot of errors, or areas where you've got to interpret and fix things for yourself. FastAPI has also made a lot of changes since the book was published (dependency hell). It actually took me quite a bit of time (months) to get through, as I had to re-familiarise myself with Python, and FastAPI isn't always obvious.
+
+As I've written before, I'm [not a huge fan](https://github.com/badlydrawnrob/python-playground?tab=readme-ov-file#coding-style) of Python, but it's a handy scripting language and you get used to it. Errors and typing are _especially_ annoying — a simple typo, missing word, or rogue piece of code can torpedo your program and be _extremely_ difficult to track down with FastAPI and Python.
 
 
-## High level stuff
+## My learning goals
 
-1. I have a feeling SQLModel is a bit slower (speed test the add user function)
-2. I'm not sure I like active record. PeeWee creates `<Person 1>` object ...
-    - Which needs to be converted to data in some way `person = object.name`
-    - And you MUST do this before you `db.close()` as you'll not be able to call
-      the `object` itself once connection is closed with some calls.
+> I'm always a fan of simplicity.
 
+1. Simple is better
+2. Smaller is better
+3. Less is better (be brutalist!)
+4. Human readable is better (documentation)
+5. Boring is better! (aim for stability)
 
+If I can handle 3k users on a simple server, I'm happy. I'm not out to build an all-singing, all-dancing app, and the goal is to validate a business model, then build out a technical team if it's successful! Things like queuing, sharding, email validation, and so on, are not my concern right now.
 
-## The programming style
+- My learning frame is a personal "do" and "don't do" list
+- Things I'm happy to take on (and learn); stuff I don't add to my to-do list.
 
-> **We should also make a point in BIG ASS LETTERS that Elm bosses the error messaging which is _far_ superior to Python** and PyLance's shitty error messages,
-which are sometimes indecipherable. A good REPL and good errors for refactoring are an absolute god-send. Also, dealing with `None` and `Optional` types is a hassle.
->
-> There really is SOOO much to think about and learn with programming, and it might bode well for you to work as a team, and focus on a narrower set of problems.
-
-I'm not a fan of the Python style however; the FastApi (or SQLModel) documentation can be longwinded, at times unclear, a bit complicated to figure out how to get things done. Going from [an article like this](https://fastapi.tiangolo.com/tutorial/security/get-current-user/), understanding the types, grasping it's component parts (inputs, outputs, dependency functions) and migrating that code to a version using SQLModel is confusing to me. The fact SQLModel is an abstraction of an abstraction (SQLAlchemy) is also worrying.
-
-The FastApi book is a good high-level view, but has many errors and continuity issues, so you'll have to fix things and check documentation. It's also fast becoming outdated (dependency hell) as FastApi evolves, so watch out for changes and updates. Authentication is easy(ish) to use (with guidance) but email notifications aren't baked in, and other nice-to-haves can be difficult.
-
-### Black box
-
-> I prefer to treat parts of this http server as a "black box".
-> That is to say, areas where I don't have to understand how it works!
-
-Some things can be set-and-forget. They involve a lot of domain knowledge and low-level detail, which I'm personally not 100% comfortable with. It's wise to find an experienced developer to mentor you and double-check code.
-
-`/auth`, `/database` modules are especially important to get right!
-
-### Errors
-
-> Compared to Elm, Python's error messaging is AWFUL.
-
-Python error messaging is particularly frustrating (cryptic, verbose, incomplete), but you can use Pydantic and Pyright to help out with types.
-
-### Limitations
-
-> "SQLModel is designed to have the best developer experience in a narrow set of very common use cases."
-
-For that reason, you might find yourself better off with a different ORM. SQLAlchemy is too complicated for my preferences, so I'd plum for something which is easier and as close to SQL as possible. [Peewee](https://docs.peewee-orm.com/en/latest/index.html) seems to fit this bill.
-
-I didn't like the way SQLModel handled joins (returns a `Tuple User Event`) and Peewee makes a bit more sense `Event` with `User` joined on (`Event.User`). However Peewee doesn't do async, but by default neither does SQLite, so we can remove our `async` keywords. That's fine for a few hundred (or thousand?) users at once, but you might want to find an async ORM like [Tortoise](https://tortoise.github.io/) or [IceAxe](https://github.com/piercefreeman/iceaxe). Optimise when it makes sense to, not prematurely.
-
-We'll keep the API models and the data models separate.
+Learning to program is a _never-ending_ task. It can be quite overwhelming, so having a mentor to hold your hand and keep you right is super helpful. I don't enjoy low-level detail![^7]
 
 
-## Setting yourself boundaries
+## FastAPI pros and cons
 
-> Have a clear goal, a clear learning frame
-> Use [BORING technology](https://boringtechnology.club/) wherever possible!
+> It seems quick, as advertised, but remember it's `async`!
 
-I think it's wise to provide yourself **a clear learning frame**, by which I mean **drawing a clear line between what you're prepared to learn, and what you're not**. For example, getting a working and reliable email confirmation script is non-trivial!
+1. It's `async`, for `async` tools.
+    - An ORM like PeeWee [does not play nicely](https://github.com/fastapi/fastapi/discussions/8049) with it![^1]
+2. It works well with SQLite.[^2] The beauty of SQLite as that it involves minimal production setup. It's just a file!
+    - SQLite doesn't default to `async`. To add support, you'll need an ORM that supports [this package](https://github.com/omnilib/aiosqlite).
 
-Personally, I'd prefer someone else to handle things like that, so unless there's a well-documented and stable plugin, I'm going to hire a professional. **I prefer things as simple as possible;** SQLite and FastApi routes are easy enough to understand the basics, but there can be a lot of moving parts! There's many ways to build out your app architecture, and I'm not sure there's a book out there that covers the best way to do things for _your_ app.
+The downsides ...
 
-There's so much to learn with programming it's good to set your own boundaries!
+1. Sometimes FastAPI documentation is not clear enough.
+    - I'm not keen on combining SQL knowledge with SQLModel documentation.
+    - It makes it way harder to scan the docs for query syntax, often longwinded.
+2. Python error messages are shit. See "[coding style](https://github.com/badlydrawnrob/python-playground?tab=readme-ov-file#coding-style)". Pydantic, PyLance, and PyRight help a bit with typing.
+    - Long traceback error messages (often, but not always the last one tells the problem)
+    - Cryptic errors and hard to pin down what's wrong
 
 
 ## Chapters
 
-> [Some notes](https://github.com/astral-sh/uv/issues/10543#issuecomment-2587276856) on using `uv` and `venv` setup[^1]
+> The tags relate to important stages in our app's development ...
+> Use the REPL to practice and discovery functionality quickly!
 
 1. Hello World
-2. Routing (1.6.0 — 1.6.6)
-3. Response models and error handling (1.7.0 — 1.7.4)
-4. Templating with Jinja (1.8.0 — 1.8.2)
-    — **1.8.1** for `json` version
-5. Structuring FastApi applications (1.9.0 — 1.9.1)
+2. Routing (`1.60` — `1.6.6`)
+3. Response models and error handling (`1.7.0` — `1.7.4`)
+4. Templating with Jinja (`1.8.0` — `1.8.2`)
+    — See `1.8.1` for our `json` version
+5. Structuring FastApi applications (`1.9.0` — `1.9.1`)
 6. Working with the database
-    - SQLModel (1.10.0 — 1.10.6)
+    - SQLModel (`1.10.0` — `1.10.6`)
     - ~~MongoDB~~[^2] (I'm sticking with SQLite)
-7. Securing FastApi applications (1.11.0 — 1.11.9)
+7. Securing FastApi applications (`1.11.0` — `1.11.9`)
     - Hash and compare passwords
     - Generating JWT tokens
     - Securing routes (with authentication)
     - CORS policy (middleware)
-8. Testing (1.12.0 - ...)
-    - Original version with SQLModel for database (1.12.4)
-    - Finished version with PeeWee for database, no `async` (...)
+8. Testing (`1.12.0` - ...)
+    - Original version with SQLModel for database (`1.12.4`)
+    - A partially finished PeeWee version (instead of SQLModel) (`1.12.10`)
+    - Reverting to a different ORM (`...`, see ORMs below)
 
 
-## Helful Commands
+## Errata
 
-1. `uv run uvicorn api:app --port 8000 --reload` (or run from `.venv`)
-2. `uv run main.py` (if you've setup properly `__main__.py`)
-    - Or, `fastapi dev main.py` (seems to essentially be the same)
-3. `uv run pyright main.py` (run in strict mode, Pylance in VS Code)
+> The book has quite a lot of errors ...
+> And make sure your routes are properly formatted!
+
+Here are a few I caught (there's more)
+
+1. `NewUser` model is mentioned but not created
+2. `User` fields are not yet used (`List Int`)
+3. `users.py` is referred to as `user.py`
+
+Also:
+
+1. Make sure any required dependencies are introduced clearly!
+    - `SQLModel` is imported but no download is mentioned
+    - Which `jose` package do you mean? There's more than one in pypi!
+2. Some upgrades are needed, but tricky to learn:
+    - ~~`@app.on_event("startup")` is now app lifecycle but requires an understanding of `contextlib`.
+3. `grant_type=` missing the `password` keyword in the authentication `curl` call.
+
+Be careful with your routes:
+
+- `:id` (params) must be added to your Bruno path
+
+
+## Commands
+
+> [Some notes](https://github.com/astral-sh/uv/issues/10543#issuecomment-2587276856) on getting setup with `uv` and `venv`
 
 ```terminal
+-- Create a new project
+uv init
+-- Run your program (from function)
+uv run uvicorn api:app -- port 8000 --reload
+-- Run your program (from file)
+uv run main.py
+-- Test types and errors
+uv run pyright main.py
+```
+
+```terminal
+-- Curl is a `GET` by default
+curl http://localhost:8000/todo
+{"todos": []}
+
+-- `POST` an entry to the to-do list
+-- Quotes inside `json` must be escaped or inside `''` single quotes
+curl -X 'POST' \
+  'http://localhost:8000/todo; \
+  -H 'accept: application/json' \
+  -H 'Content-type: application/json \
+  -d '{"id: 1, "item": "First to-do is to finish this book!" }'
+
+-- Create a JWT token at `/signin`
 curl -X 'POST' \                                        
   'http://localhost:8000/user/signin' \
   -H 'accept: application/json' \
@@ -109,12 +133,7 @@ curl -X 'POST' \
 ```sql
 -- Chapter 07 code
 SELECT u.email, e.title FROM user AS u
-JOIN event AS e ON u.email = e.creator; -- inner join
-```
-
-```sql
--- Pretty print the schema
-.schema --indent
+JOIN event AS e ON u.email = e.creator;
 ```
 
 ```python
@@ -123,182 +142,184 @@ from pprint import pprint
 pprint(vars(your_object))
 ```
 
-## Your API is self-documenting (but use Bruno anyway)
 
-> `/docs` gives a JSON Schema documentation ...
-> `/redoc` provides alternative documentation.
+## Keeping things simple
+### The 5 finger rule
 
-To implement these properly leads to messy code! Things like `Annotated[]`, `"json_schema_extra"` metadata, and so on. I'm finding that Bruno is pretty nice to work with (as an alternative) and does most of what I'd need.
+> The 5 finger rule is a bit like reading for kids. How much of it do I understand?
 
-
-## Silly errors (and things that don't work)
-
-> **The SQLModel documentation [isn't always great](https://github.com/badlydrawnrob/elm-playground/issues/45)**, and some things that should be easy enough, don't seem to be. Elm Lang is way better than Python for error messages. Python can be cryptic and hard to track down. It's also not as easy to use the REPL for "practice" or "discovery" with the SQLModel setup.
-
-1. **`:id` not added** to the Bruno path parameters (getting `method not allowed`)
-2. **`count()`** fails hard: the alternative is [`first()`](https://sqlmodel.tiangolo.com/tutorial/one/) with SQLModel
-
-
-## Errata
-
-> **The major rule for writing is ... BE CONSISTENT!**
-> - There's a lot of small mistakes and continuity errors ...
-> - So use ⚠️ `#!` style comments for major breaking code!
-> - A single source of truth for code (edits break things)
-
-For example, pg.131:
-
-1. `NewUser` model is mentioned but not created
-2. `User` fields are not yet used
-3. `User.username` is used (`curl` example) but not created
-4. `users.py` is referred to as `user.py`
-
-Also 
-
-1. Make sure any required dependencies are introduced clearly!
-    - `SQLModel` is imported, but no download is mentioned.
-    - `jose` has the same problem. Which `jose` package do you mean?!
-2. Some "upgrades", such as ~~`@app.on_event("startup")`~~ take time to learn
-    - The app lifecycle, for example, requires [understanding](https://github.com/PacktPublishing/Building-Python-Web-APIs-with-FastAPI/issues/12#issue-2843134599) of `contextlib`.
-3. `grant_type=` missing the `password` keyword in the authentication curl call.
+1. **Keep things as simple as possible.**
+    - Your models, documentation, tooling, dependencies, etc.
+    - Actively remove code and simplify processes where possible.
+    - `.jinja` at scale can get messy, why not try Elm?[^3]
+    - You might want to split your API layer from your DATA layer.
+2. **If things are too complicated for you, hire.**[^4]
+    - Have a professional look over your code ...
+    - Or, have them do it for you, and treat things as a [black box](#!black-box).
+    - Stick to a narrow problem set that suits your capabilities.
+3. **Pick tools where you understand 50-70% of the language.**
+    - The 5 finger rule means avoiding texts that are too difficult for you.
+4. **You don't have to understand everything ...**
+    - It just needs to work. Write working code first, worry about it later.
+5. **Try to stick to your [preferred coding style](https://github.com/badlydrawnrob/python-playground?tab=readme-ov-file#coding-style).**
+    - My background is Elm (Haskell-like) and I don't want to learn Pythonic code.
+    - So `Class.methods`, `@decorators`, so on, use only when necessary.
+    - Learn a subset of Python unless you write a lot of it. Be functional.
 
 
-## Tools
+## A black box
 
-You're going to need the following:
+> Some things can be set-and-forget.
+> There's simply too much to learn with programming!
 
-### Python
+Some things I want to treat as an input and output. I don't want to worry about their internal mechanisms.
+
+1. I don't want to learn some things (my learning frame)
+2. I'd rather hand over a low-level task to a collegue (email validation)
+3. `auth` and `database` are super important to get right (I don't trust myself)
+
+
+## The user experience (UI)
+
+> Remember the last time you deleted something by accident, or refreshed the page and lost all your form data?
+
+We're not worrying about it too much in this book, but it's worthwhile mentioning that a `DELETE` should notify the user: "Are you _sure_ you want to do that?", which is a _frontend_ problem. I've removed the `/delete` route in later chapters, as it's something that should _never_ happen unless you're an admin!
+
+All API architecture should consider the end-user and their needs/experience. Consider also which data points should be _public_ and which _private_. It might be fine to expose an `Event.id` but a `User.id` is better private. A data scraper can easily increment the `Event.id` however, so maybe a `shortuuid` is better.
+
+
+## Choosing an ORM
+
+> SQLModel is fine for single table `select()`s but a bit confusing for joins.
+
+You might want to stick with SQLModel but there's a few reasons you might not:
+
+1. **It could be better to separate concerns:**
+    - **To split the API layer from the DATA layer (models)**
+2. I didn't find the SQLModel documentation easy to query joins:
+    - It's not very intuitive.
+3. It's an abstraction of an abstraction:
+    - It's built on top of SQLAlchemy, which I find too big and complicated.
+4. There's better ORMs with more functionality and great documentation:
+    - But beware that FastAPI is `async` and requires async tooling
+
+Below are ORMs that'll work well with FastAPI. Alternatively, you might like to check out [Bottle](https://bottlepy.org) or [Sanic](https://sanic.dev) (WGSI). They both work with PeeWee and have data validation (not sure about `auth/`).
+
+### It's good to have a picking criteria
+
+> How do I make a decision on which ORM to use?
+> Backend is difficult, and there's a lot that can go wrong!
+
+A bit similar to the [5 finger rule](#keeping-things-simple)!
+
+1. I can understand 50-70% of it (won't take long to learn)
+2. Feels like using regular SQL (a `join` looks like a join!)
+3. The code examples don't confuse or scare me (not overly complex)
+4. The documentation is non-academic and done well (written for humans!)
+5. Has availability for [SQLite strict mode](https://sqlite.org/stricttables.html) and [or any other concern you'd like]
+6. Google(able) and easy to search for [your particular requirement]
+7. Stable, or at least exciting enough to risk breaking changes.
+
+### A few options
+
+> I'd pick [PeeWee](https://docs.peewee-orm.com/en/latest/peewee/quickstart.html) or [Pony](https://docs.ponyorm.org/) for a non-async framework. The main [problem with `async`](https://fastapi.tiangolo.com/async/#asynchronous-code) is having to [scatter your app](https://charlesleifer.com/blog/asyncio/) with `await` calls.
+
+1. **Picallo** is great, but [not 100% async](https://piccolo-orm.readthedocs.io/en/1.1.1/piccolo/tutorials/using_sqlite_and_asyncio_effectively.html)
+2. **[Ormar](https://collerek.github.io/ormar/latest/)** works with SQLite async, but less mature than Picallo (at time of writing)
+3. **Tortoise ORM** (feels a bit clunky to me, see [this example](https://tortoise.github.io/examples/fastapi.html))
+4. **[SQLmodel](https://sqlmodel.tiangolo.com/)** is the obvious option for FastAPI, but I'm not a huge fan.
+5. [IceAxe](https://github.com/piercefreeman/iceaxe) is also very interesting to me, but it's only Postgres. I like it's simplicity and similarity to raw SQL.
+
+I'm sure there's more (or will be) but these seem a good fit. Also see Reddit's "[What is your go-to ORM?](https://www.reddit.com/r/FastAPI/comments/1fjta2e/what_is_your_goto_orm/)". The alternative to using asyncio is to choose [boring](https://mcfunley.com/choose-boring-technology) technology, and simplify your stack ([PeeWee](https://docs.peewee-orm.com/en/latest/peewee/quickstart.html) and any compatible [framework](https://docs.peewee-orm.com/en/latest/peewee/database.html#framework-integration)!)
+
+### RAW SQL and JOINs
+
+> I might want to handle database creation and migration manually?
+> But have a representation of it with the `User` and `Event` models.
+
+For read-only code, you might want to use raw SQL queries, but you'll still need to map the data onto your `User` class, or a `dict`ionary. In the book, we also create a `List[int]` of `Event.id`s — we don't really need these!! Only store data like this if your [app architecture](https://openlibrary.org/dev/docs/api/covers) depends on it.
+
+OpenLibrary, for instance, has `List[int]` of images which map to a `/covers` route, with `-S`mall, `-M`edium, and `-L`arge images. Our API is NOT publically consumed, so we likely want to deal with SQL `join`s and serve the full image paths within the `Event` object.
+
+Remember, any data point on your API must be called from the database and maintained. That means anytime a `User` adds/removes an `Event`, you'd have to add/remove from that `List`. Don't do it if it's not needed![^5]
+
+### Choose a (better?) different language?
+
+The nuclear option is to ditch Python completely, and pick a different language. [Ocaml](https://aantron.github.io/dream/), [Elixir](https://phoenixframework.org/), [Roc](https://github.com/roc-lang/basic-webserver), or any other statically typed functional language.
+
+Alas, you're looking at 2-3 months to change tools, so just get something out there and worry about that later. Don't over optimise before you've proven your business model! Honestly, getting through this book has been a slow process, so don't take that journey lightly.
+
+
+## Documentation
+
+> I'm using [Bruno](https://usebruno.com) to test and document my API.
+
+FastAPI gives us `localhost:8000/docs` and `/redoc` for documentation, but I like Bruno as a simple way to test your API. You can use `Annotated[]` and `"json_schema_extra"` to format your `/docs`, but it makes for messy and verbose code. Stick to Bruno!
+
+
+## Tooling
+
+> Your production app should look like this by `chapter_08` ...
+> This repo's `pyproject.toml` contains all chapter packages, so it's a bit of a mess. Don't do that in production.
+
+In your `pyproject.toml`:
 
 - [Pydantic](https://pydantic.dev/)
 - [Uvicorn](https://www.uvicorn.org/)
-- [VS Code Python plugin](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
-- [PyRight](https://microsoft.github.io/pyright/) (CLI in [strict mode](https://github.com/jackgene/reactive-word-cloud-python/blob/b48306f94e1038c26c7c70ab56337ab26fa2b719/pyproject.toml#L21-L23), Pylance in VS Code)
-- [ORM](https://sqlmodel.tiangolo.com/) of some description
-    - Be extra careful with [raw SQL](https://www.youtube.com/watch?v=Cp3bXHYp-bY).
+- [Python plugin](https://marketplace.visualstudio.com/items?itemName=ms-python.python) for VS Code
+- [PyRight](https://microsoft.github.io/pyright/) (CLI in [strict mode](https://github.com/jackgene/reactive-word-cloud-python/blob/b48306f94e1038c26c7c70ab56337ab26fa2b719/pyproject.toml#L21-L23), Pylance for VS Code)
+- Your ORM of choice!
+    - Take care with [raw SQL](https://www.youtube.com/watch?v=Cp3bXHYp-bY)!
 
-### [Bruno](https://www.usebruno.com/)
+### Bruno
 
-> A great API test kit for Mac.
-> Much simpler than the alternatives (IMO)
+> A great API test kit for Mac.[^6]
 
-The only _downsides_ to using Bruno is **you've got to manually write your documentation and tests**. FastApi comes with `/docs` and `/redoc` which are pretty handy, but I prefer Bruno's way of writing documentation. Doing things in Bruno means we can easily switch to a different API framework and keep all our tests in place.
+For your tooling, you might like to use Bruno. I prefer Bruno's way of writing documentation, but you must write it out manually (whereas `/docs` are automatic). The benefit of Bruno is that we can _easily switch out to another API framework_, and keep all our tests in place!
 
-- **[Use OAuth2](https://docs.usebruno.com/auth/oauth2/overview) with Bruno**
-- Import `openapi.json` to a new collection
+- You can **setup Bruno with [OAuth2](https://docs.usebruno.com/auth/oauth2/overview)** in your collection settings.
+- Import your `/docs -> openapi.json` to a new collection in Bruno.
 
-[Rest Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client), [Postman](https://www.postman.com/)[^3], and [Insomnia](https://insomnia.rest/) are other options.
+### Other tools
 
-### SQLite
-
-> My general opinion is:
-> - Simple is better
-> - Smaller is better
-> - Less is better (dependencies)
-> - Human readable is better (docs)
-> - Boring is better (in general, stable)
-
-1. How do I generate [`UUID`](https://iifx.dev/en/articles/101721447)s (and what about performance?)
-2. How do I load secrets and [environment variables](https://stackoverflow.com/a/45267398)? with [Pydantic](https://docs.pydantic.dev/latest/concepts/pydantic_settings/#usage)?
-    - I think SQLite setup is a lot easier than Postgres
-3. Is async desirable with SQLite? (NEVER pre-optimise, wait until there's a need)
-    - The package is now deprecated, but there are 3rd party tools available.
-    - You might also be better off with RabbitMQ or some other queuing/sharding.
-4. Why would I use [Peewee over SQLAlchemy](https://www.reddit.com/r/Python/comments/4tnqai/comment/d5jyuug/) or SQLModel?
-
-#### How do I do database migrations?
-
-> Possibly better to do data migrations simply and often?
-> Also may have to consider the `json` and client code (w/ business logic)
-> Also handy is `user_version` which you can do [like this](https://github.com/sqlitebrowser/sqlitebrowser/issues/366).
-
-FastApi doesn't come with data migration, so it might be wise to do this manually with SQLite, or find a solid tool (or Ai) to help you. [Alembic](https://alembic.sqlalchemy.org/) seems a bit difficult. In general the advice seems to be create new (column, table) and copy data over (from old column) before dropping the old. Practice on a dummy database first, and always backup first!!
-
-- Change the [`user version`](https://stackoverflow.com/a/998652)
-- Use [ORM tools](https://docs.peewee-orm.com/en/2.10.2/peewee/playhouse.html#migrate) if you prefer
-- GUIs like [Enso](https://ensoanalytics.com/) or [Ai](https://medium.com/@timothyjosephcw/enhancing-data-migration-testing-with-ai-in-2024-454537440ab3) might be helpful too!
+- [SQLite Utils](https://sqlite-utils.datasette.io) is great for preparing data.
+    - This could be a great way to automatically populate a demo database!
+- [JSON Server](https://marketplace.visualstudio.com/items?itemName=sarthikbhat.json-server) for VS Code (great for mocking)
 
 
-## Paradigms
+## SQLite
 
-> I really don't want to use Python's OOP style very much.
-> The book is a bit sloppy in places with conflicting instructions.
-> Elm Lang just "feels" nicer: documentation, error messaging, and so on.
+> How to manage database migrations?
 
-1. **`json` is preferrable to `.jinja`** (at scale)[^4] (just use Elm?)
-2. **Try to avoid Python "magic"** that isn't transferable
-    - Features like `@classmethod`, `response_model=` are handy but not portable
-3. **Aim to keep your models, SQL, data, and code as simple as possible**
-    - [Pydantic documentation](https://docs.pydantic.dev/latest/) is kind of narly and confusing. Some examples in the book are (already) outdated.
-    - If you're unsure about something, possibly best to leave it out.
-4. **Is it wise to use `SQLModel` classes for request body?**
-    - Search `"using fastapi SQLModel as request body"` on Brave browser ...
-    - Understand if it's wiser to use `BaseModel` for your request body (and separate concerns).
-    - `SQLModel` is only usable if all fields in request body are provided (other than `Optional` ones). These seems suboptimal if user preferences _requires_ many fields!! Perhaps this could be handled client-side (enforce non-optional fields)?
-4. For `status_code=` the book uses `status.HTTP_403_FORBIDDEN` but I'm just using the `403` code by itself, as it's cleaner. This is debatable.
-5. `Depends()` is an important function that injects dependencies into our routes,
-forcing our route to handle something (such as `oauth3_scheme`) first.
-6. [Why use `response_model=`](https://github.com/fastapi/fastapi/discussions/8247) instead of a response type?
-7. Are Pydantic types really necessary? (It depends)
-8. Do you want to tightly couple your API models with your SQL model? (probably NO!)
+SQLite should be set to `STRICT TABLES`, `PRAGMA journal_mode=WAL`, `PRAGMA foreign_keys = ON`. You can also use `user_version` for migrations.
 
+You could use a tool like [Alembic](https://alembic.sqlalchemy.org) to migrate changes in the database `.schema`, but it's probably a good idea to know how to do this manually. SQLite Utils also has `sqlite-migrate` for simple migrations. I'm sure there's plenty of databse tools too (such as [Enso](https://ensoanalytics.com/) or [Ai](https://medium.com/@timothyjosephcw/enhancing-data-migration-testing-with-ai-in-2024-454537440ab3)). Either way, it seems to be sensible to backup data, create a new (column, table) first; copy data over (from the old column); then drop the old column.
 
-## Elm -vs- Python
-
-Whereas Elm has a central `Model` (generally) to work from and uses modules and functions, Python has instances of classes which (I think) are stateful. It feels like Python adds a whole lot of mess to the code base.
-
-A good example of this is FastAPI allows [generating API examples](https://tinyurl.com/fastapi-json-schema-extra) along with your models. I feel the model and **examples should be handled separately**, as the code becomes messy. Better to let Bruno handle the documentation (and use `/docs` as-is), rather than this:
-
-```python
-class ToDo(BaseModel):
-    id: int
-    item: Item
-
-    model_config = {
-        "json_schema_extra": {
-            "examples": [
-                {
-                    "id": "1",
-                    "item": {
-                        "item": "Grab some shopping for dinner",
-                        "status": "to-do"
-                    }
-                }
-            ]
-        }
-    }
-```
-
-
-## Problems
-
-> These are annoying and compared to Elm (where everything just works), not particularly user-friendly. You'd think you could just run commands once you're set up with a `venv` (virtual environment).
-
-1. **Dot notation: how are values extracted?**
-    - `dictionary.id` rather than `dictionary["id"]`
-2. Module naming clashes and `venv`:**
-    - `uv` commands require calling from the `venv` parent directory
-    - `01` numbers cannot come first for module naming (`name_01` is ok)
-3. **`uvicorn` command [won't run](https://stackoverflow.com/a/69322150)**
-    - Preface it with `uv run` (equivalent to `python -m`)
-    - Or, make sure you've `source .venv/bin/activate`d your environment
-    - Also take care with modules, folders, and names.[^5]
-4. **`uvicorn` doesn't [allow secure `https`](https://www.uvicorn.org/deployment/#running-with-https)** (by default)
-5. Using Thonny as an IDE
-    - I can get the version of Python running but the other stuff is harder
-6. You might want to return `html` instead of `json`. You can [do both](https://tinyurl.com/fastapi-return-html-or-json)!
+As always, practice with mock data first and be sure to back up! (demo/staging). It's likely better to think in terms of _small, incremental_ changes, rather than big bulk changes.
 
 
 ## Hosting
 
-- [AGSI](https://help.pythonanywhere.com/pages/ASGICommandLine) setup in Python Anywhere
+> Be careful that your stack is compatible with FastAPI
 
+- I think Python Anywhere hosts files over the network?[^7]
+- [AGSI](https://help.pythonanywhere.com/pages/ASGICommandLine) setup in Python Anywhere is now possible (I think).
+- You'll need to setup `uvicorn` to run with [`https`](https://www.uvicorn.org/deployment/#running-with-https)** (it's not default)
+- You might want parts of your app as `.jinja` html, rather than `json` (such as a login form)[^7]
 
-[^1]: "I would not recommend using directory names in `.python-version` files or using a custom virtual environment name in a project."
+  
+[^1]: Which is a shame, because I like PeeWee's documentation and syntax. It'd be perfect for apps where there's not going to be (any/many) concurrent writes to the database.
 
-[^2]: MongoDB is a an arse to setup (especially for beginners), more hassle than SQLite (and possibly Postgres easier also). The code in chapters `06`/`07` and above also starts to get Pythonic (class methods rather than functional style) and I see diminishing returns from learning in the MongoDB style.
+[^2]: I tried and failed to get MongoDB working. I found it an absolute arse to setup (especially for beginners) and more hassle than SQLite (or even Postgres, I imagine). The book's `chapters` from `_06/` or `_07/` onwards uses MongoDB; I decided to part ways with the book and use SQLite instead.
 
-[^3]: I find Postman too flippin' complicated to use. Insomnia is another option.
+[^3]: With a `json` server, this separation of concerns between frontend and backend could be slightly easier to maintain.
 
-[^4]: `jinja` code adds a bit more complexity to your API code. Seems great for small setups but could prove a liability with complicated forms and UI. For now, handle most of the complexity with Elm lang and look into HTMX or static site generators for blog posts and FAQs. Possibly handle `User` admin with FastApi.
+[^4]: If you're a great programmer, or don't mind suffering through the pain of low-level learning, then do it yourself. My goals are quite distinct and I simply don't have the time to learn everything.
 
-[^5]: There's two ways to do this. Either call `uvicorn subfolder.file:app` and make sure your modules use `from subfolder.file` names, OR `cd` into the correct folder and run Uvicorn from there!
+[^5]: Joins are easier to maintain than lists. In the book, the latter chapters use MongoDB, which is unstructured data. Here, we're trying to keep data atomic and [normalised](https://youtube.com/watch?v=GFQaEYEc8_8) with SQLite, so it's easier to search for (and `JOIN user ON event.creator = user.id`) later.
+
+[^6]: I found Postman to be too complicated for my taste.
+
+[^7]: See [`WAL`](https://sqlite.org/wal.html) for SQLite: "All processes using a database must be on the same host computer; WAL does not work over a network filesystem"
+
+[^8]: Jinja code adds quite a bit of complexity to your API code. It's great for small chunks of html, but for complex forms and UI could be a liability. You could also consider [htmx](https://htmx.org) for static code.
