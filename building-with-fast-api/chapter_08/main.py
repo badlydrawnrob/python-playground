@@ -11,95 +11,154 @@ import uvicorn
 # ------------------------------------------------------------------------------
 # A PLANNER app (SQLModel)
 # ==============================================================================
-# See earlier chapters for full instructions on FastApi etc. We've got our app
-# architecture: our Models, ORM, SQLite database, and performing CRUD operations
-# on our data. You might find that backend development is a bit more complicated
-# than frontend ... as there's a lot more to consider.
+# See earlier chapters for full instructions on FastApi etc. We have models,
+# an ORM for SQLite, and performing CRUD operations on our routes. Some of those
+# routes are protected by authentication, for which we use JWT tokens that get
+# passed to our routes with a Bearer token header (after login). Some parts of
+# the app can now be viewed as a "black box", where we only need surface-level
+# knowledge of what it does (not how, we hire a professional for that).
+#
+# There really is a LOT to learn with FastApi, http servers, REST APIs, and SQL.
+# If you're feeling overwhelmed, better to find a good mentor! As always, it's a
+# good idea to develop a "learning frame" to know when to say "cool, I'll learn
+# that", and when to say "that's not my job" and skip/delegate it.
+#
+# For example, "that's not my job" could be:
+#
+# - How to deploy a FastApi app to production (performance, DBA, etc)
+# - Email verification and signup (with an SMS authenticator)
+# - Settings up JWT tokens and authentication routes
 #
 # Notes
 # -----
-# > 💡 I'm testing out different `.select()` methods in this repo!
+# > Some say you should separate your API and ORM models.
+# > Tightly coupling them means it's harder to switch to another ORM.
 #
-# There's a bunch of ways to write SQL queries, such as:
-# 
-# 1. SQLModel and other ORMs, such as Peewee
-# 2. Query builders like PyPika (or roll your own):
-#    - @ https://death.andgravity.com/own-query-builder is also interesting
-# 3. Writing raw SQL queries:
-#    - Such as SQLAlchemy text, or using `sqlite3` directly
-#    - You've got to manually protect against malicious SQL injections
-#
-# For options (1) and (2) you'd need map your database rows to your Pydantic models,
-# or whatever data structures you're working with: @ https://tinyurl.com/object-relational-mapping-sql
-#  
-# > Some say that you should separate your API and ORM models.
-# > They say they shouldn't be tightly coupled (as SQLModel does).
-#
-# 1. SQLModel allows us to use Pydantic with FastApi (managing types)
-#    - It uses SQLAlchemy under the hood
-# 2. Peewee is another alternative, but requires running in parallel ...
-#    - So you won't be able to reuse your Pydantic models
+# 1. Each ORM does things a bit differently, so try to separate concerns where
+#    possible. For example, migrations could be handled manually (rather than
+#    using Alembic)
+# 2. Try to be consistent: for example, I'm using slightly different `.select()`
+#    methods in each function. Abstract your functions and simplify.
+# 3. ORMs can create problems with your SQL statements (or schema) at scale. Keep
+#    things simple for now with SQLModel. Consider other options later:
+#    - You'll need to translate database rows to data models whatever you choose,
+#      and this is tricker to do when working with raw SQL rows. Use `SQLAlchemy
+#      text` or `sqlite3` directly, but protect agains malicious SQL injections.
+#    - Lightweight query packages like PyPika and Pony ORM are also worth a look.
+#    - @ https://tinyurl.com/object-relational-mapping-sql (nice article)
+# 4. `__init.py__` is a dumb idea (it's a Python thing). Indicates a package dir.
+#    - @ https://stackoverflow.com/a/48804718
 #
 # Security
 # --------
-# > Dependency Injection is a pattern where an object (in our case a function)
-# > receives an instance variable needed for further execution of the function.
-# > In FastApi a dependency can be defined as either a function or a class.
-# 
-# In FastApi a bearer token (JWT) is an authentication method that is
-# injected into FastApi as dependencies called at runtime. They are dormant
-# until injected into their place of use. There's many other ways to keep your
-# API secure and it's worthwhile hiring a security expert.
+# > If you're not comfortable dealing with security (like me) hire a professional
+# > to double check your code, or prevent hacks for you. There's many other
+# > ways to keep your API secure (such as email verification).
+#
+# 1. Protect yourself from malicious SQL injections
+# 2. Dependency Injection is a design pattern to force a function to run before
+#    performing the main body of the function. Auth is a good example of this.
+#    FastApi can use a function or a class for this.
+# 3. Bearer tokens (JWT) are a way to authenticate users. Use `Dependency()` to 
+#    force authenticated user login (on routes) before the function can run.
 #
 # Wishlist
 # --------
-# 1. We want to assure that the right logged in user edits their (and only their)
-#    events. They shouldn't be able to see or work with other people's events.
-# 2. We should have a `UUID` and a `ID` which is unique for each user.
-#    - The `UUID` is public and the `ID` is private
-#    - The `UUID` is used instead of the user's email address (in authenticate)
-# 3. Our `Event` model should have a `User` field (for ownership)
-#    - It may be a dumb idea to have a `User.events` list (as there could be many)
-#    - If you need `json` list of events, you could use a `User.events` method
-# 4. Reduce code duplication (for example, similar `SELECT` statements)
-#    - Abstract this into a function (or a class)
-# 5. Check which encryption and hashing is most secure (or secure enough)
-#    - For instance, create a better `SECRET_KEY` perhaps.
-# 6. A `private` option for our `Event` model (so only the user can see it)
-# 7. Are results cached? (for performance)
+# > Remove code duplication. Simplify your code. If a thing can be removed,
+# > remove it. Follow the "5 steps" that Tesla uses to build their cars.
+#
+# 1. Make sure all routes that require a logged in user are secured. Also check
+#    that the "owner" of a data point is the only one who can edit/delete it.
+#    - What can a non-owner do? What data points are private? (read, write, delete)
+# 2. We can have a public ID (`UUID`) and a private (`Int ID`) one.
+#    - FastApi automatically adds and increments an `id` on each table insert.
+#    - We need a public facing ID for our `User` model (for our url)
+#    - Our private ID is used for any database operations (`join`, `DELETE`, etc)
+#    - We're currently using the user's email address as ID which isn't ideal.
+# 3. Our `Event.creator` is the current users `ID`:
+#    - As mentioned above, it's currently an email.
+#    - Joins are quicker with an `Int ID` than a `String` (email)
+# 4. Add a `private` option for our `Event` model (so only the user can see it)
+# 5. ⭐ Our `User.events` relationship, which is now `JSON` data is used for a
+#    `List ID` of events. However, it's FAR MORE COMPLICATED to use than when we
+#    had a simple `List Int` when our `Event` was a `BaseModel` (not a SQLModel).
+#    See the links below to see what I mean.
+#    - ⭐ You have many routes for app architecture. Ask "why do I need this?"
+#      and "how will it be used?". There's no real need for a `List Event.id` as
+#      you can simply `join` on the events to the user! That's WAY EASIER!
+#    - A `List Event.id` would be handy if it's a public API (like OpenLibrary),
+#      where you'd want to `.andThen` to the Events API to get the events. But
+#      that's not really needed for this app.
+#     - To edit events we could have a `GET` request to `/user/{id}/events`
+#       and a `POST` request to `/user/{id}/events/{event_id}` (or `DELETE`).
+#     - @ https://stackoverflow.com/q/70567929 (using json columns)
+#     - @ https://stackoverflow.com/q/79091886 (mutating a json column) but search
+#       Brave with "Replacing JSON Column FastAPI" for better options.
+#     - @ https://tinyurl.com/sqlite-peewee-and-json-data (it's even pretty
+#       complicated with Peewee ORM)
+# 6. Use abstraction to reduce code duplication.
+# 7. Is the current encryption and hashing the most secure?
+#    - Create a better `SECRET_KEY` perhaps.
+# 8. Are results cached? (for performance, but add "just-in-time", not premature)
 #    - @ https://github.com/long2ice/fastapi-cache
 #    - @ https://www.powersync.com/blog/sqlite-optimizations-for-ultra-high-performance
-# 8. Remove all `/admin` routes, such as:
-#    - `/admin/events` (for deleting all events)
-# 9. Mock data that's super easy to setup and teardown
-#    - @ https://sqlite-utils.datasette.io/en/stable/ (could be super handy)
-#
-# Questions
-# ---------
-# 1. `@app.on_event` creates database if doesn't exist
-#    - This can safely be left out if you're manually creating your database
-#    - #! Deprecated: use `lifespan` event handlers instead
-# 2. What the fuck is `__init__.py`? It makes no sense to me.
-#    - @ https://stackoverflow.com/a/448279 (regular and namespaced packages)
-#    - @ https://stackoverflow.com/a/48804718
-# 3. What's the best and most user-friendly way to authenticate users?
-#    - #! This isn't something I feel comfortable setting up myself!
-# 4. What the fuck does "Middleware" mean?
+# 9. Make `/signup` more graceful and user-friendly (or remove completely)
+#    - Option 1: Have a simple "invite" process and manually create accounts
+#    - Option 2: Find a professional and delegate the process
+#        - Signup -> Email -> Verify (code) -> Login -> Onboarding
+# 9. Remove all `/admin` routes, such as:
+#    - `/event` (for deleting all events)
+#    - These are dangerous and should never be allowed by anyone other than
+#      admin (it's also highly unlikely it's needed!)
+# 10. We could add `User.role` table, and add proper roles later:
+#    - @ https://fastapi.tiangolo.com/advanced/security/oauth2-scopes/
+# 11. Potentially use SQLite Utils to easily setup mock data
+#    - We could have a development database that gets setup automatically
+#    - And mock the live data with @ https://sqlite-utils.datasette.io/en/stable/
+#    - How would we setup and teardown?
+# 12. Understand type safety with Python a bit better:
+#    - @ https://talks.jackleow.com/strongly-typed#slide-23
+# 13. How are we creating the database?
+#    - Consider leaving the `@app.on_event` decorator out of the code and doing
+#      database setup manually.
+#    - It's deprecated anyway, and now uses `lifespan` event handlers.
+# 14. Understand "middleware" and when it's useful.
+#    - @ https://fastapi.tiangolo.com/tutorial/middleware/
+# 15. Tidy up the `dict` type in the function `return` values:
+#    - Currently `pyright` complains that they aren't specific enough.
+# 16. Create different `include_router` packages for authentication routes:
+#    - @ https://fastapi.tiangolo.com/tutorial/bigger-applications/
+#    - @ https://stackoverflow.com/a/67318405
+# 17. Implement logging for FastApi live server and preparing for launch:
+#    - @ Search Brave "fastapi logging production"
+#    - @ https://tinyurl.com/prep-fastapi-for-production (hire a professional!)
+# 18. We also need an "extend your session" route, which we can ping:
+#    - If `< 15 minutes` then extend the session notification
+# 19. Set SQLite to strict mode (and PRAGMA settings) on launch.
+#    - I might remove the `conn()` function and setup the schema manually.
+#    - The models are still handy, as this gives a high-level view of the schema.
+# 20. Fix `.utcnow` to datetime (deprecated in `jwt_handler.py`)
+# 21. Begin creating some simple tests for `join`s:
+#    - Task 1: Get the specific user events where user.email == events.creator
+#    - Task 2: Get the full `User` and `join` on the `Event` table
+#    - @ https://stackoverflow.com/questions/21975920/peewee-model-to-json
+#    - @ https://sqlmodel.tiangolo.com/tutorial/connect/read-connected-data/
+#    - @ https://docs.peewee-orm.com/en/latest/peewee/querying.html
 
 app = FastAPI()
 
 # Register our routers ---------------------------------------------------------
-# We're prefixing the `/user`: `/user/signup` and `/user/signin`
+# Prefix the `/user`: `/user/signup` and `/user/signin` (same for event)
 
 app.include_router(user_router, prefix="/user")
 app.include_router(event_router, prefix="/event")
 
 # Middleware -------------------------------------------------------------------
 # A list of allowed CORS origins (by default only the same domain)
-# @ https://fastapi.tiangolo.com/tutorial/cors/
+# @ https://fastapi.tiangolo.com/tutorial/cors/ (wildcard, or list of domains)
 
 origins = [
-    "http://localhost:8000" # a list of domains, or `"*"` wildcard for any origin
+    "http://localhost:8000"
 ]
 
 app.add_middleware(
@@ -123,8 +182,7 @@ async def home():
     return RedirectResponse(url="/event/")
 
 # Run our app ------------------------------------------------------------------
-# This is `.run(app, host="0.0.0.0")` in the book, but errors:
-#   "pass the application as an import string to enable 'reload' or 'workers'"
+# This is slightly different from the book code, which errors (see chapter_07)
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="localhost", port=8000, reload=True)

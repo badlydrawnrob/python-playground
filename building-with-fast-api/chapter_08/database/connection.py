@@ -10,15 +10,17 @@ from models.events import Event
 #
 # Questions
 # ---------
-# 1. Should SQLite be set to `STRICT` mode?
+# 1. Ideally, set SQLite to `STRICT` mode?
 #    - @ https://sqlite.org/stricttables.html
 # 2. What is `check_same_thread` and is it safe?
 #    - @ https://github.com/fastapi/fastapi/discussions/5199
 # 3. VISUALLY explain `create_engine()`, `conn()`, and `get_session()`
 #    - `conn()` is only required to create the database and tables
 #    - I think `get_session()` opens and closes for each request
-# 4. What does `session.refresh()` do?
-#     - It refreshes the object that's been updated, for example
+#    - This is handy for development purposes, but could remove it in favour
+#      of setting up the database schema manually.
+# 4. I think `session.refresh(OBJECT)` refreshes the database object, so that
+#    we can work with it in it's new state.
 #     - @ https://sqlmodel.tiangolo.com/tutorial/update/#refresh-the-object
 #
 # Security

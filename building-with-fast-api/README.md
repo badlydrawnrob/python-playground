@@ -4,30 +4,67 @@
 > For prototyping, keep things simple, get a professional to check your code ...
 > and delegate the hard stuff if you're not comfortable with it.
 
-FastApi seems a decent `http` server that's quick (other languages are faster). The book uses MongoDB in later chapters, but I found it uncomfortable and painful to setup and use. For that reason, I prefer SQLite.
+FastApi is a decent `http` server that's quick (other languages are faster). The book uses MongoDB in later chapters, but I found it uncomfortable and painful to setup and use. For that reason, I prefer SQLite.
 
-The FastApi documentation can sometimes be unclear, or overly complicated to find what you need, and mould it to your requirements.
+## The programming style
 
-The book is good from a high-level view, but has many errors and continuity issues, so you'll have to fix things and check documentation. It's also fast becoming outdated (dependency hell) as FastApi evolves, so watch out for changes and updates. Authentication is easy(ish) to use (with guidance) but email notifications aren't baked in, and other nice-to-haves can be difficult:
+I'm not a fan of the Python style however; the FastApi (or SQLModel) documentation can be longwinded, at times unclear, a bit complicated to figure out how to get things done. Going from [an article like this](https://fastapi.tiangolo.com/tutorial/security/get-current-user/), understanding the types, grasping it's component parts (inputs, outputs, dependency functions) and migrating that code to a version using SQLModel is confusing to me. The fact SQLModel is an abstraction of an abstraction (SQLAlchemy) is also worrying.
 
-- Backend servers require domain knowledge (and low-level detail)
-- There's a lot that I'm personally not 100% comfortable with DIYing ...
-- It's wise to find an experienced dev to help out and double-check code.
-- `/auth`, `/database` and `/.env` are especially important to get right!
-- I'd prefer to treat parts of the server as a "black box" (set and forget)
-- Extra "defensive coding" and security advice may be needed ...
-- Error messaging is particularly frustrating (cryptic, verbose, incomplete)
+The FastApi book is a good high-level view, but has many errors and continuity issues, so you'll have to fix things and check documentation. It's also fast becoming outdated (dependency hell) as FastApi evolves, so watch out for changes and updates. Authentication is easy(ish) to use (with guidance) but email notifications aren't baked in, and other nice-to-haves can be difficult.
+
+### Black box
+
+> I prefer to treat parts of this http server as a "black box".
+> That is to say, areas where I don't have to understand how it works!
+
+Some things can be set-and-forget. They involve a lot of domain knowledge and low-level detail, which I'm personally not 100% comfortable with. It's wise to find an experienced developer to mentor you and double-check code.
+
+`/auth`, `/database` modules are especially important to get right!
+
+### Errors
+
+> Compared to Elm, Python's error messaging is AWFUL.
+
+Python error messaging is particularly frustrating (cryptic, verbose, incomplete), but you can use Pydantic and Pyright to help out with types.
+
+### Limitations
+
+> "SQLModel is designed to have the best developer experience in a narrow set of very common use cases."
+
+For that reason, you might find yourself better off with a different ORM. SQLAlchemy is too complicated for my preferences, so I'd plum for something which is easier and as close to SQL as possible. [Peewee](https://docs.peewee-orm.com/en/latest/index.html) seems to fit this bill.
 
 
 ## Setting yourself boundaries
 
 > Have a clear goal, a clear learning frame
+> Use [BORING technology](https://boringtechnology.club/) wherever possible!
 
 I think it's wise to provide yourself **a clear learning frame**, by which I mean **drawing a clear line between what you're prepared to learn, and what you're not**. For example, getting a working and reliable email confirmation script is non-trivial!
 
 Personally, I'd prefer someone else to handle things like that, so unless there's a well-documented and stable plugin, I'm going to hire a professional. **I prefer things as simple as possible;** SQLite and FastApi routes are easy enough to understand the basics, but there can be a lot of moving parts! There's many ways to build out your app architecture, and I'm not sure there's a book out there that covers the best way to do things for _your_ app.
 
 There's so much to learn with programming it's good to set your own boundaries!
+
+
+## Chapters
+
+> [Some notes](https://github.com/astral-sh/uv/issues/10543#issuecomment-2587276856) on using `uv` and `venv` setup[^1]
+
+1. Hello World
+2. Routing (1.6.0 — 1.6.6)
+3. Response models and error handling (1.7.0 — 1.7.4)
+4. Templating with Jinja (1.8.0 — 1.8.2)
+    — **1.8.1** for `json` version
+5. Structuring FastApi applications (1.9.0 — 1.9.1)
+6. Working with the database
+    - SQLModel (1.10.0 — 1.10.6)
+    - ~~MongoDB~~[^2] (I'm sticking with SQLite)
+7. Securing FastApi applications (1.11.0 — 1.11.9)
+    - Hash and compare passwords
+    - Generating JWT tokens
+    - Securing routes (with authentication)
+    - CORS policy (middleware)
+8. Testing (1.12.0 - ...)
 
 
 ## Helful Commands
@@ -59,32 +96,9 @@ JOIN event AS e ON u.email = e.creator; -- inner join
 To implement these properly leads to messy code! Things like `Annotated[]`, `"json_schema_extra"` metadata, and so on. I'm finding that Bruno is pretty nice to work with (as an alternative) and does most of what I'd need.
 
 
-## Chapters
-
-> [Some notes](https://github.com/astral-sh/uv/issues/10543#issuecomment-2587276856) on using `uv` and `venv` setup[^1]
-
-1. Hello World
-2. Routing (1.6.0 — 1.6.6)
-3. Response models and error handling (1.7.0 — 1.7.4)
-4. Templating with Jinja (1.8.0 — 1.8.2)
-    — **1.8.1** for `json` version
-5. Structuring FastApi applications (1.9.0 — 1.9.1)
-6. Working with the database
-    - SQLModel (1.10.0 — 1.10.6)
-    - ~~MongoDB~~[^2] (I'm sticking with SQLite)
-7. Securing FastApi applications (1.11.0 — 1.11.9)
-    - Hash and compare passwords
-    - Generating JWT tokens
-    - Securing routes (with authentication)
-    - CORS policy (middleware)
-
-
 ## Silly errors (and things that don't work)
 
-> **The SQLModel documentation [isn't always great](https://github.com/badlydrawnrob/elm-playground/issues/45)**, and some things that should be
-> easy enough, don't seem to be. Compared to Elm lang, Python errors can be
-> a bit cryptic and using the REPL for "practice" or "discovery" isn't always easy
-> or possible with SQLModel setup.
+> **The SQLModel documentation [isn't always great](https://github.com/badlydrawnrob/elm-playground/issues/45)**, and some things that should be easy enough, don't seem to be. Elm Lang is way better than Python for error messages. Python can be cryptic and hard to track down. It's also not as easy to use the REPL for "practice" or "discovery" with the SQLModel setup.
 
 1. **`:id` not added** to the Bruno path parameters (getting `method not allowed`)
 2. **`count()`** fails hard: the alternative is [`first()`](https://sqlmodel.tiangolo.com/tutorial/one/) with SQLModel

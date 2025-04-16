@@ -34,7 +34,7 @@ settings = Settings() # Get the secret key
 
 def create_access_token(user: str) -> str:
     payload = {
-        "user": user,
+        "user": user, # email address
         "expires": time.time() + 3600 # Expires in 1 hour
     }
     

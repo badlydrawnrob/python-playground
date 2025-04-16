@@ -1,79 +1,113 @@
+from auth.authenticate import authenticate
 from auth.hash_password import HashPassword
 from auth.jwt_handler import create_access_token
+
 from database.connection import get_session
+
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
-from models.users import User, TokenResponse
 from sqlmodel import select
+
+from models.users import User, TokenResponse
+from models.events import Event
 
 # ------------------------------------------------------------------------------
 # Our USERS routes
 # ==============================================================================
-# ⚠️ Our password is plain text over the wire, but gets hashed on signup. I'm not
-# sure if there's a way to hide the password before it's hashed. In production,
-# you never want to store the password as plain text.
+# > ⭐ Our `User` routes should be treat like a black box.
+# > See `chapter_07` for more details.
+# 
+# Our password hashing, authentication, and other functions can be treated as a 
+# "black box", where we hire a professional to worry about that for us, and all
+# we've got to do is write our `Depends(authenticate)` and hashing methods and
+# not worry about it! No need to understand what `Oauth2PasswordRequestForm` is.
 #
-# Notes
-# -----
-# We're now adding our user directly into the database, so we'll remove the
-# `users` variable. We give them an email as their username, and if their
-# password checks out we return a bearer token (JWT). We strictly follow the
-# OAuth spec using the `OAuth2PasswordRequestForm` and our `/auth` functions.
+# Our user has an `email` and `password`. The `username` is their `email`. You
+# should have a high-level view of how this works:
+#    @ https://tinyurl.com/fastapi-oauth2-depends
+#
+#
+# Invite only
+# -----------
+# > Building a proper authentication system is hard.
+# > We're currently using JWT Bearer tokens (in the header).
+#
+# So in general your app could be invite-only, and you manually create the user
+# accounts on their behalf. Once you've got a bit of cash, you can hire a
+# professional do build a solid login system for you!
 #
 # Wishlist
 # --------
-# 1. Hashing can be slow. How can it be speeded up?
-# 2. What about `+test` type email addresses?
-#    - Should these be disallowed?
-# 3. Which encryption package is best?
-#    - Should I use an alternative method to `python-jose`?
+# 1. Hashing can be slow. Can it be speeded up?
+# 2. We should probably disallow `+test` type email addresses.
+#    - Although these are useful for testing.
+# 3. Are there better encryption methods than `python-jose`?
+#    - This "isn't my job", but I should understand the options.
+# 4. The expiry time is currently hard-coded to 1 hour.
+#    - Should this be an `.env` variable setting?
+#    - We need to write a function to extend the expiry time.
+# 5. Change our `User` model to use `UUID` AND an `Int Id`
+# 6. Do we need a separate `User` and `UserSign` class?
+#    - Otherwise all our `User`s will have `Optional` (`None`) fields.
+#
+# ⚠️ FastApi and SQLModel problems
+# --------------------------------
+# > @ https://tinyurl.com/sqlmodel-join-a-table-on
+# > TLDR: I fucking give up with SQLModel.
+#
+# I really dislike the way FastApi and SQLModel work together, when it comes
+# to anything more complicated than rendering a single table. The syntax doesn't
+# make sense to me, and the documentation isn't clear enough.
+#
+# It's taken me half a day to figure out how SQLModel `join` works, and doesn't
+# seem to be the way you'd expect (compared to SQL statements). It returns a
+# `Tuple`, which kind of makes sense as they're rows/tables, but questions like
+# "how the fuck to I utilise SQLModel models to render my queries?", or "why the
+# hell isn't this `join` giving me any results?" are coming up.
+#
+# It also seems like other ORMs (like PeeWee) require converting from model
+# objects (rows) into a dictionary or json structure, but has methods to convert
+# the data structures from one form to another. I'm fairly sure FastApi/SQLModel
+# has similar, but my early mess around with PeeWee quickstart felt a lot more
+# solid than trying to understand how SQLModel types are working.
+# 
+# @ https://stackoverflow.com/a/21979166 (PeeWee -> dict)
+# @ https://tinyurl.com/fastapi-jsonable-convertor (Pydantic -> Json)
+#
+# Again SQLModel is an abstraction of an abstraction, and some say it's better 
+# to separate the API (and data validation) from the database layer. I'm beginning
+# to agree.
 
 user_router = APIRouter(
     tags=["User"]  # used for `/redoc` (menu groupings)
 )
 
 # Hashing password -------------------------------------------------------------
-# We're using a `HashPassword` class to hash our passwords.
 
 hash_password = HashPassword()
 
-# JWT --------------------------------------------------------------------------
-# Comprises the user ID and an expiry time before encoding into a long string.
-# I'm not sure if there's a way to store further information (like auth group)
-
 # Routes -----------------------------------------------------------------------
-# Our database users should have a unique ID, which is a number or UUID. We'll
-# create this automatically and use our `User.email` to check against on sign-up.
-#
-# 1. #! I used to be using `UserSign`, which had only the `str` for `email` and
-#    `password`. This felt a little fragile, but using the `User` class with an
-#    optional `events` field, which can be set to `None` to begin with.
-#    - @ ... see the old version here
-# 2. @ https://tinyurl.com/fastapi-oauth2-depends and we're now using the user's
-#    email as their USERNAME on sign-in. Go figure. See also `README.md` for why
-#    `response_model=` is required here (and not a return type).
 
 @user_router.post("/signup")
 async def sign_new_user(data: User, session=Depends(get_session)) -> dict:
-    # First check if user already exists
-    statement = select(User).where(User.email == data.email)
-    user = session.exec(statement).first()
+    statement = select(User).where(User.email == data.email) # Does user exist?
+    user = session.exec(statement).first() # There should be ONE row
     
-    if user: # This could be `None` if user doesn't exist
+    if user: # `None` if user doesn't exist
         raise HTTPException(status_code=409, detail="Username already exists")
 
-    # Hash the password (using `user` which is a `UserSign` class)
+    # Secure the password
     hashed_password = hash_password.create_hash(data.password)
-    data.password = hashed_password # replace request body password
+    data.password = hashed_password # Replace request body password
 
-    # Now add the user with their newly hashed password
-    session.add(User(email=data.email, password=data.password)) #! (1)
+    # Finally, add the user to database
+    session.add(User(email=data.email, password=data.password))
     session.commit()
 
     return { "message": f"User with {data.email} registered!" }
 
 
-@user_router.post("/signin", response_model=TokenResponse) #! (2)
+@user_router.post("/signin", response_model=TokenResponse) #! What's this?
 async def sign_in_user(
         user: OAuth2PasswordRequestForm = Depends(),
         session=Depends(get_session)
@@ -84,6 +118,7 @@ async def sign_in_user(
 
     if db_user_exist is None:
         raise HTTPException(status_code=404, detail="User doesn't exist")
+    
     if hash_password.verify_hash(user.password, db_user_exist.password):
         access_token = create_access_token(db_user_exist.email)
         return {
@@ -91,5 +126,94 @@ async def sign_in_user(
             "token_type": "Bearer"
         }
     
-    # if hashed password doesn't work ... ("403 vs 401 wrong password")
+    # User exists but hashed password isn't working ("403 vs 401 wrong password")
     raise HTTPException(status_code=401, detail="Invalid password")
+
+
+@user_router.get("/me")
+async def get_user_me(
+    user: str = Depends(authenticate),
+    session=Depends(get_session)
+    ):
+    # (1) Selecting `User` and `Event` columns
+    # ----------------------------------------
+    # This is the first part of documentation here:
+    # You're basically returning a `Tuple` of `(User, Event)` objects that
+    # match the user's email. In SQL it'd look like:
+    #
+    # `cdb194405db64ffeaed9c82ee1b49253|lovely@bum.com|1|lovely@bum.com` etc
+    #
+    # Notice the duplication there? That's because it isn't a proper join.
+    #
+    # ```
+    # statement = select(User, Event).where(Event.creator == user)
+    # results = session.exec(statement).all()
+    # ```
+    #
+    # The problem is these haven't been serialised as json yet. You could use
+    # `response_model=` but I'm not sure how that should look. Or, you can create
+    # another model for the response, but that seems like A LOT of work to do
+    # for every join.
+    #
+    # The alternative is to convert the rows to json.
+    #
+    # (2) Second attempt using a `join`
+    # --------------------------------------------------------------------------
+    # This version is using a join, but I can't figure out how the fuck to get
+    # back what I want, which is the `Event` rows with `Event.creator` joined
+    # onto the `User` details. Do I have to create another `models.event` for this?
+    # See `EventWithUser`: what do I put here?
+    #
+    # ```
+    # statement = select(Event, User).join(User).where(Event.creator == user)
+    # results = session.exec(statement).all()
+    # ```
+    # The code above currently outputs:
+    #
+    # ('lovely@bum.com',)
+    #
+    # Calling `results` again reveals it's type:
+    # `<sqlalchemy.engine.result.ChunkedIteratorResult object at 0x103fa3d00>`
+    #
+    # @ https://stackoverflow.com/a/78832114
+    # Which should be callable with `all()`, `first()`, or `one()`
+    #
+    # However it RETURNS NO RESULTS, just an empty `[]` list.
+    #
+    # The docs say we shouldn't need to use `ON` keyword, as it's inferred by
+    # `foreign_key=` in the `models.events` package ... but we get nothing!
+    #
+    # FYI, in SQL it'd look something like:
+    #
+    # ```
+    # SELECT * FROM event
+    # JOIN user ON event.creator = user.email
+    # WHERE event.creator = 'lovely@bum.com';
+    # ```
+    # 
+    # Which DOES return something (split onto new lines):
+    #
+    # ```
+    # 1|lovely@bum.com|Glastonbury|https://somegood.com/song.jpg|
+    # Ed Sheeran singing his best song 'Class A Team'!|Live|["music", "adults", "event"]|
+    # cdb194405db64ffeaed9c82ee1b49253|lovely@bum.com|$2b$12$25mRszZMp71Gulk3sFHyRundN7WeKLp.AnUJGSvp2xHxQNGMVnJFm
+    # ```
+    #
+    # (3) Third attempt (a basic `join`)
+    # ----------------------------------
+    # > Returns a `List Tuple(Event, User)` object (# of rows depends on DB)
+    statement = select(Event, User).join(User) #! How do I narrow down to ONE user?!
+    results = session.exec(statement).all()
+
+    # We need to unpack the `Tuple` (why is it a `Tuple`?)
+    list = []
+    
+    for event, user in results:
+        list.append(event.title)
+        list.append(event.creator)
+        list.append(event.tags)
+        list.append(user.id)
+
+
+    #! Currently no guards or error checking!
+    return {"data": list}

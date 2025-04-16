@@ -1,0 +1,17 @@
+meta {
+  name: planner-get-me
+  type: http
+  seq: 8
+}
+
+get {
+  url: http://localhost:8000/user/me/
+  body: none
+  auth: inherit
+}
+
+docs {
+  # Events
+  
+  > `GET` user profile (with events)
+}

@@ -7,6 +7,8 @@ There's quite a lot of minor (and perhaps major) errors in this book, so you've 
 
 ## Essentials
 
+> Getting through the book has been quite a slow process. Just imagine doing this from scratch in a different language! **Do not take that journey lightly**, as it's liable to take 2-3 months.
+
 1. Have a great **high-level view** of your API, architecture, data flow, etc.
 2. **Treat some parts of the program as a black box** (outsource these parts).
 3. Be extremely careful of **your "learning line", the framing of "need to know"**.
@@ -19,6 +21,16 @@ There's quite a lot of minor (and perhaps major) errors in this book, so you've 
     - Positively or negatively check?
     - How many checks should we have? (just-enough, don't plan ahead)
     - Basic security rules (don't give too much away in errors/response)
+6. **Working with `json` data in SQLite**
+    - The ORMS seem to make this a little tricky to work with.
+    - Do a little more research and some basic tests.
+    - Or just stick with relational data.
+    - **It seems to be easier to deal with atomic data, as in, one route for each simple model (like `/event` and `/user` and `/user/event/id` and so on)**
+7. **How necessary is it to use typing for SQL return values?**
+    - You've got your SQL models
+    - You've got your API models
+    - Your SQL values should be pretty predictable?
+    - It adds quite a bit of code bloat.
 
 ## Notes
 
@@ -39,7 +51,7 @@ isn't always clear either, and the book has LOTS of mistakes.
 2. For some examples, better to have a snippet ...
     - And link to the full file examples (e.g: `Msg` unpacking `Maybe` once)
     - This assures that the card viewing experience is pleasant, without too much awkward scrolling etc ... but may mean viewing on desktop instead.
-2. If you already know something reasonably well (and have study notes) ...
+3. If you already know something reasonably well (and have study notes) ...
     - It's OK to skip it and let the code speak for itself.
     - However, if you forget in future, a link to notes would be helpful.
 
