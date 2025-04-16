@@ -57,11 +57,12 @@ import uvicorn
 # the `/new/event` route gives a `peewee.OperationalError: Connection already opened`
 # error. Run the event route again a couple of times, that error vanishes:
 #
-#    - ⚠️ From early tests the connection is not reliable! Apparently FastApi
-#      uses `async` under the hood, even if you get rid of ALL `async` keywords.
-#    - And (I think) I'm doing everything right and `.close()`ing any open
-#      connection within the route function body.
-#    - @ https://github.com/fastapi/fastapi/discussions/8049 (explains why)
+#    - I'm doing everything right and `.close()`ing any open connection within
+#      the route function body. However, the connection is not reliable!
+#    - One option is to use `db.connect(reuse_if_open=True)`, but this feels like
+#      a plaster on an open wound: unreliable, and masking the problem.
+#    - ⚠️ Apparently FastApi uses `async` under the hood (even without `async`)
+#    - ⚠️ @ https://github.com/fastapi/fastapi/discussions/8049 (explains why)
 #
 # Managing connections
 # --------------------
