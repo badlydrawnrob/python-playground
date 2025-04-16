@@ -78,40 +78,98 @@ niceTypes =
 
 ### Other paradigm differences
 
-1. Classes and methods (rather than plain functions).
-2. [Keyword arguments](https://www.geeksforgeeks.org/args-kwargs-python/) and other Python magic.
+> These can be avoided wherever necessary
+
+1. `Class()`es and `Class.method()`s (rather than plain functions).
+2. Stateful applications (rather than stateless)
+2. [`**Kwargs`](https://www.geeksforgeeks.org/args-kwargs-python/) and other Python magic.
 3. The concept of [`self`](https://how.dev/answers/what-is-self-in-python) (a pretty dumb idea in my opinion)
 
 
 ## The compiler
+### The most important part of a language?
 
-> Elm catches most bugs before they make you crazy ...
-> Python, well, doesn't:
-> 
-> 1. Types are turned off by default
-> 2. Missing packages are not displayed in `repl`
-> 3. `None` is non-descript and unhelpful
+> **Elm has FAR superior types and error messaging**, which really save you when refactoring.
+> Python by default, doesn't. Python's error messaging makes you crazy!
+
+For example:
+
+1. Typing is ugly and off by default.
+2. Concepts like `None` and `Optional` require a different mindset.
+3. **A good REPL and helpful error messages are a god-send for refactoring.**
+4. Python magic like `@decorators` and `extra='keyword arguments` don't exist in Haskell.
+
+Take this piece of code, for example:
 
 ```python
-def does_id_exist(todo: ToDo, id: int) -> bool:
-    for todo in todo_list:
-        if todo.id == id:
-            return False
-        else:
+simple_loop(l: list, id: int) -> bool:
+    for item in l:
+        if todo["id"] == id:
             return True
+        else:
+            return "False"
 ```
 ```terminal
-> does_id_exist([{"id": 1}], 1)
+> simple_loop([], 1)
+> simple_loop([{"id": "string"}, 1])
+'False'
 ```
 
-These are the problems by default:
+There's a ton of problems with this:
 
-1. `None` is implicitly returned, but no errors are shown
-2. `ToDo` type is ignored, and our malformed dict shows no errors
-3. I'm not even using `ToDo` in the procedure body ... still no errors
-4.  searching `todo_list` (which is currently empty)
+1. `None` is implicitly returned, without an error
+2. Different return types are allowed (this will break things)
+3. `{"id": "string"}` should fail, but doesn't.
+4. Dictionary could literally be `Any` type, with any combination of types.
+5. In order to _enforce_ typing, more setup is involved.
 
-Seems to be a LOT more setup required to get default Elm compiler stuff.
+### Elm to the rescue!
+
+> All of these problems are fixed by default!
+
+With Elm no need for any complicated setup, just:
+
+1. [Install](https://guide.elm-lang.org/install/elm.html) Elm (simply)
+2. `elm repl` to open the interactive repl
+3. All you gotta do is code!
+
+Here's what our code looks like now:
+
+```elm
+simpleFun l i =
+    List.map (\list -> list.id == i) l
+
+> simpleFun [] 1
+[] : List Bool
+```
+
+An example Elm error message looks like this; it infers the types, spots that
+`1 == "string"` is impossible, and suggests a fix:
+
+```elm
+simpleFun [{id = "string"}] 1
+```
+```terminal
+-- TYPE MISMATCH ---------------------------------------------------------- REPL
+
+The 2nd argument to `simpleFun` is not what I expect:
+
+6|   simpleFun [{id = "string"}] 1
+                                 ^
+This argument is a number of type:
+
+    number
+
+But `simpleFun` needs the 2nd argument to be:
+
+    String
+
+Hint: I always figure out the argument types from left to right. If an argument
+is acceptable, I assume it is “correct” and move on. So the problem may actually
+be in one of the previous arguments!
+
+Hint: Try using String.fromInt to convert it to a string?
+```
 
 
 ## Questions
