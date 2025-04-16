@@ -2,7 +2,7 @@ import time
 from datetime import datetime
 from fastapi import HTTPException
 from jose import jwt, JWTError
-from database.database import Settings
+from database.settings import Settings
 
 # ------------------------------------------------------------------------------
 # JWT Token handler
@@ -29,6 +29,14 @@ from database.database import Settings
 #
 # Which means we can decode it with base64 too! For the `expires` value, we need
 # to use the `Time` module in Elm (with same method as it's encoded).
+#
+#
+# Wishlist
+# --------
+# > We need a public id that's short enough for a URL ...
+#
+# 1. But we could use a `token.uuid` and `token.shortuuid` and serve both for
+#    our public/private IDs (encode/decode with `base57`)
 
 settings = Settings() # Get the secret key
 

@@ -1,93 +1,107 @@
-from sqlmodel import Column, Field, JSON, SQLModel
+from pydantic import BaseModel
 from typing import List, Optional
 
 # ------------------------------------------------------------------------------
-# Our EVENT model
+# Our EVENT model (API layer)
 # ==============================================================================
-# We use `SQLModel` rather than Pydantic's `BaseModel` for SQL and tables. It's
-# best to be consistent, but Pydantic fields can be declared in any order.
+# We're not using `SQLModel` anymore! We're using Pydantic's `BaseModel` for any
+# incoming request (we could do that for response as well). This keeps the API
+# layer and the DATA layer separate. Pydantic fields can be declared in any order.
 #
 # Questions:
 # ----------
-# 1. What is `session.refresh()` doing? (see `connection.py`)
-# 2. Why do we use `table=True`? When can it be omitted?
-# 3. What is `sa_column` and what does it do? (or `sa_type`)
-#    - @ https://stackoverflow.com/a/70659555
-# 4. Should fields be named alphabetically or by position? (preference)
-# 5. When is `BaseModel` allowed? (and when is it not?)
+# 1. Should fields be named alphabetically or by position? (preference)
+# 2. When do we transition to PeeWee's data models?
 #
-# SQLite (general info)
-# ---------------------
-# > Terminology
+# Using Pydantic
+# --------------
+# 1. `Optional` is useful when one of the data points isn't required.
+#    - You MUST supply the fallback value, unfortunately ...
+#    - @ https://fastapi.tianglo/tutorial/body/ `= None` or `| None = None`
+#    - @ https://stackoverflow.com/q/76466468 (for the reason why)
+# 2. It's easier to NOT nest models (it's errored for me before).
+# 3. Some data points need to be handled by PeeWee (like `id`).
+#    - For this we MUST provide a default value `None` (though why `Optional`
+#      doesn't handle this for us I've no idea) (see (1))
+# 4. For `EventUpdate`, we could do a `PATCH` or a `PUT` request.
+#    - As our example is a `PATCH` request, all fields are optional.
 #
-# 1. Understand what a primary key is.
-# 2. Understand what a foreign key is.
-# 3. Understand what a composite key is.
-# 4. Understand what a unique key is.
-# 5. Understand what a check constraint is.
-# 6. Understand the difference between columns and fields.
+# Wishlist
+# --------
+# > What do we want to leave out and simplify?
 #
-# > FastApi and SQLModel
-# 
-# 1. `Optional` is useful here when a request body data point isn't required.
-#    - But it doesn't mean that the field is optional in the database! `None` and
-#      `default=None` is also used. It's important to understand WHY:
-#    - @ https://sqlmodel.tiangolo.com/tutorial/automatic-id-none-refresh/
-# 2. Creating connected tables with SQLModel:
-#   - @ https://sqlmodel.tiangolo.com/tutorial/connect/create-connected-tables/
-# 3. FastApi automatically creates an `id` field if it's left out.
-#   - It automatically increments the `id` field.
-# 4. `Event.creator` is a foreign key to the `User` table.
-#   - Our `authenticate` function returns the `user.email` right now ...
-#   - Which is a `String`, but would perform quicker if an `Int` (primary key)
-#   - @ @ https://www.dittofi.com/learn/relationships-in-sql-complete-guide-with-examples
-# 5. Our `EventUpdate` model is used for _partial_ updates (PATCH).
-#   - For that reason, most of the fields are marked as `Optional`.
-#   - The client code can be different (some fields required), but we write the
-#     model this way for all eventualities. Some fields might be missing!
-#   - Different apps do this differently. For example, Gmail has a separate UI
-#     form for EACH and EVERY data point in the `User` (name, for example).
-#   - This is an app ARCHITECTURE decision.
+# 1. The `response_model=` isn't really needed, as we're now using `PeeWee`
+#    - But we could use it if we wanted to (and populate the fields)
+# 2. Alternatively we could use a response type (the bit after `-> type`)
+#    - But is that overkill? Our SQL returns should be predictable!
+#    - We could use `TypedDict` to define the response type.
+#    - @ https://mypy.readthedocs.io/en/stable/typed_dict.html
 
-class Event(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True) # unique identifier
-    creator: Optional[str] | None = Field(default=None, foreign_key="user.email") #!
+class Event(BaseModel):
+    # We automatically generate `id` and `creator` with PeeWee ... (1) (3)
+    # - `id` is ommited from the request, as is `creator` (foreign key `User.Id`)
+    id: Optional[int] = None # `None` is a fallback value
+    creator: Optional[int] = None
     title: str
     image: str
     description: str
     location: str
-    tags: List[str] = Field(sa_column=Column(JSON))
+    tags: List[str]
 
-# This isn't a table (it's a type! WITHOUT an `id` field)
-class EventUpdate(SQLModel):
+class EventUpdate(BaseModel):
     # `:id` supplied in the URL
-    title: Optional[str]
-    image: Optional[str]
-    description: Optional[str]
-    location: Optional[str]
-    tags: Optional[List[str]]
+    title: Optional[str]       #! (4)
+    image: Optional[str]       #! (4)
+    description: Optional[str] #! (4)
+    location: Optional[str]    #! (4)
+    tags: Optional[List[str]]  #! (4)
 
-class EventWithUser(SQLModel):
-    pass
-    # I don't know what the fuck I should put here!
-    # I imagine to return a `[(User, Event)]` as in `get_user_me`
-    # a NEW data structure must be created(?) and do the following:
-    #
-    # 1. Call the database with `join` on `Event`
-    # 2. Extract the `Tuple`
-    # 3. Create a `EventWithUser` object
-    #    - Use the extracted tuple data to populate kwargs
-    #
-    # I'm not convinced that it's a good idea to create such a model
-    # as we could use the raw data and validate it with Python typing
-    # if absolutely necessary, like so:
-    #
-    # `get_user_event() -> dict`
-    #
-    # I'm not sure how important it is to be more specific than that. If
-    # our SQL models are correct, the return types should be predictable.
-    # If absolutely necessary, you could use Pydantic `BaseModel` or a
-    # `TypedDict` @ https://mypy.readthedocs.io/en/stable/typed_dict.html
-    #
-    # I guess it's personal preference and just how strict you want things.
-    # You could always write tests (or use Bruno) to check return values.
+
+# Response Models --------------------------------------------------------------
+# > What's the benefit of `response_model=` or response types?
+#
+# Do we _really_ need typing for our return values? I'm not so convinced it's a
+# good idea! Where it _is_ useful however, is when you've got sensitive details
+# that would otherwise need a lot of manual boilerplate code to remove.
+#
+# Our SQL models are already typed with PeeWee, so return values should be very
+# predictable. A `get_user_event() -> dict` could be enough! If we _did_ decide
+# to use typing for return values, it'd mean:
+#
+# 1. Unpacking the `request` type `Event` (Pydantic)
+# 2. Calling the database with `EventData` model (PeeWee)
+# 3. Convert `EventData` -> `EventWithUser` object ..
+# 4. Or, `model_to_dict(event)` and validate it with `response_model=`
+#
+# That's a lot of work! It makes our code base more complicated. If it were a
+# typed functional language, like Elm, then sure. But Python's not that solid
+# at typing anyways. You _could_ combine PeeWee and Pydantic, but it feels like
+# a lot of work for little gain.
+#
+# @ https://tinyurl.com/pydantic-peewee-example
+#
+# Below is one usecase that could be useful. It removes sensitive `UserData`
+# fields from the response. However:
+#
+#! ⚠️ For some reason `response_model=` doesn't work with `EventWithCreator`.
+#! ⚠️ It works if you use it as the _return type_ of the function. So, it might
+#! ⚠️ be better to just be explicit and do this manually.
+    
+class EventJustTitle(BaseModel):
+    title: str
+
+class Creator(BaseModel):
+    # id: int
+    public: str
+    email: str
+    # password: str
+
+class EventWithCreator(BaseModel):
+    # id: int
+    creator: Creator
+    title: str
+    image: str
+    description: str
+    location: str
+    tags: List[str]
+

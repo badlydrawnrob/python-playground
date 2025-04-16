@@ -12,13 +12,13 @@
 3. Minimal backend code
 4. Minimal server setup
 
-That's about it. I need something that interfaces with a simple database, keeping things light. It's for prototypes, and will probably be replaced by another programming language at some stage. [Roc](https://www.roc-lang.org/) looks promising, but I'm not a heavy coding guy, so might have a team by then!
+That's about it. I need something that interfaces with a simple database, keeping things light. It's for prototypes, and will probably be replaced by another programming language at some stage. [Roc](https://www.roc-lang.org/) looks promising, but I'm not a heavy coding guy, so might have a team by then![^]
 
 
 ## On writing ...
 
 > Some books have:
-> 1. Minor or major errors in the code[^1]
+> 1. Minor or major errors in the code[^2]
 > 2. Outdated dependencies (how many does yours have?)
 > 3. Academic language (or verbose terminology)
 > 4. Not enough visuals (or poorly labelled ones)
@@ -78,40 +78,100 @@ niceTypes =
 
 ### Other paradigm differences
 
-1. Classes and methods (rather than plain functions).
-2. [Keyword arguments](https://www.geeksforgeeks.org/args-kwargs-python/) and other Python magic.
-3. The concept of [`self`](https://how.dev/answers/what-is-self-in-python) (a pretty dumb idea in my opinion)
+> These can be avoided wherever necessary
+
+1. `Class()`es and `Class.method()`s (rather than plain functions).
+2. Stateful applications (rather than stateless and functional)
+3. A `list` can be _mutable_, and changed _anywhere_ in the program. That's bad!
+4. [`**Kwargs`](https://www.geeksforgeeks.org/args-kwargs-python/) and other Python magic.
+5. The concept of [`self`](https://how.dev/answers/what-is-self-in-python) (a pretty dumb idea in my opinion)
+6. Declaration order can be important (Pydantic nested class should come before it's use).
 
 
 ## The compiler
+### The most important part of a language?
 
-> Elm catches most bugs before they make you crazy ...
-> Python, well, doesn't:
-> 
-> 1. Types are turned off by default
-> 2. Missing packages are not displayed in `repl`
-> 3. `None` is non-descript and unhelpful
+> **Elm has FAR superior types and error messaging**, which really save you when refactoring.
+> Python by default, doesn't. Python's error messaging makes you crazy!
+
+For example:
+
+1. Typing is ugly and off by default.
+2. Concepts like `None` and `Optional` require a different mindset.
+3. **A good REPL and helpful error messages are a god-send for refactoring.**
+4. Python magic like `@decorators` and `extra='keyword arguments` don't exist in Haskell.
+
+Take this piece of code, for example:
 
 ```python
-def does_id_exist(todo: ToDo, id: int) -> bool:
-    for todo in todo_list:
-        if todo.id == id:
-            return False
-        else:
+simple_loop(l: list, id: int) -> bool:
+    for item in l:
+        if todo["id"] == id:
             return True
+        else:
+            return "False"
 ```
 ```terminal
-> does_id_exist([{"id": 1}], 1)
+> simple_loop([], 1)
+> simple_loop([{"id": "string"}, 1])
+'False'
 ```
 
-These are the problems by default:
+There's a ton of problems with this:
 
-1. `None` is implicitly returned, but no errors are shown
-2. `ToDo` type is ignored, and our malformed dict shows no errors
-3. I'm not even using `ToDo` in the procedure body ... still no errors
-4.  searching `todo_list` (which is currently empty)
+1. `None` is implicitly returned, without an error
+2. Different return types are allowed (this will break things)
+3. `{"id": "string"}` should fail, but doesn't.
+4. Dictionary could literally be `Any` type, with any combination of types.
+5. In order to _enforce_ typing, more setup is involved.
 
-Seems to be a LOT more setup required to get default Elm compiler stuff.
+### Elm to the rescue!
+
+> All of these problems are fixed by default!
+
+With Elm no need for any complicated setup, just:
+
+1. [Install](https://guide.elm-lang.org/install/elm.html) Elm (simply)
+2. `elm repl` to open the interactive repl
+3. All you gotta do is code!
+
+Here's what our code looks like now:
+
+```elm
+simpleFun l i =
+    List.map (\list -> list.id == i) l
+
+> simpleFun [] 1
+[] : List Bool
+```
+
+An example Elm error message looks like this; it infers the types, spots that
+`1 == "string"` is impossible, and suggests a fix:
+
+```elm
+simpleFun [{id = "string"}] 1
+```
+```terminal
+-- TYPE MISMATCH ---------------------------------------------------------- REPL
+
+The 2nd argument to `simpleFun` is not what I expect:
+
+6|   simpleFun [{id = "string"}] 1
+                                 ^
+This argument is a number of type:
+
+    number
+
+But `simpleFun` needs the 2nd argument to be:
+
+    String
+
+Hint: I always figure out the argument types from left to right. If an argument
+is acceptable, I assume it is “correct” and move on. So the problem may actually
+be in one of the previous arguments!
+
+Hint: Try using String.fromInt to convert it to a string?
+```
 
 
 ## Questions
@@ -134,7 +194,7 @@ Seems to be a LOT more setup required to get default Elm compiler stuff.
 
 - [UV in production?](https://pythonspeed.com/articles/uv-python-production/)
 - [UV commands](https://docs.astral.sh/uv/reference/cli/) (a quick overview)
-- [Thonny](https://thonny.org/) — a beginner IDE[^2]
+- [Thonny](https://thonny.org/) — a beginner IDE[^3]
 - [VS Code](https://code.visualstudio.com/docs/python/python-tutorial) setup tutorial
 
 
@@ -142,7 +202,9 @@ Seems to be a LOT more setup required to get default Elm compiler stuff.
 
 | Command                                    | Does this                            |
 | ------------------------------------------ | -------------------------------------|
-| `pip install -r /path/to/requirements.txt` | Install requirements[^3]             |
+| `activate`                                 | `source .venv/bin/activate` alias in `.zshrc` file |
+| `pip freeze`                               | A list of currently installed packages |
+| `pip install -r /path/to/requirements.txt` | Install requirements[^4]             |
 | `uv init [folder-name]`                    | Start `uv` project                   |
 | `uv python install [version]`              | Install a Python version (or latest) |
 | `uv python list`                           | List all Python versions installed   |
@@ -153,16 +215,18 @@ Seems to be a LOT more setup required to get default Elm compiler stuff.
 | `uv add [package]`                         | Download and install a package       |
 | `uv tree`                                  | List all dependencies (as a tree)    |
 | `uv run [command]`                         | Run the server, run a file, etc      |
-| `uv sync`                                  | Sets up a project's "stuff"[^4]      |
-| `uv run uvicorn src.main:app --reload`     | Run command for subfolder file[^5]   |
+| `uv sync`                                  | Sets up a project's "stuff"[^5]      |
+| `uv run uvicorn src.main:app --reload`     | Run command for subfolder file[^6]   |
 
 
-[^1]: This is likely to happen when you're making regular changes to the book. But you've really got to have a good editor (or using Ai) to triple check your changes for continuity errors. For the beginner, it's highly likely they'll get stuck, and there's nothing in the book to keep them right other than context and the student's initiative.
+[^1]: Personally, I'd prefer someone else to handle the heavy-lifting for some areas of the program. Ideally a stable and well-documented package, or have someone build it for me. Some areas of Python programs have a LOT of moving parts, and I'd prefer to stick to areas I'm good at (ui, ux, marketing, etc).
 
-[^2]: You can't run this app while there's a virtual environment running in the terminal. You can set the virtual environment by going to `Tools -> Options ... -> Interpreter -> Python executable` and selecting the path or symlink in your `venv-folder-name`.
+[^2]: This is likely to happen when you're making regular changes to the book. But you've really got to have a good editor (or using Ai) to triple check your changes for continuity errors. For the beginner, it's highly likely they'll get stuck, and there's nothing in the book to keep them right other than context and the student's initiative.
 
-[^3]: If you're using stock Python commands, you'll probably need to preface with `python3 -m`, such as `python3 -m pip install [package]`. If you're using `uv` you don't need to worry about this (just use `uv run` etc). You also won't need to worry about `PATH` or any of that shit (I think `uv` does that for you).
+[^3]: You can't run this app while there's a virtual environment running in the terminal. You can set the virtual environment by going to `Tools -> Options ... -> Interpreter -> Python executable` and selecting the path or symlink in your `venv-folder-name`.
 
-[^4]: From scratch. Environment, dependencies, and so on. I think this needs a `pyproject.toml` file (and maybe a `.python-version` file). Lookup the docs for more info.
+[^4]: If you're using stock Python commands, you'll probably need to preface with `python3 -m`, such as `python3 -m pip install [package]`. If you're using `uv` you don't need to worry about this (just use `uv run` etc). You also won't need to worry about `PATH` or any of that shit (I think `uv` does that for you).
 
-[^5]: It seems that the `uv` command **must** be run from the parent directory that the virtual server lives in. You also need to use the `module-folder.dot_format.py` to call a [subfolder's file](https://stackoverflow.com/a/62934660).
+[^5]: From scratch. Environment, dependencies, and so on. I think this needs a `pyproject.toml` file (and maybe a `.python-version` file). Lookup the docs for more info.
+
+[^6]: It seems that the `uv` command **must** be run from the parent directory that the virtual server lives in. You also need to use the `module-folder.dot_format.py` to call a [subfolder's file](https://stackoverflow.com/a/62934660).
