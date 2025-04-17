@@ -29,6 +29,7 @@ Make sure you're explaining _just enough_ and no more. Aim for simple language a
 ## Coding style
 
 > It doesn't feel as intuitive or consistent as Elm.
+> Python's main benefit is it's shorter learning curve.
 
 Perhaps you get shorter code at scale, but is it more readable? I'm not so sure.
 
@@ -94,10 +95,10 @@ niceTypes =
 > **Elm has FAR superior types and error messaging**, which really save you when refactoring.
 > Python by default, doesn't. Python's error messaging makes you crazy!
 
-For example:
+For example, with Python:
 
 1. Typing is ugly and off by default.
-2. Concepts like `None` and `Optional` require a different mindset.
+2. Concepts like `None` and `Optional` require a different mindset to `Maybe`.
 3. **A good REPL and helpful error messages are a god-send for refactoring.**
 4. Python magic like `@decorators` and `extra='keyword arguments` don't exist in Haskell.
 
@@ -187,7 +188,7 @@ Hint: Try using String.fromInt to convert it to a string?
 ## Courses
 
 - [Imperial College London](https://python.pages.doc.ic.ac.uk/2021/materials.html) course 
-([example](https://python.pages.doc.ic.ac.uk/lessons/core05/07-style/03-docstring.html)
+([example](https://python.pages.doc.ic.ac.uk/lessons/core05/07-style/03-docstring.html) chapter)
 
 
 ## Tools

@@ -29,7 +29,7 @@ Learning to program is a _never-ending_ task. It can be quite overwhelming, so h
 
 > It seems quick, as advertised, but remember it's `async`!
 
-1. It's `async`, for `async` tools.
+1. **It's `async`, for `async` tools.**
     - An ORM like PeeWee [does not play nicely](https://github.com/fastapi/fastapi/discussions/8049) with it![^1]
 2. It works well with SQLite.[^2] The beauty of SQLite as that it involves minimal production setup. It's just a file!
     - SQLite doesn't default to `async`. To add support, you'll need an ORM that supports [this package](https://github.com/omnilib/aiosqlite).
@@ -198,8 +198,8 @@ You might want to stick with SQLModel but there's a few reasons you might not:
     - **To split the API layer from the DATA layer (models)**
 2. I didn't find the SQLModel documentation easy to query joins:
     - It's not very intuitive.
-3. It's an abstraction of an abstraction:
-    - It's built on top of SQLAlchemy, which I find too big and complicated.
+3. **It's an abstraction of an abstraction:**
+    - **It's built on top of [SQLAlchemy](https://docs.sqlalchemy.org/en/20/core/), which I find too big and complicated.**
 4. There's better ORMs with more functionality and great documentation:
     - But beware that FastAPI is `async` and requires async tooling
 
@@ -225,10 +225,13 @@ A bit similar to the [5 finger rule](#keeping-things-simple)!
 > I'd pick [PeeWee](https://docs.peewee-orm.com/en/latest/peewee/quickstart.html) or [Pony](https://docs.ponyorm.org/) for a non-async framework. The main [problem with `async`](https://fastapi.tiangolo.com/async/#asynchronous-code) is having to [scatter your app](https://charlesleifer.com/blog/asyncio/) with `await` calls.
 
 1. **Picallo** is great, but [not 100% async](https://piccolo-orm.readthedocs.io/en/1.1.1/piccolo/tutorials/using_sqlite_and_asyncio_effectively.html)
-2. **[Ormar](https://collerek.github.io/ormar/latest/)** works with SQLite async, but less mature than Picallo (at time of writing)
+2. **[Ormar](https://collerek.github.io/ormar/latest/)** with SQLite async, less mature than Picallo (at time of writing).
+    - Another abstraction on top of SQLAlchemy
+    - Based on [encode orm](https://github.com/encode/orm) (but more tightly integrated with FastAPI and Pydantic types).
 3. **Tortoise ORM** (feels a bit clunky to me, see [this example](https://tortoise.github.io/examples/fastapi.html))
 4. **[SQLmodel](https://sqlmodel.tiangolo.com/)** is the obvious option for FastAPI, but I'm not a huge fan.
-5. [IceAxe](https://github.com/piercefreeman/iceaxe) is also very interesting to me, but it's only Postgres. I like it's simplicity and similarity to raw SQL.
+5. [IceAxe](https://github.com/piercefreeman/iceaxe) is also very interesting to me, but it's only Postgres.
+    - I like it's simplicity and similarity to raw SQL.
 
 I'm sure there's more (or will be) but these seem a good fit. Also see Reddit's "[What is your go-to ORM?](https://www.reddit.com/r/FastAPI/comments/1fjta2e/what_is_your_goto_orm/)". The alternative to using asyncio is to choose [boring](https://mcfunley.com/choose-boring-technology) technology, and simplify your stack ([PeeWee](https://docs.peewee-orm.com/en/latest/peewee/quickstart.html) and any compatible [framework](https://docs.peewee-orm.com/en/latest/peewee/database.html#framework-integration)!)
 

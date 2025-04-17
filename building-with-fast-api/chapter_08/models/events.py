@@ -18,6 +18,7 @@ from typing import List, Optional
 # 1. `Optional` is useful when one of the data points isn't required.
 #    - You MUST supply the fallback value, unfortunately ...
 #    - @ https://fastapi.tianglo/tutorial/body/ `= None` or `| None = None`
+#    - @ https://sqlmodel.tiangolo.com/tutorial/automatic-id-none-refresh/
 #    - @ https://stackoverflow.com/q/76466468 (for the reason why)
 # 2. It's easier to NOT nest models (it's errored for me before).
 # 3. Some data points need to be handled by PeeWee (like `id`).

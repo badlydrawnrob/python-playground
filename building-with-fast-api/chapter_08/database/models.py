@@ -26,6 +26,8 @@ from playhouse.sqlite_ext import JSONField
 # 5. Understand what a check constraint is.
 # 6. Understand the difference between columns and fields.
 #
+#    @ https://stackoverflow.com/q/11586986 (disadvantages of composite key)
+#
 #
 # PeeWee
 # ------
