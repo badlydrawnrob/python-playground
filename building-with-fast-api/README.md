@@ -304,7 +304,9 @@ And you could could generate a database from the `json` or [`.csv`](https://alex
 
 ### Other tools
 
-- [JSON Server](https://marketplace.visualstudio.com/items?itemName=sarthikbhat.json-server) for VS Code (great for mocking)
+- [JQ](https://jqlang.org/) is handy for manipulating `json` data
+    - Eg: convert `{ list: [] }` -> `[]` (similar to Elm's `Decoder.at`)
+[JSON Server](https://marketplace.visualstudio.com/items?itemName=sarthikbhat.json-server) for VS Code (great for mocking)
 
 
 ## SQLite
