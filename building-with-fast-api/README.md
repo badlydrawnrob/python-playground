@@ -283,10 +283,27 @@ For your tooling, you might like to use Bruno. I prefer Bruno's way of writing d
 - You can **setup Bruno with [OAuth2](https://docs.usebruno.com/auth/oauth2/overview)** in your collection settings.
 - Import your `/docs -> openapi.json` to a new collection in Bruno.
 
+### SQLite Utils
+
+> Could be really handy for testing/preparing data!
+> Perhaps populate a demo database automatically?
+
+[SQLite Utils](https://sqlite-utils.datasette.io) has a lot of helpful functions for formatting data from `json`, `csv`, and `.db` SQLite files. For example, you have a [Tally Form](https://tally.so/) that exports as `.csv` ...
+
+```terminal
+-- Activate the virtual environment
+> activate
+-- Install the python package and CLI
+> uv add sqlite-utils
+-- Output a list of `json` dictionaries (one for each entry)
+sqlite-utils memory event.csv "select * from event"
+-- Add `| python -m json.tool` to pretty print the `json`
+```
+
+And you could could generate a database from the `json` or [`.csv`](https://alexwlchan.net/til/2024/use-sqlite-utils-to-convert-csv-to-sqlite/)! Or input the values with your own schema design.
+
 ### Other tools
 
-- [SQLite Utils](https://sqlite-utils.datasette.io) is great for preparing data.
-    - This could be a great way to automatically populate a demo database!
 - [JSON Server](https://marketplace.visualstudio.com/items?itemName=sarthikbhat.json-server) for VS Code (great for mocking)
 
 
