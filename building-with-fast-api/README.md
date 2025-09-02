@@ -96,6 +96,8 @@ Be careful with your routes:
 
 ## Commands
 
+### Using `uv`
+
 > [Some notes](https://github.com/astral-sh/uv/issues/10543#issuecomment-2587276856) on getting setup with `uv` and `venv`
 
 ```terminal
@@ -107,7 +109,28 @@ uv run uvicorn api:app -- port 8000 --reload
 uv run main.py
 -- Test types and errors
 uv run pyright main.py
+``
+
+Deploying with [Github Actions](https://docs.astral.sh/uv/guides/integration/github/)
+
+```yaml
+steps:
+  - uses: actions/checkout@v4
+
+  - name: Install uv
+    uses: astral-sh/setup-uv@v6
+
+  - name: Set up Python
+    run: uv python install
+
+  - name: Install the project
+    run: uv sync --locked --all-extras --dev
+
+  - name: Run something
+    run: uv run python3 some_script.py
 ```
+
+### The API
 
 ```terminal
 -- Curl is a `GET` by default
@@ -130,11 +153,15 @@ curl -X 'POST' \
   -d 'grant_type=password&username=[email]&password=[password]&scope=&client_id=string&client_secret=string'
 ```
 
+### SQL
+
 ```sql
 -- Chapter 07 code
 SELECT u.email, e.title FROM user AS u
 JOIN event AS e ON u.email = e.creator;
 ```
+
+### Misc
 
 ```python
 # Inspect an object's properties
