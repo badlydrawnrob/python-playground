@@ -98,7 +98,7 @@ Be careful with your routes:
 
 ### Using `uv`
 
-> [Some notes](https://github.com/astral-sh/uv/issues/10543#issuecomment-2587276856) on getting setup with `uv` and `venv`
+> [Some notes](https://github.com/astral-sh/uv/issues/10543#issuecomment-2587276856) on getting setup with `uv` and `venv`. I think running `uv run` activates the virtual environment first (without `activate`).
 
 ```terminal
 -- Create a new project
@@ -111,7 +111,7 @@ uv run main.py
 uv run pyright main.py
 ``
 
-Deploying with [Github Actions](https://docs.astral.sh/uv/guides/integration/github/)
+You can `pip install uv` on a live server (like Ubuntu), or `curl` install. If you don't want to do `uv run` you can do `source .venv/bin/activate` and then you're using the virtualenv Python (for a Github Action that probably doesn't matter, but locally it's definitely better). Deploying with [Github Actions](https://docs.astral.sh/uv/guides/integration/github/)
 
 ```yaml
 steps:
