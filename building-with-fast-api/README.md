@@ -20,27 +20,31 @@ As I've written before, I'm [not a huge fan](https://github.com/badlydrawnrob/py
 **If I can handle 3k users on a simple server, I'm happy.** I'm not out to build an all-singing, all-dancing app, and the goal is to validate a business model, then build out a technical team if it's successful! Things like queuing, sharding, email validation, and so on, are not my concern right now.
 
 - **My learning frame** is a personal "do" and "don't do" list
-- **Things I'm happy to take on (and learn);** stuff I don't add to my to-do list.
+- **Things I'm happy to take on (and learn);** stuff I don't add to my to-do list
+- **The [5 finger rule](#the-5-finger-rule)** to choose books, tuts, and packages
+- **Some things as a [black box](#a-black-box)** that are set and forget (or outsource)
 
-Learning to program is a _never-ending_ task. It can be quite overwhelming, so having a mentor to hold your hand and keep you right is super helpful. I don't enjoy low-level detail![^7]
+Learning to program is a _never-ending_ task. It can be quite overwhelming, so having a mentor to hold your hand and keep you right is super helpful. I don't enjoy low-level detail![^1]
 
 
 ## FastAPI pros and cons
 
 > It seems quick, as advertised, but remember it's `async`!
 
-1. **It's `async`, for `async` tools.**
-    - An ORM like PeeWee [does not play nicely](https://github.com/fastapi/fastapi/discussions/8049) with it![^1]
-2. It works well with SQLite.[^2] The beauty of SQLite as that it involves minimal production setup. It's just a file!
-    - SQLite doesn't default to `async`. To add support, you'll need an ORM that supports [this package](https://github.com/omnilib/aiosqlite).
+1. **It's `async`, for `async` tools** (this isn't always needed)
+    - PeeWee [does not play nicely](https://github.com/fastapi/fastapi/discussions/8049) with it![^2]
+2. **It works well with SQLite.**[^3]
+    - SQLite is great as it's easy to migrate and setup. It's just a file!
+    - SQLite doesn't default to `async`: you'll need an ORM that supports [`aiosqlite`](https://github.com/omnilib/aiosqlite)
 
 The downsides ...
 
-1. Sometimes FastAPI documentation is not clear enough.
-    - I'm not keen on combining SQL knowledge with SQLModel documentation.
-    - It makes it way harder to scan the docs for query syntax, often longwinded.
-2. Python error messages are shit. See "[coding style](https://github.com/badlydrawnrob/python-playground?tab=readme-ov-file#coding-style)". Pydantic, PyLance, and PyRight help a bit with typing.
-    - Long traceback error messages (often, but not always the last one tells the problem)
+1. FastAPI documentation is not always clear enough.
+    - SQL knowledge is combined with SQLModel documentation, or longwinded ...
+    - Making it way harder to scan documentation for query syntax, etc.
+2. Python error messages are shit. See "[coding style](https://github.com/badlydrawnrob/python-playground?tab=readme-ov-file#coding-style)".
+    - Pydantic, PyLance, and PyRight help a bit with typing.
+    - Long traceback error messages (often the last message points to the problem)
     - Cryptic errors and hard to pin down what's wrong
 
 
@@ -79,19 +83,13 @@ Here are a few I caught (there's more)
 1. `NewUser` model is mentioned but not created
 2. `User` fields are not yet used (`List Int`)
 3. `users.py` is referred to as `user.py`
-
-Also:
-
-1. Make sure any required dependencies are introduced clearly!
+4. Dependencies are sometimes not introduced clearly!
     - `SQLModel` is imported but no download is mentioned
-    - Which `jose` package do you mean? There's more than one in pypi!
-2. Some upgrades are needed, but tricky to learn:
-    - ~~`@app.on_event("startup")`~~ is now app lifecycle but requires an understanding of `contextlib`.
-3. `grant_type=` missing the `password` keyword in the authentication `curl` call.
-
-Be careful with your routes:
-
-- `:id` (params) must be added to your Bruno path
+    - Which `jose` package do you mean? There's more than one!
+5. Some packages and syntax are outdated and need updated copy:
+    - ~~`@app.on_event("startup")`~~ is now app lifecycle ...
+    - Which requires an understanding of `contextlib` and is tricky to learn!
+6. `grant_type=` missing the `password` keyword in the authentication `curl` call.
 
 
 ## Commands
@@ -103,15 +101,20 @@ Be careful with your routes:
 ```terminal
 -- Create a new project
 uv init
+
 -- Run your program (from function)
 uv run uvicorn api:app -- port 8000 --reload
+
 -- Run your program (from file)
 uv run main.py
+
 -- Test types and errors
 uv run pyright main.py
-``
+```
 
-You can `pip install uv` on a live server (like Ubuntu), or `curl` install. If you don't want to do `uv run` you can do `source .venv/bin/activate` and then you're using the virtualenv Python (for a Github Action that probably doesn't matter, but locally it's definitely better). Deploying with [Github Actions](https://docs.astral.sh/uv/guides/integration/github/)
+#### Deployment
+
+You can `pip install uv` on a live server (like Ubuntu), or `curl` install. You can either `uv run` or `source .venv/bin/activate` to start using the Python virtualenv (for a Github Action that probably doesn't matter, but locally it's definitely better). Deploy with [Github Actions](https://docs.astral.sh/uv/guides/integration/github/)
 
 ```yaml
 steps:
@@ -130,7 +133,7 @@ steps:
     run: uv run python3 some_script.py
 ```
 
-### The API
+### API and CURL
 
 ```terminal
 -- Curl is a `GET` by default
@@ -178,9 +181,9 @@ pprint(vars(your_object))
 1. **Keep things as simple as possible.**
     - Your models, documentation, tooling, dependencies, etc.
     - Actively remove code and simplify processes where possible.
-    - `.jinja` at scale can get messy, why not try Elm?[^3]
+    - `.jinja` at scale can get messy, why not try Elm?[^4]
     - You might want to split your API layer from your DATA layer.
-2. **If things are too complicated for you, hire.**[^4]
+2. **If things are too complicated for you, hire.**[^1]
     - Have a professional look over your code ...
     - Or, have them do it for you, and treat things as a [black box](#a-black-box).
     - Stick to a narrow problem set that suits your capabilities.
@@ -262,12 +265,12 @@ A bit similar to the [5 finger rule](#keeping-things-simple)!
 
 I'm sure there's more (or will be) but these seem a good fit. Also see Reddit's "[What is your go-to ORM?](https://www.reddit.com/r/FastAPI/comments/1fjta2e/what_is_your_goto_orm/)". The alternative to using asyncio is to choose [boring](https://mcfunley.com/choose-boring-technology) technology, and simplify your stack ([PeeWee](https://docs.peewee-orm.com/en/latest/peewee/quickstart.html) and any compatible [framework](https://docs.peewee-orm.com/en/latest/peewee/database.html#framework-integration)!)
 
-### RAW SQL and JOINs
+### RAW SQL, JOINs, app architecture, and mapping data
 
 > I might want to handle database creation and migration manually?
 > But have a representation of it with the `User` and `Event` models.
 
-For read-only code, you might want to use raw SQL queries, but you'll still need to map the data onto your `User` class, or a `dict`ionary. In the book, we also create a `List[int]` of `Event.id`s — we don't really need these!! Only store data like this if your [app architecture](https://openlibrary.org/dev/docs/api/covers) depends on it.
+For read-only code you might want to use raw SQL queries, but you'll still need to map the data onto your `User` class, or a `dict`ionary. In the book, we also create a `List[int]` of `Event.id`s — we don't really need these!! Only store data like this if your [app architecture](https://openlibrary.org/dev/docs/api/covers) depends on it.
 
 OpenLibrary, for instance, has `List[int]` of images which map to a `/covers` route, with `-S`mall, `-M`edium, and `-L`arge images. Our API is NOT publically consumed, so we likely want to deal with SQL `join`s and serve the full image paths within the `Event` object.
 
@@ -307,8 +310,9 @@ In your `pyproject.toml`:
 
 For your tooling, you might like to use Bruno. I prefer Bruno's way of writing documentation, but you must write it out manually (whereas `/docs` are automatic). The benefit of Bruno is that we can _easily switch out to another API framework_, and keep all our tests in place!
 
-- You can **setup Bruno with [OAuth2](https://docs.usebruno.com/auth/oauth2/overview)** in your collection settings.
-- Import your `/docs -> openapi.json` to a new collection in Bruno.
+- **[OAuth2](https://docs.usebruno.com/auth/oauth2/overview)** can be setup in your collection settings.
+- FastApi `/docs` can be saved as `.json` file and added as a new collection to speed things up.
+- Take care with your routes: `:id` (params) must be added to your Bruno path!
 
 ### SQLite Utils
 
@@ -354,16 +358,16 @@ As always, practice with mock data first and be sure to back up! (demo/staging).
 - I think Python Anywhere hosts files over the network?[^7]
 - [AGSI](https://help.pythonanywhere.com/pages/ASGICommandLine) setup in Python Anywhere is now possible (I think).
 - You'll need to setup `uvicorn` to run with [`https`](https://www.uvicorn.org/deployment/#running-with-https)** (it's not default)
-- You might want parts of your app as `.jinja` html, rather than `json` (such as a login form)[^7]
+- You might want parts of your app as `.jinja` html, rather than `json` (such as a login form)[^8]
 
   
-[^1]: Which is a shame, because I like PeeWee's documentation and syntax. It'd be perfect for apps where there's not going to be (any/many) concurrent writes to the database.
+[^1]: If you're a great programmer, or don't mind suffering through the pain of low-level learning, then do it yourself. My goals are quite distinct and I simply don't have the time to learn everything.
 
-[^2]: I tried and failed to get MongoDB working. I found it an absolute arse to setup (especially for beginners) and more hassle than SQLite (or even Postgres, I imagine). The book's `chapters` from `_06/` or `_07/` onwards uses MongoDB; I decided to part ways with the book and use SQLite instead.
+[^2]: Which is a shame, because I like PeeWee's documentation and syntax. It'd be perfect for apps where there's not going to be (any/many) concurrent writes to the database.
 
-[^3]: With a `json` server, this separation of concerns between frontend and backend could be slightly easier to maintain.
+[^3]: I tried and failed to get MongoDB working. I found it an absolute arse to setup (especially for beginners) and more hassle than SQLite (or even Postgres, I imagine). The book's `chapters` from `_06/` or `_07/` onwards uses MongoDB; I decided to part ways with the book and use SQLite instead.
 
-[^4]: If you're a great programmer, or don't mind suffering through the pain of low-level learning, then do it yourself. My goals are quite distinct and I simply don't have the time to learn everything.
+[^4]: With a `json` server, this separation of concerns between frontend and backend could be slightly easier to maintain.
 
 [^5]: Joins are easier to maintain than lists. In the book, the latter chapters use MongoDB, which is unstructured data. Here, we're trying to keep data atomic and [normalised](https://youtube.com/watch?v=GFQaEYEc8_8) with SQLite, so it's easier to search for (and `JOIN user ON event.creator = user.id`) later.
 
