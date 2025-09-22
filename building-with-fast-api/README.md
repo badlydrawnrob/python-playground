@@ -9,7 +9,7 @@ As I've written before, I'm [not a huge fan](https://github.com/badlydrawnrob/py
 
 ## My learning goals
 
-> I'm always a fan of simplicity.
+> I'm a fan of simplicity: learning to program is a _never-ending_ task and can be overwhelming. Have a mentor to hold your hand; focus on your learning frame to reduce the burden.
 
 1. Simple is better
 2. Smaller is better
@@ -19,19 +19,17 @@ As I've written before, I'm [not a huge fan](https://github.com/badlydrawnrob/py
 
 **If I can handle 3k users on a simple server, I'm happy.** I'm not out to build an all-singing, all-dancing app, and the goal is to validate a business model, then build out a technical team if it's successful! Things like queuing, sharding, email validation, and so on, are not my concern right now.
 
-- **My learning frame** is a personal "do" and "don't do" list
-- **Things I'm happy to take on (and learn);** stuff I don't add to my to-do list
+- **My learning frame** is a personal learning "do" and "don't do" list
 - **The [5 finger rule](#the-5-finger-rule)** to choose books, tuts, and packages
-- **Some things as a [black box](#a-black-box)** that are set and forget (or outsource)
-
-Learning to program is a _never-ending_ task. It can be quite overwhelming, so having a mentor to hold your hand and keep you right is super helpful. I don't enjoy low-level detail![^1]
+- **Some things can be a [black box](#a-black-box)** that are set and forget (or outsource)
+- **I don't enjoy low-level detail** so will avoid that kind of work[^1]
 
 
 ## FastAPI pros and cons
 
 > It seems quick, as advertised, but remember it's `async`!
 
-1. **It's `async`, for `async` tools** (this isn't always needed)
+1. **It's `async`, for `async` tools** (this isn't always needed).
     - PeeWee [does not play nicely](https://github.com/fastapi/fastapi/discussions/8049) with it![^2]
 2. **It works well with SQLite.**[^3]
     - SQLite is great as it's easy to migrate and setup. It's just a file!
@@ -39,10 +37,10 @@ Learning to program is a _never-ending_ task. It can be quite overwhelming, so h
 
 The downsides ...
 
-1. FastAPI documentation is not always clear enough.
-    - SQL knowledge is combined with SQLModel documentation, or longwinded ...
-    - Making it way harder to scan documentation for query syntax, etc.
-2. Python error messages are shit. See "[coding style](https://github.com/badlydrawnrob/python-playground?tab=readme-ov-file#coding-style)".
+1. **FastAPI documentation is not always clear enough.**
+    - SQLModel documentation is longwinded, and gets combined with SQL tutorials ...
+    - This makes it way harder to scan documentation for query syntax, etc.
+2. **Python error messages are shit** (see [coding style](https://github.com/badlydrawnrob/python-playground?tab=readme-ov-file#coding-style)).
     - Pydantic, PyLance, and PyRight help a bit with typing.
     - Long traceback error messages (often the last message points to the problem)
     - Cryptic errors and hard to pin down what's wrong
@@ -54,7 +52,7 @@ The downsides ...
 > Use the REPL to practice and discover functionality quickly!
 
 1. Hello World
-2. Routing (`1.60` — `1.6.6`)
+2. Routing (`1.6.0` — `1.6.6`)
 3. Response models and error handling (`1.7.0` — `1.7.4`)
 4. Templating with Jinja (`1.8.0` — `1.8.2`)
     — See `1.8.1` for our `json` version
@@ -70,7 +68,7 @@ The downsides ...
 8. Testing (`1.12.0` - ...)
     - Original version with SQLModel for database (`1.12.4`)
     - A partially finished PeeWee version (instead of SQLModel) (`1.12.10`)
-    - Reverting to a different ORM (`...`, see ORMs below)
+    - **A REPLACEMENT ORM MUST BE USED as PEWEE DOES NOT DO `async`!! (see below ORMs)**
 
 
 ## Errata
@@ -96,7 +94,7 @@ Here are a few I caught (there's more)
 
 ### Using `uv`
 
-> [Some notes](https://github.com/astral-sh/uv/issues/10543#issuecomment-2587276856) on getting setup with `uv` and `venv`. I think running `uv run` activates the virtual environment first (without `activate`).
+> [Some notes](https://github.com/astral-sh/uv/issues/10543#issuecomment-2587276856) on getting setup with `uv` and `venv`. `uv run` (without `source .venv/bin/activate`) will activate the virtual environment then run the command.
 
 ```terminal
 -- Create a new project
