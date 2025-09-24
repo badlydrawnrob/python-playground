@@ -108,11 +108,14 @@ uv run main.py
 
 -- Test types and errors
 uv run pyright main.py
+
+-- Add to your .zshrc or .bash_profile
+alias activate='source .venv/bin/activate'
 ```
 
-#### Deployment
+### Deploying with `uv`
 
-You can `pip install uv` on a live server (like Ubuntu), or `curl` install. You can either `uv run` or `source .venv/bin/activate` to start using the Python virtualenv (for a Github Action that probably doesn't matter, but locally it's definitely better). Deploy with [Github Actions](https://docs.astral.sh/uv/guides/integration/github/)
+You can `pip install uv` on a live server (like Ubuntu), or `curl` install. You can either `uv run` or `source .venv/bin/activate` to start using the Python virtualenv (for a Github Action that probably doesn't matter, but locally it's definitely better). Deploy with [Github Actions](https://docs.astral.sh/uv/guides/integration/github/)!
 
 ```yaml
 steps:
@@ -172,9 +175,6 @@ pprint(vars(your_object))
 
 
 ## Keeping things simple
-### The 5 finger rule
-
-> The 5 finger rule is a bit like reading for kids. How much of it do I understand?
 
 1. **Keep things as simple as possible.**
     - Your models, documentation, tooling, dependencies, etc.
@@ -185,14 +185,27 @@ pprint(vars(your_object))
     - Have a professional look over your code ...
     - Or, have them do it for you, and treat things as a [black box](#a-black-box).
     - Stick to a narrow problem set that suits your capabilities.
-3. **Pick tools where you understand 50-70% of the language.**
-    - The 5 finger rule means avoiding texts that are too difficult for you.
-4. **You don't have to understand everything ...**
-    - It just needs to work. Write working code first, worry about it later.
-5. **Try to stick to your [preferred coding style](https://github.com/badlydrawnrob/python-playground?tab=readme-ov-file#coding-style).**
-    - My background is Elm (Haskell-like) and I don't want to learn Pythonic code.
-    - So `Class.methods`, `@decorators`, so on, use only when necessary.
-    - Learn a subset of Python unless you write a lot of it. Be functional.
+3. **Write working code first, worry about the finer details later.**
+    - Minimal use of `Class.methods`, `@decorators` and so on (only when necessary).
+    - I don't like Python as a language much, so only learn what I must!
+
+### The 5 finger rule
+
+> A bit like reading for kids: how much of it do I understand?
+
+1. **I can understand 50-70% of the language used** (tool or package documentation)
+    - The 5 finger rule avoids texts that are too difficult for you!
+2. **It feels like my regular language that I know quite well** (familiarity)
+    - You don't have to understand everything, but you have to write working code.
+    - Try to stick to your [preferred coding style](https://github.com/badlydrawnrob/python-playground?tab=readme-ov-file#coding-style) as it reduces cognitive load (Elm-like)
+3. **The code examples don't confuse or scare me** (not overly academic or complex)
+    - Documentation is well written, in plain english, for humans not automatons!
+4. **Plenty of helpful guides from Google, StackOverflow, etc** (well known)
+    - A niche language is going to be tricky if it's light on tutorials
+5. **A friendly, helpful, patient, community**
+    - Elm is great! Python seems generally OK.
+6. **Boring. Stable. Not going to blow up**
+    - Or at least exciting and stable enough to risk breaking changes.
 
 
 ## A black box
@@ -204,62 +217,61 @@ Some things I want to treat as an input and output: I don't want to worry about 
 
 1. I don't want to learn some things (my learning frame)
 2. I'd rather hand over a low-level task to a collegue (email validation)
-3. `auth` and `database` are super important to get right (I don't trust myself)
+3. `auth` and `database` are super important to get right (I don't trust myself!)
 
 
-## The user experience (UI)
+## User experience, architecture, and privacy
 
-> Remember the last time you deleted something by accident, or refreshed the page and lost all your form data?
+> `/delete` is something that should _never_ happen unless you're an admin! I've removed this option in later chapters; user auth and permissions is an advanced feature and should be handled with care (and experience).
 
-We're not worrying about it too much in this book, but it's worthwhile mentioning that a `DELETE` should notify the user: "Are you _sure_ you want to do that?", which is a _frontend_ problem. I've removed the `/delete` route in later chapters, as it's something that should _never_ happen unless you're an admin!
+Be mindful of the customer journey, what does and doesn't make sense for a particular user. Remember the last time you deleted something by accident, or refreshed the page and lost all your form data? Those kind of things.
 
-All API architecture should consider the end-user and their needs/experience. Consider also which data points should be _public_ and which _private_. It might be fine to expose an `Event.id` but a `User.id` is better private. A data scraper can easily increment the `Event.id` however, so maybe a `shortuuid` is better.
+- `DELETE` should notify the user: "Are you _sure_ you want to do that?"
+- There's _frontend_ problems: a nice experience and notifying users of changes.
+- There's _backend_ problems: making sure one user doesn't tank other user's data!
+
+When designing your API architecture, consider the end-user: their needs and experience. Is it better to have a dedicated endpoint to edit an event, or do it from the `/events` route? Do you want the `book_id` url [mushed together](https://www.goodreads.com/book/show/33396914-assassin-s-quest) with the name? How do you match a [user's list of books](https://www.goodreads.com/review/list/79624791-michael-wilkinson?shelf=to-read) in the database and the route? Go and see how other apps are doing it.
+
+Also consider security. Which data points should be _public_ (an `Event.id`)? Which _private_ (a `User.id`)? If `User.id` was public, a data scraper can easily increment the url path: a `shortuuid` might be better (you can always have this column next to the _real_ `user_id`. Do you publically expose a user profile and their lists, or make that private?!
 
 
 ## Choosing an ORM
 
-> SQLModel is fine for single table `select()`s but a bit confusing for joins.
+> SQLModel is fine for single table `select()`s but I found it confusing for joins, and the documentation could be a lot better. I didn't find it very intuitive.
 
-You might want to stick with SQLModel but there's a few reasons you might not:
+Feel free to use [SQLmodel](https://sqlmodel.tiangolo.com/), but there are reasons not to:
 
-1. **It could be better to separate concerns:**
-    - **To split the API layer from the DATA layer (models)**
-2. I didn't find the SQLModel documentation easy to query joins:
-    - It's not very intuitive.
-3. **It's an abstraction of an abstraction:**
-    - **It's built on top of [SQLAlchemy](https://docs.sqlalchemy.org/en/20/core/), which I find too big and complicated.**
-4. There's better ORMs with more functionality and great documentation:
-    - But beware that FastAPI is `async` and requires async tooling
+1. ~~SQLModel tightly couples it's models~~ (shares models with API)
+    - **Better to decouple your models: API layer and DATA layer** (model for each)
+3. ~~An abstraction of an abstraction~~ ([SQLAlchemy](https://docs.sqlalchemy.org/en/20/core/) is narly, huge, complicated)
+    - A lighter ORM that's been built from the ground up could be preferable
+4. ~~Merges SQL tutorials with SQLModel documentation~~ (verbose and difficult to pinpoint)
+    - A smaller ORM with the [5 finger rule](#the-5-finger-rule) is better (must be `async`)
 
-Below are ORMs that'll work well with FastAPI. Alternatively, you might like to check out [Bottle](https://bottlepy.org) or [Sanic](https://sanic.dev) (WGSI). They both work with PeeWee and have data validation (not sure about `auth/`).
+Below are ORMs that'll work well with FastAPI. Alternatively, you might like to check out [Bottle](https://bottlepy.org) or [Sanic](https://sanic.dev) (WGSI). They both work with PeeWee and have data validation (you'll have to check if they support `auth/` in a similar way).
 
 ### It's good to have a picking criteria
 
 > How do I make a decision on which ORM to use?
 > Backend is difficult, and there's a lot that can go wrong!
 
-A bit similar to the [5 finger rule](#keeping-things-simple)!
+Use the [5 finger rule](#the-5-finger-rule) first, but be aware of things that are useful: for example, does it allow setting PRAGMAS for [SQLite strict mode](https://sqlite.org/stricttables.html) and other concerns?
 
-1. I can understand 50-70% of it (won't take long to learn)
-2. Feels like using regular SQL (a `join` looks like a join!)
-3. The code examples don't confuse or scare me (not overly complex)
-4. The documentation is non-academic and done well (written for humans!)
-5. Has availability for [SQLite strict mode](https://sqlite.org/stricttables.html) and [or any other concern you'd like]
-6. Google(able) and easy to search for [your particular requirement]
-7. Stable, or at least exciting enough to risk breaking changes.
 
 ### A few options
 
 > I'd pick [PeeWee](https://docs.peewee-orm.com/en/latest/peewee/quickstart.html) or [Pony](https://docs.ponyorm.org/) for a non-async framework. The main [problem with `async`](https://fastapi.tiangolo.com/async/#asynchronous-code) is having to [scatter your app](https://charlesleifer.com/blog/asyncio/) with `await` calls.
 
-1. **Picallo** is great, but [not 100% async](https://piccolo-orm.readthedocs.io/en/1.1.1/piccolo/tutorials/using_sqlite_and_asyncio_effectively.html)
-2. **[Ormar](https://collerek.github.io/ormar/latest/)** with SQLite async, less mature than Picallo (at time of writing).
-    - Another abstraction on top of SQLAlchemy
-    - Based on [encode orm](https://github.com/encode/orm) (but more tightly integrated with FastAPI and Pydantic types).
-3. **Tortoise ORM** (feels a bit clunky to me, see [this example](https://tortoise.github.io/examples/fastapi.html))
-4. **[SQLmodel](https://sqlmodel.tiangolo.com/)** is the obvious option for FastAPI, but I'm not a huge fan.
-5. [IceAxe](https://github.com/piercefreeman/iceaxe) is also very interesting to me, but it's only Postgres.
-    - I like it's simplicity and similarity to raw SQL.
+1. **Picallo** is great but [isn't 100% async](https://piccolo-orm.readthedocs.io/en/1.1.1/piccolo/tutorials/using_sqlite_and_asyncio_effectively.html).
+    - You'll also have to [validate your types](https://github.com/piccolo-orm/piccolo/issues/1187) 
+2. **[Ormar](https://collerek.github.io/ormar/latest/)** with SQLite async, but less mature than Picallo (2025).
+    - Unfortunately it's another abstraction of an abstraction (built on SQLAlchemy)
+    - More tightly integrated with FastAPI and Pydantic than [encode orm](https://github.com/encode/orm)
+3. **Tortoise ORM** (feels clunky to me, see [this example](https://tortoise.github.io/examples/fastapi.html))
+5. **[IceAxe](https://github.com/piercefreeman/iceaxe)** looks a really nice option (but very young)
+    - I like it's simplicity and similarity to raw SQL, but it's Postgres only ...
+    - One to watch for when your app gets past a couple thousand users with SQLite
+    
 
 I'm sure there's more (or will be) but these seem a good fit. Also see Reddit's "[What is your go-to ORM?](https://www.reddit.com/r/FastAPI/comments/1fjta2e/what_is_your_goto_orm/)". The alternative to using asyncio is to choose [boring](https://mcfunley.com/choose-boring-technology) technology, and simplify your stack ([PeeWee](https://docs.peewee-orm.com/en/latest/peewee/quickstart.html) and any compatible [framework](https://docs.peewee-orm.com/en/latest/peewee/database.html#framework-integration)!)
 
