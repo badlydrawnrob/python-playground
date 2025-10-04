@@ -17,13 +17,35 @@ That's about it. I need something that interfaces with a simple database, keepin
 
 ## On writing ...
 
-> Some books have:
+> Some writing has:
 > 1. Minor or major errors in the code[^2]
 > 2. Outdated dependencies (how many does yours have?)
-> 3. Academic language (or verbose terminology)
-> 4. Not enough visuals (or poorly labelled ones)
+> 3. A high reading level (needlessly computer sciency)
+> 4. Academic language (or verbose terminology)
+> 5. Not enough visuals (or poorly labelled ones)
+> 6. Not enough examples (or poorly framed ones)
 
-Make sure you're explaining _just enough_ and no more. Aim for simple language and minimal terminology, and for beginners to intermediates, stick to easier to learn languages that instil good habits.
+In general I believe that beginners (and even intermediates) should stick to languages that are easy to setup, painless to learn, which instil good habits. I'm not sure Python is one of those languages!
+
+Python suffered from [bad documentation](http://xahlee.info/python/python_doc.html) in years past. It's definitely improved: more accessible resources and writing styles than the early 2000s, but I _still_ have trouble following some function and package docs. APIs that are academic, verbose, or difficult to read; computer sciency writing when all you want to do is quickly scan an example to get shit done. I could say the same for API and language design (why so complicated?).
+
+Learning Elm (and to some extent, Racket) has spoiled me. Installing and getting started is easy; learning materials increase in difficulty, gradually, as your experience grows (Racket's [teachpacks](https://download.racket-lang.org/docs/5.1/html/teachpack/index.html) are great); documentation and packages get standardised with helpful examples, rather than a wall of a API function parameters and types.
+
+It baffles me why some programming languages are "clever" but impenetrable. The test of any great teacher is to explain things to a few levels: beginners grab the gist of the idea, while more advanced stuff is available, but hidden from view to avoid confusion. I aim to write and explain _as simply as possible_ with _just enough_ information for them to get the job done but I often get it wrong ...
+
+- Writing about too many learning points in the same article
+- Tangental information that deviates from the learning point
+- Laundry lists of unfocused or poorly written comments
+- A lot of questions going unanswered (which might not be needed anyway)
+- Not letting the code do the talking, where comments are overkill
+
+My [anki programming tool](https://github.com/badlydrawnrob/anki) is a good case in point. It's a time consuming process, but I often rewrite my flashcards (sometimes 3-4 times) so at-a-glance they make perfect sense, and stick better. That's an evolving process. There's something to be said for having a tight _learning frame_ — at the micro level (per card), and the macro level (cognitive strain) — anyone who's tried to learn two languages, or a bunch of "in process" books that never get finished could attest to that.
+
+1. Have a learning frame of things I "will" and "wont" learn
+2. Try to stick to a core-competency unless you're a good polygot
+3. Understand the tradeoffs of learning something new (especially as you age!)
+
+Aim for simple language and minimal terminology. Stick the 5 finger rule when picking packages. Support well-written, single-purpose, useful articles and tools, because it's not an easy thing to do and we should be promoting that more!
 
 
 ## Coding style
