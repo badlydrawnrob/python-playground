@@ -226,20 +226,23 @@ Hint: Try using String.fromInt to convert it to a string?
 | Command                                    | Does this                            |
 | ------------------------------------------ | -------------------------------------|
 | `activate`                                 | `source .venv/bin/activate` alias in `.zshrc` file |
-| `pip freeze`                               | A list of currently installed packages |
-| `pip install -r /path/to/requirements.txt` | Install requirements[^4]             |
-| `uv init [folder-name]`                    | Start `uv` project                   |
-| `uv python install [version]`              | Install a Python version (or latest) |
-| `uv python list`                           | List all Python versions installed   |
-| `uv python pin`                            | Create a `.python-version` file      |
-| `uv venv --python python3.11 [my_env]`     | Create/Download virtual environment  |
-| `source my_env/bin/activate`               | Activate virtual environment         |
-| `deactivate`                               | Deactivate (exit) venv               |
-| `uv add [package]`                         | Download and install a package       |
-| `uv tree`                                  | List all dependencies (as a tree)    |
-| `uv run [command]`                         | Run the server, run a file, etc      |
-| `uv sync`                                  | Sets up a project's "stuff"[^5]      |
-| `uv run uvicorn src.main:app --reload`     | Run command for subfolder file[^6]   |
+| `pip freeze`                               | A list of currently installed packages   |
+| `pip install -r /path/to/requirements.txt` | Install requirements[^4]                 |
+| `uv init [folder-name]`                    | Start `uv` project                       |
+| `uv sync`                                  | Setup a project from `pyproject.toml[^5] |
+| `uv python install [version]`              | Install a Python version (or latest)     |
+| `uv python list`                           | List all Python versions installed       |
+| `uv python pin`                            | Create a `.python-version` file           |
+| `uv venv --python python3.11 [my_env]`     | Create/Download virtual environment      |
+| `source my_env/bin/activate`               | Activate virtual environment             |
+| `deactivate`                               | Deactivate (exit) venv                   |
+| `uv add [package]`                         | Download and install a package (`--dev`) |
+| `uv remove [package]`                      | Remove a package                         |
+| `uv tree`                                  | List all dependencies (as a tree)        |
+| `uv run [command]`                         | Run the server, run a file, etc           |
+| `uv sync`                                  | Sets up a project's "stuff"              |
+| `uv run uvicorn src.main:app --reload`     | Run command for subfolder file[^6]        |
+| `uv cache clean [package/prune]`           | Clear cache for all/single/unused package|
 
 
 [^1]: Personally, I'd prefer someone else to handle the heavy-lifting for some areas of the program. Ideally a stable and well-documented package, or have someone build it for me. Some areas of Python programs have a LOT of moving parts, and I'd prefer to stick to areas I'm good at (ui, ux, marketing, etc).

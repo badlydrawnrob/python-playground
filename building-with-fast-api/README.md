@@ -334,11 +334,13 @@ For your tooling, you might like to use Bruno. I prefer Bruno's way of writing d
 ```terminal
 -- Activate the virtual environment
 > activate
+
 -- Install the python package and CLI
 > uv add sqlite-utils
+
 -- Output a list of `json` dictionaries (one for each entry)
-sqlite-utils memory event.csv "select * from event"
 -- Add `| python -m json.tool` to pretty print the `json`
+sqlite-utils memory event.csv "select * from event"
 ```
 
 And you could could generate a database from the `json` or [`.csv`](https://alexwlchan.net/til/2024/use-sqlite-utils-to-convert-csv-to-sqlite/)! Or input the values with your own schema design.
