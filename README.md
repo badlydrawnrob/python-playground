@@ -72,17 +72,24 @@ It's also not at all type safe by default (and type annotations are awkward). Ev
 > [Declaration order](https://stackoverflow.com/a/758197) matters in Python! You might also want to [strongly type](https://talks.jackleow.com/strongly-typed) your code. It's also important to understand "[why functional programming](https://dev.to/cherryramatis/ending-the-war-or-continuing-it-lets-bring-functional-programming-to-oop-codebases-3mhd) over object-oriented?"?
 
 ```python
+
 from typing import List
 
 # Requires `return` to print anything!
 def ugly_types(num: List[int]) -> dict:
-    { "numbers": num } 
+    { "numbers": num }
 ```
 ```terminal
 > ugly_types([1, 2, 3])
 # returns nothing
 
 ```
+```python
+# This package can be helpful to inspect classes:
+import pprint
+> pprint(vars(className))
+```
+
 
 ### Elm 
 

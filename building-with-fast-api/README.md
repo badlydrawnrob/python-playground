@@ -67,8 +67,8 @@ The downsides ...
     - CORS policy (middleware)
 8. Testing (`1.12.0` - ...)
     - Original version with SQLModel for database (`1.12.4`)
-    - A partially finished PeeWee version (instead of SQLModel) (`1.12.10`)
-    - **A REPLACEMENT ORM MUST BE USED as PEWEE DOES NOT DO `async`!! (see below ORMs)**
+    - A partially finished PeeWee version (instead of SQLModel) (`1.12.11`)
+    - ... **[Reimplementing with Piccolo]** ...
 
 
 ## Errata
