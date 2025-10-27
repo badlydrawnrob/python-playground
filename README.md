@@ -76,6 +76,7 @@ It's also not at all type safe by default (and type annotations are awkward). Ev
 from typing import List
 
 # Requires `return` to print anything!
+# Weirdly, trailing commas are allowed `[1, 2, 3,]`
 def ugly_types(num: List[int]) -> dict:
     { "numbers": num }
 ```
@@ -85,9 +86,10 @@ def ugly_types(num: List[int]) -> dict:
 
 ```
 ```python
-# This package can be helpful to inspect classes:
+# This package can be helpful to inspect classes.
+# Calling the classname itself gives lots of junk data.
 import pprint
-> pprint(vars(className))
+> pprint(vars(class_name_instance))
 ```
 
 
