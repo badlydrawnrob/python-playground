@@ -323,6 +323,7 @@ For your tooling, you might like to use Bruno. I prefer Bruno's way of writing d
 - **[OAuth2](https://docs.usebruno.com/auth/oauth2/overview)** can be setup in your collection settings.
 - FastApi `/docs` can be saved as `.json` file and added as a new collection to speed things up.
 - Take care with your routes: `:id` (params) must be added to your Bruno path!
+- [VS Code plugin](https://marketplace.visualstudio.com/items?itemName=bruno-api-client.bruno) also available (call endpoints directly in the app)
 
 ### SQLite Utils
 
