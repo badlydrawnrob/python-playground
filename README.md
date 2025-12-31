@@ -237,6 +237,7 @@ Hint: Try using String.fromInt to convert it to a string?
 | `activate`                                 | `source .venv/bin/activate` alias in `.zshrc` file |
 | `pip freeze`                               | A list of currently installed packages   |
 | `pip install -r /path/to/requirements.txt` | Install requirements[^4]                 |
+| `python3 -m asyncio`                       | Launch repl in async mode                |
 | `uv init [folder-name]`                    | Start `uv` project                       |
 | `uv sync`                                  | Setup a project from `pyproject.toml[^5] |
 | `uv python install [version]`              | Install a Python version (or latest)     |

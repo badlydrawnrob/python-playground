@@ -69,6 +69,7 @@ The downsides ...
     - Original version with SQLModel for database (`1.12.4`)
     - A partially finished PeeWee version (instead of SQLModel) (`1.12.11`)
     - ... **[Reimplementing with Piccolo]** ...
+        - We're now hashing passwords with `BaseUser`!
 
 
 ## Errata

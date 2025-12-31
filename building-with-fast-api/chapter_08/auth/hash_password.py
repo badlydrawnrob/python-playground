@@ -3,6 +3,9 @@ from passlib.context import CryptContext
 # ------------------------------------------------------------------------------
 # Password hashing
 # ==============================================================================
+# > #! Passlib is no longer maintained. Use `bycrypt` directly:
+# > #! @ https://github.com/fastapi/fastapi/discussions/11773
+#
 # This file will contain the functions that will be used to encrypt the password
 # of a user during sign-up and compare passwords during sign-in.
 #
