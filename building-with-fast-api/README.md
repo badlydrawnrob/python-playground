@@ -66,10 +66,10 @@ The downsides ...
     - Securing routes (with authentication)
     - CORS policy (middleware)
 8. Testing (`1.12.0` - ...)
-    - Original version with SQLModel for database (`1.12.4`)
-    - A partially finished PeeWee version (instead of SQLModel) (`1.12.11`)
-    - ... **[Reimplementing with Piccolo]** ...
-        - We're now hashing passwords with `BaseUser`!
+    - ~~Original version: SQLModel, authentication, jwt~~ (`1.12.4`)
+    - ~~Peewee version: ORM, authentication, jwt~~ (`1.12.11`)
+    - Piccolo version: ORM, jwt, `BaseUser.login()` hashing (`1.12.12`)
+        - **TO DO: implement with Piccolo**
 
 
 ## Errata
