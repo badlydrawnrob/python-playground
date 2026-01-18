@@ -12,6 +12,22 @@ import uvicorn
 # ------------------------------------------------------------------------------
 # A PLANNER app (SQLModel)
 # ==============================================================================
+#
+#
+# Coding style
+# ------------
+# > Prefer functional programming over OOP where possible.
+# > Previous PeeWee examples used objects quite heavily.
+#
+# 1. Never use objects where a function will do!
+# 2. Use data models (Pydantic) for type safety and validation.
+# 3. Use as little code as possible to achieve the goal.
+
+
+
+
+
+
 # See earlier chapters for full instructions on FastApi etc. I like to treat some
 # parts of the app as a "black box" (I don't need to know how it works, only that
 # it works!), but it's best to get a senior (or book) to help you with this.
@@ -145,6 +161,8 @@ import uvicorn
 #    that the "owner" of a data point is the only one who can edit/delete it.
 #    - What can a non-owner do? What data points are private? (read, write, delete)
 # 2. We can have a public ID (`UUID`) and a private (`Int ID`) one.
+#    - Decide on which `UUID` type to use (regular -vs- shorter)
+#    - @ https://github.com/piccolo-orm/piccolo/issues/1271
 #    - FastApi automatically adds and increments an `id` on each table insert.
 #    - We need a public facing ID for our `User` model (for our url)
 #    - Our private ID is used for any database operations (`join`, `DELETE`, etc)
@@ -224,6 +242,8 @@ import uvicorn
 # 23. Change `.env` settings to something simpler!
 #    - By default `.env` files don't handle dictionaries.
 #    - You store it as a `json` string, then convert to a dictionary
+# 24. I find migrations pretty difficult to understand
+#    - Can I get by with `sqlite-utils` alone?
 
 app = FastAPI()
 

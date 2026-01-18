@@ -3,24 +3,34 @@ name = "building-with-fast-api"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.13"
 dependencies = [
     "fastapi[standard]>=0.115.6",
+    "piccolo[orjson,sqlite]>=1.28.0",
+    "python-decouple>=3.8.0",
+    "python-jose>=3.4.0",
+    "uvicorn>=0.34.0",
+]
+
+[dependency-groups]
+chapter-08-database = [
+    "sqlite-utils>=3.38",
+]
+chapter-08-testing  = [
+    "pyright>=1.1.406"
+]
+chapter-older = [
     "jinja2>=3.1.5",
     "logging>=0.4.9.6",
     "nanoid>=2.0.0",
     "passlib[bcrypt]>=1.7.4",
     "peewee>=3.17.9",
     "pydantic-settings>=2.8.1",
-    "pyright>=1.1.393",
     "pytest>=8.3.4",
-    "python-jose>=3.4.0",
     "shortuuid>=1.0.13",
-    "sqlite-utils>=3.38",
     "sqlmodel>=0.0.22",
     "svix-ksuid>=0.6.2",
     "uuid>=1.30",
-    "uvicorn>=0.34.0",
 ]
 
 [tool.uv]

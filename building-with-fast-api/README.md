@@ -2,6 +2,10 @@
 
 > This repo is my working copy of the book [Building Python APIs with FastAPI](https://www.packtpub.com/en-us/product/building-python-web-apis-with-fastapi-9781801074513)
 
+**There's so much to think about when writing an API and considering your app architecture** and it can feel very overwhelming, even with the small examples in this book. There's a tendency to have a lot of questions and a big old wishlist of things you'd like to add, but try and keep it simple wherever possible. Make working code first. Understand it thoroughly later (or never). There's lots of things that can go wrong, and tackling them (and learning) just-in-time is perhaps a saner approach.
+
+**It also takes a considerable amount of time to switch ORMs** so try to learn one thoroughly and stick to it! Is the alternative 10x faster/better? No? Stick to what you know then!
+
 **The book goes into detail on building a http server API with the [FastAPI](https://fastapi.tiangolo.com/).** In general it's a good book, but there's a lot of errors, or areas where you've got to interpret and fix things for yourself. FastAPI has also made a lot of changes since the book was published (dependency hell). It actually took me quite a bit of time (months) to get through, as I had to re-familiarise myself with Python, and FastAPI isn't always obvious.
 
 As I've written before, I'm [not a huge fan](https://github.com/badlydrawnrob/python-playground?tab=readme-ov-file#coding-style) of Python, but it's a handy scripting language and you get used to it. Errors and typing are _especially_ annoying — a simple typo, missing word, or rogue piece of code can torpedo your program and be _extremely_ difficult to track down with FastAPI and Python.
@@ -9,15 +13,17 @@ As I've written before, I'm [not a huge fan](https://github.com/badlydrawnrob/py
 
 ## My learning goals
 
-> I'm a fan of simplicity: learning to program is a _never-ending_ task and can be overwhelming. Have a mentor to hold your hand; focus on your learning frame to reduce the burden.
+> Learning to program is a _never-ending_ task and there's a ton of ways your app can go wrong.
+> I'm a fan of simplicity: focus your learning frame, cut down code, and reduce your burden.
 
 1. Simple is better
 2. Smaller is better
 3. Less is better (be brutalist!)
 4. Human readable is better (documentation)
 5. Boring is better! (aim for stability)
+6. Brutal is better! (see the Brutalist movement)
 
-**If I can handle 3k users on a simple server, I'm happy.** I'm not out to build an all-singing, all-dancing app, and the goal is to validate a business model, then build out a technical team if it's successful! Things like queuing, sharding, email validation, and so on, are not my concern right now.
+**If I can handle 3k users on a simple server, I'm happy.** I'm not out to build an all-singing, all-dancing app, and the goal is to validate a business model, then build out a technical team if it's successful! Things like queuing, sharding, email validation, and so on, are not my concern right now. It's always good to have a mentor, or to outsource for more complex and mission-critical tasks.
 
 - **My learning frame** is a personal learning "do" and "don't do" list
 - **The [5 finger rule](#the-5-finger-rule)** to choose books, tuts, and packages
@@ -70,6 +76,9 @@ The downsides ...
     - ~~Peewee version: ORM, authentication, jwt~~ (`1.12.11`)
     - Piccolo version: ORM, jwt, `BaseUser.login()` hashing (`1.12.12`)
         - **TO DO: implement with Piccolo**
+        - We've also deviated from the folder structure to suit Piccolo better.
+        - We used `piccolo schema generate` to migrate our tables and no longer
+          need the `UserData` table (Piccolo handles this with `BaseUser`).
 
 
 ## Errata
@@ -89,6 +98,13 @@ Here are a few I caught (there's more)
     - ~~`@app.on_event("startup")`~~ is now app lifecycle ...
     - Which requires an understanding of `contextlib` and is tricky to learn!
 6. `grant_type=` missing the `password` keyword in the authentication `curl` call.
+
+
+## Dependencies
+
+> Always keep your dependencies to a minimum ...
+
+The `pyproject.toml` dependencies file is a mess. It holds all dependencies for chapters of the book, as well as some chapters which have different versions (such as MongoDB or Peewee ORM). Your app dependencies should be kept to an absolute minimum and regularly pruned and maintained.
 
 
 ## Commands
@@ -189,6 +205,9 @@ pprint(vars(your_object))
 3. **Write working code first, worry about the finer details later.**
     - Minimal use of `Class.methods`, `@decorators` and so on (only when necessary).
     - I don't like Python as a language much, so only learn what I must!
+4. **Let the code do the talking, where possible**
+    - I've got copious amounts of comments and wishlists in some chapters.
+    - Aim to cut these down to the bare necessities (lean on documentation).
 
 ### The 5 finger rule
 
@@ -264,6 +283,7 @@ Use the [5 finger rule](#the-5-finger-rule) first, but be aware of things that a
 > I'd pick [PeeWee](https://docs.peewee-orm.com/en/latest/peewee/quickstart.html) or [Pony](https://docs.ponyorm.org/) for a non-async framework. The main [problem with `async`](https://fastapi.tiangolo.com/async/#asynchronous-code) is having to [scatter your app](https://charlesleifer.com/blog/asyncio/) with `await` calls.
 
 1. **Picallo** is great but [isn't 100% async](https://piccolo-orm.readthedocs.io/en/1.1.1/piccolo/tutorials/using_sqlite_and_asyncio_effectively.html).
+    - 🚀 **See [the playground](https://piccolo-orm.readthedocs.io/en/latest/piccolo/getting_started/playground.html) before you get started.**
     - You'll also have to [validate your types](https://github.com/piccolo-orm/piccolo/issues/1187) 
 2. **[Ormar](https://collerek.github.io/ormar/latest/)** with SQLite async, but less mature than Picallo (2025).
     - Unfortunately it's another abstraction of an abstraction (built on SQLAlchemy)
@@ -286,6 +306,10 @@ For read-only code you might want to use raw SQL queries, but you'll still need 
 OpenLibrary, for instance, has `List[int]` of images which map to a `/covers` route, with `-S`mall, `-M`edium, and `-L`arge images. Our API is NOT publically consumed, so we likely want to deal with SQL `join`s and serve the full image paths within the `Event` object.
 
 Remember, any data point on your API must be called from the database and maintained. That means anytime a `User` adds/removes an `Event`, you'd have to add/remove from that `List`. Don't do it if it's not needed![^5]
+
+### Migrations
+
+**I'm not worrying about migrations** in this repository, but make updates manually.
 
 ### Choose a (better?) different language?
 
@@ -357,12 +381,17 @@ And you could could generate a database from the `json` or [`.csv`](https://alex
 ## SQLite
 
 > How to manage database migrations?
+> How to avoid locked database "connection already open"?
 
 SQLite should be set to `STRICT TABLES`, `PRAGMA journal_mode=WAL`, `PRAGMA foreign_keys = ON`. You can also use `user_version` for migrations.
+
+**⚠️ The only problem with Piccolo is there's no PRAGMA settings available** so we have to be extra careful with our Pydantic models and verify data before inserting or updating. Piccolo should respect `NULL` values and foreign keys and you might want to set the timeout for SQLite. In general Piccolo and a lot of ORMs tend to prefer (or have more options for) Postgres.
 
 You could use a tool like [Alembic](https://alembic.sqlalchemy.org) to migrate changes in the database `.schema`, but it's probably a good idea to know how to do this manually. SQLite Utils also has `sqlite-migrate` for simple migrations. I'm sure there's plenty of databse tools too (such as [Enso](https://ensoanalytics.com/) or [Ai](https://medium.com/@timothyjosephcw/enhancing-data-migration-testing-with-ai-in-2024-454537440ab3)). Either way, it seems to be sensible to backup data, create a new (column, table) first; copy data over (from the old column); then drop the old column.
 
 As always, practice with mock data first and be sure to back up! (demo/staging). It's likely better to think in terms of _small, incremental_ changes, rather than big bulk changes.
+
+Database locking is [something to consider](https://piccolo-orm.readthedocs.io/en/1.3.2/piccolo/tutorials/using_sqlite_and_asyncio_effectively.html) with Piccolo but so long as you don't combine read and writes within the same endpoint connection, it shouldn't be something to worry about.
 
 
 ## Hosting
