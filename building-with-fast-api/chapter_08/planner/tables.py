@@ -61,6 +61,7 @@
 # Concurrent connections with SQLite are only an issue if you combine read and
 # write operations at the same time. See here for more info:
 #
+#    @ https://github.com/piccolo-orm/piccolo/issues/1319
 #    @ https://piccolo-orm.readthedocs.io/en/1.3.2/piccolo/tutorials/using_sqlite_and_asyncio_effectively.html
 #
 #
