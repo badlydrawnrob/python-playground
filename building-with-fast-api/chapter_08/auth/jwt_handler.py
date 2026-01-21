@@ -8,24 +8,6 @@
 # using the `HS256` algorithm which is perfect for when you own the full stack.
 # If you don't have control of the client, consider the `RS256` algorithm instead.
 #
-# Security
-# --------
-# > #! Keep your `SECRET` very safe and refresh it on a regular basis!
-# > @ https://en.wikipedia.org/wiki/Key_size (128-256 bits)
-# 
-# Double check all security settings with an expert! To generate a random 256
-# bit (32 char) key in terminal, you can use `openssl`:
-#
-# ```
-# openssl rand -hex 32
-# ```
-#
-# 1. Make sure your `SECRET` key is the correct length (256 bits / 32 chars)
-# 2. If someone gets your `SECRET` they can torpedo your app. KISKIS.
-# 3. Refresh your `SECRET` often, every couple of weeks or so.
-# 4. Your JWT should expire in a couple of hours (not days)
-# 5. You could refresh the JWT, but have to be extremely careful (YAGNI)
-#
 # 
 # JWT
 # ---
@@ -38,6 +20,35 @@
 #
 # A JWT can be encoded/decoded with `base64`. Our signature will NOT decode, as
 # that requires the `SECRET` which will be handled on the backend.
+#
+#
+# Security
+# --------
+# > #! Keep your `SECRET` very safe and refresh it on a regular basis!
+# > @ https://en.wikipedia.org/wiki/Key_size (128-256 bits)
+# 
+# Double check all security settings with an expert! To generate a random 256
+# bit (32 char) key in terminal, you can use `openssl`:
+#
+# ```
+# openssl rand -hex 32
+# ```
+#
+# 1. Your JWT should expire in a couple of hours (not days)
+# 2. Your JWT should include minimal non-identifying info (username/userid)
+# 3. Make sure your `SECRET` key is the correct length (256 bits / 32 chars)
+# 4. If someone gets your `SECRET` they can torpedo your app. KISKIS.
+# 5. Refresh your `SECRET` often, every couple of weeks or so.
+# 6. You could refresh the JWT, but have to be extremely careful (YAGNI)
+#
+#
+# User details
+# ------------
+# > A site like Auth0 has a separate endpoint for user information.
+#
+# Once you've verified the JWT, you can use the `"user"` value to lookup user,
+# and get their details from the database. This might be their preferences, the
+# user type (admin/regular), etc.
 #
 #
 # Time
