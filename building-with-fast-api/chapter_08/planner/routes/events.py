@@ -12,94 +12,87 @@ from typing import List
 # ------------------------------------------------------------------------------
 # Our EVENTS routes
 # ==============================================================================
-# Here we setup our app routes. We're using our Pydantic or SQLModel models.
-# If there's sensitive information in the model, we can use `response_model=` to
-# return a different model type (sans sensitive information). SQLModel is bleeding
-# edge and a bit of a risk. Use boring technology where possible.
+# Our app routes use Pydantic for API data validation and Piccolo ORM for our
+# data models. SQLite is not strict by default, so we've got to be extra careful.
+# If there's sensitive information we don't wish to expose, we can use the
+# `response_model=` with the correct Pydantic model.
 #
-# Warning
-# -------
-# > PeeWee isn't compatible with `async` by default ...
-# > See `database.connection` for how to fix this ...
+#
+# Async only
+# ----------
+# > Beware of routes that contain both read and write functions!
+#
+# For atomic data (for now) it's much easier for any update/insert/delete function
+# NOT to also contain reads within the same endpoint. Otherwise you get the same
+# "database locked" problem we had with PeeWee, which has to be handled by changing
+# the transaction type.
+#
+#     @ https://piccolo-orm.readthedocs.io/en/latest/piccolo/tutorials/using_sqlite_and_asyncio_effectively.html
+#     @ https://github.com/piccolo-orm/piccolo/issues/1319
+#
+#
+# Data validation
+# ---------------
+# > We're not running SQLite in strict mode!
+# > Postgres doesn't have this problem (it's always strict).
+# > Pyright complains if you return vague `dict` types!
 # 
-# For now, we'll remove the `async` from FastApi, which kind of defeats the
-# purpose, but it'll do for a thousand users, and we can change our ORM later
-# to an async one, or fix the connection with PeeWee.
+# Which means SQLite will accept whatever you give it by default ... ANY data.
+# Any data at all. We could set `STRICT TABLES` but that'd limit our Piccolo
+# column types, so instead be sure to validate with Pydantic _before_ inserting
+# data into a row.
+#
+#
+# User experience
+# ---------------
+# 1. `DELETE` data should always prompt the user to confirm
+# 2. Your privacy policy should be honoured: don't leak sensitive information!
+# 3. Non-public-facing urls should be heavily secure or localhost-only
+#
+#
+# FastApi functions
+# -----------------
+# 1. `Depends(authenticate)` runs before the route function
+#     - It fails if user is not logged in
+# 2. Use a Pydantic `-> Response` type -or- `response_model=`
+#     - You generally do not want (or need) to use both!
 #
 #
 # Questions
 # ---------
-# > ⭐ How many concurrent connections can SQLite handle?
-#
-# 1. What's preferrable, `get()` or `get_or_none()`?
-#    - The latter is more similar to SQLModel and can be checked for `None`
-#    - The former (I think) requires a `try/except` block, which I don't prefer
-#      @ https://softwareengineering.stackexchange.com/a/107727
-# 2. Understand the difference between a response type and a `response_model=`
-#    - And why `response_model=` is used in some cases and not others.
-#    - `response_model=` is always prioritised if used.
-# 3. ⭐ Visually describe what `Depends()` does.
-# 4. ⭐ Understand what a path, query, request parameters are.
-# 5. Understand named keyword arguments (`session=Depends(get_session)`)
-# 6. Why `data.model_dump(exclude_unset=True)`?
-#    - This removes any `None` values that haven't been set.
-#    - `data.dict()` is deprecated
-# 7. Why `PATCH` instead of `PUT`? (see tag `1.10.4`)
-#    - @ https://sqlmodel.tianglo.com/tutorial/fastapi/update
-# 8. Don't need to understand them, but know that `Body()` and `Request()` exist.
-# 9. SQLite doesn't really allow `await`, but understant it exists. (AsyncIO)
-# 10. Understand that a `PATCH` call could have any number of `Optional` fields
-#    that have not been set.
-#    - How does this affect our DATA models. Do we want to use `PUT` instead?
-#    - With `PATCH` there's no way of knowing which data is present, so we'd need
-#      PeeWee to be flexible with it's update function (I think we can just change
-#      the fields in the object `User.name = "Name"`)
-# 11. Using `PUT` instead of `PATCH` (following on from Q6 and Q11)
-#    - Using `.add()` would be better with a `PUT` where all data is present.
-#    - @ https://fastapi.tiangolo.com/tutorial/body-updates/#update-replacing-with-put
-#    - @ https://sqlmodel.tiangolo.com/tutorial/update/#add-the-hero-to-the-session
+# 1. How best to check for `None` or `[]`?
+#     - `RETURNING` -vs- `SELECT` guards (opt for the former generally)
+# 2. Positive or negative guards?
+# 3. Do I understand what `Depends()` is doing? (visualise)
+# 4. Do I understand what path, query, and request parameters are?
+# 5. Do I understand what named keyword arguments are? (plus `**kwargs`)
 #
 #
-# The user experience
-# -------------------
-# 1. Whenever you `DELETE` data, be sure to prompt the user to confirm.
-# 2. Make sure to handle errors correctly. Don't leak sensitive information.
-# 3. Authenticate all routes that require authentication, or are "risky".
-#    - These are anything that should not be public-facing.
-#    - We use the `Depends(authenticate)` function for this. Returns @email.
-#    - Make sure it's the correct user that is allowed to edit their posts.
-#
-# Bugs
-# ----
-# 1. ⭐ Duplicate `:id`s cause errors with SQL `POST`
-#    - FastApi auto-increments so just ommit the `:id` field from the request
-#    - You could also use a `UUID` instead of an integer
-# 2. Make sure all errors are handled
-#    - See `chapter_03` for full checks, such as `[]` empty events, etc
-#    - Have a high-level view of your API (Bruno is a good start)
-#
-# Wishlist
+# WISHLIST
 # --------
-# > Securing routes
-# 
-# Set these all in one place? Search Brave with "fastapi always run the session"
+# > Make sure routes are properly secured
 #
-# 1. Fix the `session=Depends(get_session)` problem. We're not abstracting with
-#    PeeWee and have to `db.connect()` and `db.close()` for every route!
-#    - Add this to `database.connection` later, if it's possible (commit `1.12.7`)
-# 2. Some routes use `user: str = Depends(authenticate)` to get the user
-#
-# > Admin and roles
-#
-# 1. We need to add a role to the user (e.g: admin, user, etc)
-# 2. `DELETE` all events is a destructive action, which should be admin only!
-#    - I've removed this route from the app. Use raw SQL instead.
-#    - That's a lot simpler and SAFER!!! There's no way to accidentally delete.
-#    - You might like to use a GUI, or a no-code dashboard.
-# 3. ⭐ How to `EventData.save()` and store the data before `.close()`?
-#    - You've got to be careful where you place your `db.close()` function.
-#    - Remember your object will look like `<Person 1>` which is an OBJECT,
-#      NOT DATA! ... pull out data with `model_to_dict()` and _then_ `.close()`
+# 1. Event creator should be `User.id` not `User.email`
+# 2. We no longer have sessions (SQLite doesn't need them) - remove.
+# 3. Assure all routes that need authentication have it with
+#     - `user: str = Depends(authenticate)`
+# 4. Are there any obvious errors we're not handling?
+#     - Write a duplicate ID function (SQLite unique constraint error)
+# 5. Remove ALL documentation from Bruno
+#     - Follow the "APIs you won't hate" guidelines
+#     - Bruno could be the "high level viewpoint" of your API?
+# 6. Write a brief note about the difference between response type ...
+#     - And `response_model=` ... and which to prefer
+#     - `response_model=` is always prioritised if used.
+# 7. Write an article about making `/signup` more graceful with Piccolo:
+#    - How does it effect usability and the user experience? (Artifacts)
+#    - Option 1: Have a simple "invite" process and manually create accounts
+#    - Option 2: Find a professional and delegate the process
+#        - Just how much would this cost? (via Ai / via Human)
+#        - Signup -> Email -> Verify (code) -> Login -> Onboarding
+# 8. Create different `include_router` packages for authentication routes?
+#    - @ https://fastapi.tiangolo.com/tutorial/bigger-applications/
+#    - @ https://stackoverflow.com/a/67318405
 
 event_router = APIRouter(
     tags=["Events"] # used for `/redoc` (menu groupings)
@@ -107,17 +100,10 @@ event_router = APIRouter(
 
 
 # Routes -----------------------------------------------------------------------
-# 1. `Depends()` runs before the route function
-# 2. `Event` is now an `SQLModel` type (is it a table?)
-# 3. `.session.exec()` executes the supplied `statement`
-# 4. You'll also need to understand the other commands (add, commit, refresh)
 
 @event_router.get("/", response_model=List[EventJustTitle])
 def retrieve_all_events() -> List[EventJustTitle]:
     """Return a simple list of event titles!
-
-    > Pick _either_ a `response_model=` OR a response type, not both!
-    > Unless there's a very good reason to do so ... (I don't think there is)
     
     A little different than our book example, but just to show the flexibility
     and speed of a Pythonic solution. I generally type in an Elm-style, but this
@@ -167,10 +153,6 @@ def create_event(
     body: Event,
     user: str = Depends(authenticate)) -> EventWithCreator:
     """Create a new event
-    
-    Our `Depends(authenticate)` function will run before this route, and will
-    fail if user is not logged in. There's no need to check that again within the
-    body function.
 
     The `user` value should really be a `nanoid`, which we use to reference the
     user in the database, and do any real work with `User.id` (a simple
@@ -219,6 +201,12 @@ def create_event(
 
     return model_to_dict(query) # You could write this _before_ `close()`
 
+
+"""
+********************************************************************************
+A user profile with user details and all their (only their) events route
+********************************************************************************
+"""
 
 # @event_router.patch("/edit/{id}", response_model=Event)
 # def update_event(id: int, data: EventUpdate, user: str = Depends(authenticate)) -> Event:
