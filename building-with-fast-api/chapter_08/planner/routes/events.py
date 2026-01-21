@@ -96,6 +96,10 @@ event_router = APIRouter(
 )
 
 
+# ------------------------------------------------------------------------------
+# Read routes
+# ==============================================================================
+
 # Routes -----------------------------------------------------------------------
 
 @event_router.get("/", response_model=List[EventJustTitle])
@@ -204,6 +208,14 @@ def create_event(
 A user profile with user details and all their (only their) events route
 ********************************************************************************
 """
+
+# ------------------------------------------------------------------------------
+# Write routes
+# ==============================================================================
+
+
+
+
 
 # @event_router.patch("/edit/{id}", response_model=Event)
 # def update_event(id: int, data: EventUpdate, user: str = Depends(authenticate)) -> Event:

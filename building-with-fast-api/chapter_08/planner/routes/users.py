@@ -1,51 +1,47 @@
 # ------------------------------------------------------------------------------
 # Our USERS routes
 # ==============================================================================
-# > ⭐ Our `User` routes should be treat like a black box.
-# > See `chapter_07` for more details on the authentication functions.
+# > Treat our `User` routes like a "black box"! See `chapter_07` for more info.
 # 
-# Our password hashing, authentication, and other functions can be treated as a 
-# "black box", where we hire a professional to worry about that for us, and all
-# we've got to do is write our `Depends(authenticate)` and hashing methods and
-# not worry about it! No need to understand what `Oauth2PasswordRequestForm` is.
+# Authentication is difficult, so we hand over this responsibility to Piccolo.
+# If you're doing this yourself, it'll take quite a bit of reading and learning.
+# You can always hire a professional to worry about this for you. All you need to
+# know is that `Depends(authenticate)` checks a user exists and logs them in.
+# 
+#     @ https://tinyurl.com/fastapi-oauth2-depends
 #
-# Our user has an `email` and `password`. The `username` is their `email`. You
-# should have a high-level view of how this works:
-#    @ https://tinyurl.com/fastapi-oauth2-depends
+# Using Piccolo saves us from a ton of problems that generating our own user's
+# with SQLModel or Peewee created. Here's some of your user data:
+#
+# - `User.username`
+# - `User.email`
+# - `User.password`
 #
 #
 # Invite only
 # -----------
-# > Building a proper authentication system is hard.
-# > We're currently using JWT Bearer tokens (in the header).
+# > Building a proper authentication system is hard!
+# > Use JWT Bearer tokens in the request header (be wary of XXS attacks)
 #
-# Your app could be invite-only, and you manually create the user accounts on
-# their behalf. If you need a fully fledged authentication system, you'll have to
-# look elsewhere, as our `/signup` route isn't fully secure (no email verification).
+# A user `/signup` route isn't fully secure as there's no email verification!
+#
+# Your app could be invite-only and use `piccolo user create` to generate the
+# user account. You'd then use `BaseUser.login()` in the sign-in endpoint. For a
+# fully fledged authentication system, you'll have to use Piccolo's auth API or
+# roll one yourself.
 #
 #
-# Wishlist
+# Data validation
+# ---------------
+# > For user data we're using `BaseUser` with Piccolo
+#
+# This should be automatically handled for us, but you'll still need a Pydantic
+# type for the API layer.
+#
+#
+# WISHLIST
 # --------
-# 1. We should probably disallow `+test` type email addresses.
-#    - Although these are useful for testing.
-# 2. The expiry time is currently hard-coded to 1 hour.
-#    - Should this be an `.env` variable setting?
-#    - We need to write a function to extend the expiry time.
-# 3. Do we need a separate `User` and `UserSign` class?
-#    - Otherwise all our `User`s will have `Optional` (`None`) fields.
-# 4. Fix the `session=Depends(get_session)` problem. We're not abstracting with
-#    PeeWee and have to `db.connect()` and `db.close()` for every route!
-#    - Add this to `database.connection` later, if it's possible (commit `1.12.7`)
-# 5. We could've used a `TypedDict` here, but `response_model=` converts our `dict`
-#    to a `TokenResponse`, which is slightly cleaner.
-# 6. How do we make sure PyLance recognises our types?
-#    - PeeWee `Field` typing is a bit off for `.get()` and `.create()`
-#    - It's also not recognising our `UserData` field types on retrieval.
-#
-# Not my job
-# ----------
-# 1. Are there better encryption methods than `python-jose`?
-# 2. Hashing can be slow. Can it be speeded up?
+# 1. Use a `TypedDictionary` for the `/signin` response type?
 
 from auth.authenticate import authenticate
 from auth.jwt_handler import create_access_token
@@ -59,12 +55,11 @@ user_router = APIRouter(
     tags=["User"]  # used for `/redoc` (menu groupings)
 )
 
-# Hashing password -------------------------------------------------------------
 
-hash_password = HashPassword()
-
-# Routes -----------------------------------------------------------------------
-# Here we're converting from FastApi Pydantic (API layer) to PeeWee (Database layer)
+# ------------------------------------------------------------------------------
+# Write routes
+# ==============================================================================
+# Convert from a Pydantic API type -> Pydantic DATA type
 
 @user_router.post("/signup")
 def sign_new_user(data: User) -> dict:
@@ -98,6 +93,10 @@ def sign_new_user(data: User) -> dict:
 
     return { "message": f"User with {new_user.email} registered!" }
 
+
+# ------------------------------------------------------------------------------
+# Read routes
+# ==============================================================================
 
 @user_router.post("/signin", response_model=TokenResponse) #! dict -> model (5)
 def sign_in_user(data: OAuth2PasswordRequestForm = Depends()):

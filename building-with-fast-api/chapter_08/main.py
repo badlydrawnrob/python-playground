@@ -153,6 +153,8 @@ import uvicorn
 # 12. Logging for FastApi live server to prepare for launch:
 #    - @ Search Brave "fastapi logging production"
 #    - @ https://tinyurl.com/prep-fastapi-for-production (hire a professional!)
+# 13. Disallow some email addresses if we're not in control of signup
+#    - For example `user+test@gmail` which allows multiple accounts.
 
 app = FastAPI()
 
