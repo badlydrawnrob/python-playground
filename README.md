@@ -65,11 +65,12 @@ Perhaps you get shorter code at scale, but is it more readable? I'm not so sure.
     - `[1, 2, 3][-1]`
     - `List.elemIndex (List.reverse [1, 2, 3])`
 
-It's also not at all type safe by default (and type annotations are awkward). Even the naming conventions feel messy (capitals and lowercase)! Here are some examples and comparisons for Python versus Elm Lang.
+It's also not at all type safe by default (and type annotations are awkward). Even the naming conventions feel messy (capitals and lowercase)! Here are some examples and comparisons for Python versus Elm Lang. It's important to understand "why would I use [functional programming](https://dev.to/cherryramatis/ending-the-war-or-continuing-it-lets-bring-functional-programming-to-oop-codebases-3mhd) over object-oriented?" as it makes you a better programmer!
 
 ### Python
 
-> [Declaration order](https://stackoverflow.com/a/758197) matters in Python! You might also want to [strongly type](https://talks.jackleow.com/strongly-typed) your code. It's also important to understand "[why functional programming](https://dev.to/cherryramatis/ending-the-war-or-continuing-it-lets-bring-functional-programming-to-oop-codebases-3mhd) over object-oriented?"?
+> [Declaration order](https://stackoverflow.com/a/758197) matters in Python!
+> Types can be managed with Pydantic ([strongly typed](https://talks.jackleow.com/strongly-typed) Python is a hassle).
 
 ```python
 

@@ -1,8 +1,8 @@
 # ------------------------------------------------------------------------------
 # Fruits database models
 # ==============================================================================
-# > @ https://piccolo-orm.readthedocs.io/en/latest/piccolo/schema/index.html
-# > @ https://github.com/piccolo-orm/piccolo/issues/1257
+# > Docs: @ https://piccolo-orm.readthedocs.io/en/latest/piccolo/schema/index.html
+# > Column types: @ https://github.com/piccolo-orm/piccolo/issues/1257
 #
 # For full documentation see the `mocking/fruits` example here:
 #
@@ -74,6 +74,13 @@
 # example has a single form for editing each `User` data point. This makes it a
 # little easier to do technically (each is a simple `PATCH`), but results in a
 # LOT of clicks for the user.
+#
+#
+# Tooling
+# -------
+# > Rather than using Piccolo's migrations, we can use `sqlite-utils`.
+#
+# See the `sqlite_utils.sql` file.
 #
 #
 # Wishlist

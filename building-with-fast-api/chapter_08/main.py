@@ -1,261 +1,174 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-from database.connection import sqlite_db
-from database.models import UserData, EventData
 from fastapi.responses import RedirectResponse
 
-from routes.users import user_router
-from routes.events import event_router
+from planner.routes.users import user_router
+from planner.routes.events import event_router
+from planner.tables import Event
+
 import uvicorn
 
 # ------------------------------------------------------------------------------
 # A PLANNER app (SQLModel)
 # ==============================================================================
+# > We're now using Piccolo ORM instead of SQLModel. The book uses MongoDB for
+# > Chapters 6—8; after three attempts with different ORMs I've settled on Piccolo.
+#
+# This is for a few reasons:
+#
+# 1. Piccolo is ASYNC, so works well with FastApi (unlike PeeWee).
+#     - Notes on async: @ https://github.com/piccolo-orm/piccolo/issues/1319
+# 2. Piccolo has better documentation for querying the database.
+#     - A nice playground feature: @ https://tinyurl.com/piccolo-playground-docs
+# 3. Piccolo feels a bit lighter to use than the other ORMs I tried.
+#     - Users are built-in: @ https://tinyurl.com/piccolo-user-creation
+# 4. Piccolo doesn't require `open()`ing and `closing()` the database.
+#     - It handles connections for you (unlike PeeWee).
+# 5. Piccolo is relatively boring and stable (that's a good thing!)
+#
+# Versions
+# --------
+# > 1. I found SQLModel docs verbose and hard to work with.
+# > 2. PeeWee used objects quite heavily and SQLite async buggy ...
+# 
+#     @ https://github.com/badlydrawnrob/python-playground/releases/tag/1.12.4
+#     @ https://github.com/badlydrawnrob/python-playground/releases/tag/1.12.11
 #
 #
 # Coding style
 # ------------
 # > Prefer functional programming over OOP where possible.
-# > Previous PeeWee examples used objects quite heavily.
-#
-# 1. Never use objects where a function will do!
-# 2. Use data models (Pydantic) for type safety and validation.
-# 3. Use as little code as possible to achieve the goal.
-
-
-
-
-
-
-# See earlier chapters for full instructions on FastApi etc. I like to treat some
-# parts of the app as a "black box" (I don't need to know how it works, only that
-# it works!), but it's best to get a senior (or book) to help you with this.
-#
-# 1. FastApi with models and routes (API layer)
-# 2. PeeWee ORM (data layer) for CRUD operations
-# 3. JWT tokens for authentication
-#
-# We're now splitting our API layer from our DATA layer, so we have models for
-# each. This might actually work out for the best, as we can switch out to a
-# different ORM or API framework a tiny bit quicker (SQLModel is tightly connected)
-#
-# There's LOTS of things to learn, so it's easy to feel overwhelmed. I find it
-# helpful to use a REPL to test out code snippets, and have a solid "learning
-# frame", meaning knowing when to learn, and when to delegate. It's find to tell
-# yourself "that's not for me, not my job". For me that's:
-#
-# 1. How to deploy a FastApi app to production (performance, DBA, etc)
-#     - @ https://tinyurl.com/fastapi-preparing-production
-# 2. Email verification and signup (with an SMS authenticator)
-#     - This is non-trivial! I don't want to handle this.
-# 3. Setting up JWT tokens, password hashing, and authentication
-#    - All I want to know is how to write the `depends()` in the routes.
-#
-# ⚠️ Warnings
-# ===========
-# Async
-# -----
-# > FastApi is async, but PeeWee is NOT ... see `database.connection` for info.
+# > Have a clear goal and learning frame to operate within.
 # 
-# See the following example on how to fix this (as well as the many Github issues
-# on PeeWee repo (the alternative is `gevent` or queuing).
-#    @ https://fastapi.xiniushu.com/uk/advanced/sql-databases-peewee
-#    @ https://fastapi.tiangolo.com/async/ (or, just don't use `async` keyword)
+# 1. Use as little code as possible to achieve the goal.
+# 2. Never use objects where a function will do!
+# 3. Always validate types and data with Pydantic.
+# 4. There's too much to learn, so cherry pick.
+# 5. Never prematurely optimise (fix just-in-time).
+# 6. There's a lot could go wrong (fix just-in-time).
+# 7. Prefer explicit code over implicit code (`PUT` > `PATCH`).
+# 8. Ignore the hard bits (delegate, or learn later).
 #
-# The producer of PeeWee has this to say about async! I have to agree that
-# scattering your program with `await` and `async` keywords feels ugly, when
-# other programming languages do this by default.
+#
+# The hard bits
+# -------------
+# > Things I've decided I'm not prepared to learn, or do:
+#
+#     - Email notification and verification
+#     - JWT verification and validation (mostly rely on the book)
+#     - Migrations (use `sqlite-utils` or manual SQL for now)
+#     - Server management and deployment
+#     - Writing unit tests (test manually for now)
+#
+# Authentication and authorization are handles using dependency injection.
+# Bearer tokens (JWT) for authentication. These are checked on each route.
+# 
+#
+# Architecture
+# ------------
+# > Some areas I like to treat as a "black box" whereby I set it and forget it.
+# > For prototyping, vibe coding, jobbing devs: you don't need to know everything!
+#
+# 1. FastAPI (API layer)
+# 2. Pydantic models (API data validation layer)
+# 3. Piccolo ORM models (data layer)
+# 4. Piccolo ORM database (SQLite)
+# 5. JWT tokens (authentication layer)
+#
+# It seems best to split the models into API and Data layers. This way you can
+# switch out the ORM or API framework more easily later on. Some routes should
+# be protected in a real-world app, so users don't see protected data.
+#
+#
+# SQLite
+# ------
+# > There's downsides and upsides to SQLite
+#
+# 1. It's great because it's easy to backup and move around (just a file)
+# 2. It's rubbish because it's not strict by default (like Postgres)
+#     - So for type safety you always validate with Pydantic models first. 
+#
+#
+# The downsides of FastApi and ORMs
+# ---------------------------------
+# FastApi:
+# > There's better languages for web APIs, but unless they're 10x faster, productive,
+# > or enjoyable to use, it's not really worth switching.
+#
+# I think the whole concept of async in Python is a bit dumb. At least the way it
+# scatters your code with `await` and `async` keywords. The producer of PeeWee has
+# this to say about async:
+#
 #    @ https://charlesleifer.com/blog/asyncio/
 #
-# There's also this thread that advises (eventually) not to use PeeWee, or at
-# least to take care with it. For example, hitting the `/signin` route, then
-# the `/new/event` route gives a `peewee.OperationalError: Connection already opened`
-# error. Run the event route again a couple of times, that error vanishes:
+# ORMs:
+# > ORMs can create problems with your SQL statements (or schema) at scale.
+# > Our rule is "never prematurely optimise", so we'll worry about that later.
 #
-#    - I'm doing everything right and `.close()`ing any open connection within
-#      the route function body. However, the connection is not reliable!
-#    - One option is to use `db.connect(reuse_if_open=True)`, but this feels like
-#      a plaster on an open wound: unreliable, and masking the problem.
-#    - ⚠️ Apparently FastApi uses `async` under the hood (even without `async`)
-#    - ⚠️ @ https://github.com/fastapi/fastapi/discussions/8049 (explains why)
-#
-# Managing connections
-# --------------------
-# > Make sure you CONNECT and CLOSE, every time.
-# > PeeWee requires opening and closing for every route function
-# 
-# When I didn't do this on `/signin` I got a `Error, database connection not opened`
-# massive fail. So it seems it's running on a single thread, and the thread must
-# be managed carefully!
-#
-# Speed
-# -----
-# > PeeWee may be SLOWER than SQLModel (but the cache is quick)
-# > On first load it can be quite slow.
-#
-# How might we speed up the first load?
-#
-# > Changing ORMs and databases can be tricky!
-# > Are your schema and models compatible?
-#
-# Compatibility
-# -------------
-# You need to make sure your schema and ORM are compatible! It might help to
-# manually setup your schema and simply use the ORM for rows -> objects.
-#
-# > API layer and DATA layer splitting can be a little confusing.
-# > Have a high-level view, somewhere so everything makes sense ...
-# > Especially as you grow your team!
-#
-# For example, `Event.id` is handled by PeeWee, NOT Pydantic!
-#
-# Why I changed from SQLModel to PeeWee 
-# -------------------------------------
-# > FastApi and SQLModel problems
-#
-# - We're now using PeeWee to handle our database layer
-# - SQLModel joins I found to be far from intuitive, and the docs not great ...
-# - @ https://tinyurl.com/sqlmodel-join-a-table-on (see commit `1.12.4` full notes)
+# Without an ORM you'd have to manually manipulate your database rows, converting
+# them to the dictionaries FastApi expects. You'll likely get a boost in performance
+# by writing SQL directly (you can do so with Piccolo), but you must be VERY
+# careful of malicious SQL injections.
 #
 #
-# Notes
-# -----
-# > We're now separating our API and ORM models. Some say this is better.
-# > If you tightly couple them, it's harder to switch to another ORM later!
-#
-# 1. For now, I handle migrations manually with raw SQL.
-# 2. I try to be consistent with my function, and abstract where possible.
-# 3. ORMs can create problems with your SQL statements (or schema) at scale.
-#    - However you manage this, database rows need to be translated ...
-#    - Meaning, row data needs to be converted to data models (or objects).
-#    - If you choose to use raw SQL, be careful of malicious SQL injections.
-# 4. `__init.py__` is a daft idea. It's a Python thing.
-#    - @ https://stackoverflow.com/a/48804718
-# 5. Decide if you need a `PUT` or `PATCH` request.
-#    - Does your client send ALL the data or just some?
-#
-# I also don't like Python OOP style. Check out Elm Lang for typed functional
-# style programming. Where possible, I'll use that style.
-#
-#
-# Security
+# WISHLIST
 # --------
-# > I'm not very confident with security, so I always have someone I trust check
-# > over my code. It's important to protect yourself against hacks and keep your
-# > API secure (things like email verification help).
+# > Remove code duplication and keep code simple (your future stupid self!)
 #
-# Things to consider:
-# 
-# 1. Malicious SQL injections and DDOS attacks.
-# 2. Authentication and authorization (we use dependency injection).
-# 3. Bearer tokens (JWT) for authentication. These are checked on each route.
-#
-#
-# Wishlist
-# --------
-# > Remove code duplication. Simplify your code. If a thing can be removed,
-# > remove it. Follow the "5 steps" that Tesla uses to build their cars.
-#
-# 1. Make sure all routes that require a logged in user are secured. Also check
-#    that the "owner" of a data point is the only one who can edit/delete it.
-#    - What can a non-owner do? What data points are private? (read, write, delete)
-# 2. We can have a public ID (`UUID`) and a private (`Int ID`) one.
-#    - Decide on which `UUID` type to use (regular -vs- shorter)
+# 1. Go through the "5 steps" Tesla uses to build their cars.
+#    - @ https://tinyurl.com/tesla-5-steps
+# 2. Make sure all routes that require a logged in user are secured.
+#    - Does this user "own" this data point?
+#    - Remove any unecessary routes (`DELETE` all will torpedo your app!)
+# 3. Consider using some GUI to aid "birds eye view" of schema/data
+#    - I think Piccolo has some rudimentary version of this, and Admin
+#    - See "APIs you won't hate" for more ideas (error codes, etc)
+# 4. Consider shortening the `UUID` type for prettier URLs.
+#    - This can be done after the fact (`UUID` -> `ShortUUID`)
 #    - @ https://github.com/piccolo-orm/piccolo/issues/1271
-#    - FastApi automatically adds and increments an `id` on each table insert.
-#    - We need a public facing ID for our `User` model (for our url)
-#    - Our private ID is used for any database operations (`join`, `DELETE`, etc)
-#    - We're currently using the user's email address as ID which isn't ideal.
-# 3. Our `Event.creator` is the current users `ID`:
-#    - As mentioned above, it's currently an email.
-#    - Joins are quicker with an `Int ID` than a `String` (email)
-# 4. Add a `private` option for our `Event` model (so only the user can see it)
-# 5. ⭐ Our `User.events` relationship, which is now `JSON` data is used for a
-#    `List ID` of events. However, it's FAR MORE COMPLICATED to use than when we
-#    had a simple `List Int` when our `Event` was a `BaseModel` (not a SQLModel).
-#    See the links below to see what I mean.
-#    - ⭐ You have many routes for app architecture. Ask "why do I need this?"
-#      and "how will it be used?". There's no real need for a `List Event.id` as
-#      you can simply `join` on the events to the user! That's WAY EASIER!
-#    - A `List Event.id` would be handy if it's a public API (like OpenLibrary),
-#      where you'd want to `.andThen` to the Events API to get the events. But
-#      that's not really needed for this app.
-#     - To edit events we could have a `GET` request to `/user/{id}/events`
-#       and a `POST` request to `/user/{id}/events/{event_id}` (or `DELETE`).
-#     - @ https://stackoverflow.com/q/70567929 (using json columns)
-#     - @ https://stackoverflow.com/q/79091886 (mutating a json column) but search
-#       Brave with "Replacing JSON Column FastAPI" for better options.
-#     - @ https://tinyurl.com/sqlite-peewee-and-json-data (it's even pretty
-#       complicated with Peewee ORM)
-# 6. Use abstraction to reduce code duplication.
-# 7. Is the current encryption and hashing the most secure?
-#    - Create a better `SECRET_KEY` perhaps.
-# 8. Are results cached? (for performance, but add "just-in-time", not premature)
+#    - #! Order of speed for lookup/joins: `Int` > `Bytes` > `String`
+# 5. Bombardier test for concurrency and speed
+#    - Remember 100s of connections may be unlikely; prefer solid to speedy
+# 6. Write down the reason to prefer `PUT` over `PATCH`
+#    - Patch is harder to predict which optional values are present
+#    - Similar to the Elm `Decode.maybe` problem
+#    - @ https://sqlmodel.tianglo.com/tutorial/fastapi/update
+# 7. Make sure only the "this" user "this" time can view (authentication)
+#    - Add a condition that only a particular user can grab their events?
+#    - `user.email == events.creator` guards (or USE SQL `WHERE`!)
+# 8. `List Int` for tags is far more complicated than simple join
+#    - Would this be a many-to-many relationship?
+#    - What difference does this make to UI and architecture?
+#    - Does it make the Elm Lang code easier or harder?
+#    - How are others handling this and their endpoints?
+# 9. Do we need any caching? (on the server or with SQlite)
 #    - @ https://github.com/long2ice/fastapi-cache
 #    - @ https://www.powersync.com/blog/sqlite-optimizations-for-ultra-high-performance
-# 9. Make `/signup` more graceful and user-friendly (or remove completely)
-#    - Option 1: Have a simple "invite" process and manually create accounts
-#    - Option 2: Find a professional and delegate the process
-#        - Signup -> Email -> Verify (code) -> Login -> Onboarding
-# 9. Remove all `/admin` routes, such as:
-#    - `/event` (for deleting all events)
-#    - These are dangerous and should never be allowed by anyone other than
-#      admin (it's also highly unlikely it's needed!)
-# 10. We could add `User.role` table, and add proper roles later:
+# 10. Consider a `User.role` with `BaseUser` ... possible?
 #    - @ https://fastapi.tiangolo.com/advanced/security/oauth2-scopes/
-# 11. Potentially use SQLite Utils to easily setup mock data
-#    - We could have a development database that gets setup automatically
-#    - And mock the live data with @ https://sqlite-utils.datasette.io/en/stable/
-#    - How would we setup and teardown?
-# 12. Understand type safety with Python a bit better:
-#    - @ https://talks.jackleow.com/strongly-typed#slide-23
-# 13. How are we creating the database?
-#    - Consider leaving the `@app.on_event` decorator out of the code and doing
-#      database setup manually.
-#    - It's deprecated anyway, and now uses `lifespan` event handlers.
-# 14. Understand "middleware" and when it's useful.
+# 11. Understand middleware a little better
 #    - @ https://fastapi.tiangolo.com/tutorial/middleware/
-# 15. Tidy up the `dict` type in the function `return` values:
-#    - Currently `pyright` complains that they aren't specific enough.
-# 16. Create different `include_router` packages for authentication routes:
-#    - @ https://fastapi.tiangolo.com/tutorial/bigger-applications/
-#    - @ https://stackoverflow.com/a/67318405
-# 17. Implement logging for FastApi live server and preparing for launch:
+# 12. Logging for FastApi live server to prepare for launch:
 #    - @ Search Brave "fastapi logging production"
 #    - @ https://tinyurl.com/prep-fastapi-for-production (hire a professional!)
-# 18. We also need an "extend your session" route, which we can ping:
-#    - If `< 15 minutes` then extend the session notification
-# 19. Set SQLite to strict mode (and PRAGMA settings) on launch.
-#    - I might remove the `conn()` function and setup the schema manually.
-#    - The models are still handy, as this gives a high-level view of the schema.
-# 20. Fix `.utcnow` to datetime (deprecated in `jwt_handler.py`)
-# 21. Begin creating some simple tests for `join`s:
-#    - Task 1: Get the specific user events where user.email == events.creator
-#    - Task 2: Get the full `User` and `join` on the `Event` table
-#    - @ https://stackoverflow.com/questions/21975920/peewee-model-to-json
-#    - @ https://sqlmodel.tiangolo.com/tutorial/connect/read-connected-data/
-#    - @ https://docs.peewee-orm.com/en/latest/peewee/querying.html
-# 22. Some way to manage our data points from a high-level view
-#    - For example, which FastApi fields are `Optional()`?
-#    - Which are automatically handled (or handled) by PeeWee?
-# 23. Change `.env` settings to something simpler!
-#    - By default `.env` files don't handle dictionaries.
-#    - You store it as a `json` string, then convert to a dictionary
-# 24. I find migrations pretty difficult to understand
-#    - Can I get by with `sqlite-utils` alone?
 
 app = FastAPI()
 
-# Register our routers ---------------------------------------------------------
-# Prefix the `/user`: `/user/signup` and `/user/signin` (same for event)
 
-app.include_router(user_router, prefix="/user")
-app.include_router(event_router, prefix="/event")
+# ------------------------------------------------------------------------------
+# Routers (register)
+# ==============================================================================
 
-# Middleware -------------------------------------------------------------------
-# A list of allowed CORS origins (by default only the same domain)
-# @ https://fastapi.tiangolo.com/tutorial/cors/ (wildcard, or list of domains)
+app.include_router(user_router, prefix="/user") # prefixes the `/user` url
+app.include_router(event_router, prefix="/event") # prefixes the `/event` url
+
+
+# ------------------------------------------------------------------------------
+# Middleware
+# ==============================================================================
+# Tightens up security: @ https://fastapi.tiangolo.com/tutorial/cors/
 
 origins = [
     "http://localhost:8000"
@@ -269,24 +182,29 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
-# Database build ---------------------------------------------------------------
-#! This should build automatically, but there's a minor issue with indexes in
-# some cases.
 
-@app.on_event("startup")
-def on_startup():
-    sqlite_db.connect()
-    sqlite_db.create_tables([UserData, EventData], safe=True)
-    sqlite_db.close()
+# ------------------------------------------------------------------------------
+# Build the database and set the home route
+# ==============================================================================
+# If it does not already exist. See also my `data-playground/mocking/fruits`
+# repo for further explanation.
 
-# Routes -----------------------------------------------------------------------
-    
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await create_db_tables(Event, if_not_exists=True)
+    yield
+
+app = FastAPI(lifespan=lifespan)
+
 @app.get("/")
 def home():
     return RedirectResponse(url="/event/")
 
-# Run our app ------------------------------------------------------------------
-# This is slightly different from the book code, which errors (see chapter_07)
+
+# ------------------------------------------------------------------------------
+# Run app
+# ==============================================================================
+# Slightly different from the book code which errors (see chapter_07)
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="localhost", port=8000, reload=True)

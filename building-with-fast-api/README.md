@@ -205,7 +205,7 @@ pprint(vars(your_object))
 3. **Write working code first, worry about the finer details later.**
     - Minimal use of `Class.methods`, `@decorators` and so on (only when necessary).
     - I don't like Python as a language much, so only learn what I must!
-4. **Let the code do the talking, where possible**
+4. **🌟 Let the code do the talking, where possible**
     - I've got copious amounts of comments and wishlists in some chapters.
     - Aim to cut these down to the bare necessities (lean on documentation).
 
