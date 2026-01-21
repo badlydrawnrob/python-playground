@@ -1,16 +1,3 @@
-from auth.authenticate import authenticate
-from auth.hash_password import HashPassword
-from auth.jwt_handler import create_access_token
-
-from database.connection import sqlite_db
-from database.models import UserData
-
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordRequestForm
-
-from models.users import User, TokenResponse
-# We're not using the API `Event` model here for return type.
-
 # ------------------------------------------------------------------------------
 # Our USERS routes
 # ==============================================================================
@@ -60,6 +47,13 @@ from models.users import User, TokenResponse
 # 1. Are there better encryption methods than `python-jose`?
 # 2. Hashing can be slow. Can it be speeded up?
 
+from auth.authenticate import authenticate
+from auth.jwt_handler import create_access_token
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
+
+from piccolo.apps.user.tables import BaseUser
+from planner.models.users import User, TokenResponse
 
 user_router = APIRouter(
     tags=["User"]  # used for `/redoc` (menu groupings)

@@ -1,14 +1,3 @@
-from fastapi import APIRouter, Body, Depends, HTTPException
-
-from auth.authenticate import authenticate
-from database.connection import sqlite_db
-from database.models import EventData, UserData
-from models.events import Event, EventUpdate, EventJustTitle, EventWithCreator
-
-from playhouse.shortcuts import model_to_dict
-
-from typing import List
-
 # ------------------------------------------------------------------------------
 # Our EVENTS routes
 # ==============================================================================
@@ -93,6 +82,14 @@ from typing import List
 # 8. Create different `include_router` packages for authentication routes?
 #    - @ https://fastapi.tiangolo.com/tutorial/bigger-applications/
 #    - @ https://stackoverflow.com/a/67318405
+
+from auth.authenticate import authenticate
+from fastapi import APIRouter, Body, Depends, HTTPException
+
+from planner.tables import Event
+from planner.models.events import Event, EventUpdate, EventJustTitle, EventWithCreator
+
+from typing import List
 
 event_router = APIRouter(
     tags=["Events"] # used for `/redoc` (menu groupings)
