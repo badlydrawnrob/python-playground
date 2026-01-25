@@ -1,53 +1,37 @@
-from pydantic import BaseModel, EmailStr, Field
-from typing import Optional
-import nanoid
-
 # ------------------------------------------------------------------------------
-# Our USER model
+# Our USER model (API layer)
 # ==============================================================================
-# See `models.events` for information and questions on Pydantic.
+# Seem `planner.models.events` for documentation on how to use Pydantic.
 #
-# Using Pydantic
-# --------------
-# 1. If a value is `Optional`, it must be a `None` value. If it's optional without
-#    `None`, Pydantic throws an error.
-#    - `{ id: None }` on creation, and `model_dump(exclude_none=True)` will
-#      remove it, ready to `UserData(**kwargs)` the dictionary and create a
-#      data model object.
-# 2. Some APIs have a `List ID`, such as `List Image`, for example:
-#    - This depends on the app architecture, and if it's a public API. A list
-#      of images would help you `andThen` grab each `/image/{id}` route.
-#    - As we don't have a public API, we can leave this out ...
-#    - And use a `join` on the `Event` table instead!
-# 3. If we decided to use a `List[str]` here, it could be a `json` blob!
-#    - For that though, PeeWee would need to use an SQLite extension.
-#    - Better to use data normalisation where possible.
-# 4. We're generating a `nanoid` with `default_factory=` automatically. We're now
-#     using a shorter code, rather than a long `UUID`. It's very URL friendly.
-#    - ⚠️ You seem to have to use the method NAME, not an instance of the method.
-#    - Unfortunately we can't use a proper type here like `UUID`!
-#    - Currently a `nanoid` could include a `-` which may not be ideal.
-#    - There's LOTS of unique ID generators to choose from:
-#        - See `testing/shortcodes.py` for the three that work well, and how
-#          long each takes to run.
-#        - A `ksuid` is pretty interesting, as it generates a timestamp too!
-#    - ⚠️ Make sure to CHECK COLLISIONS (how likely two `nanoid`s will clash?)
-#      @ https://zelark.github.io/nano-id-cc/
-# 5. Search Brave browser to check how to mark a field as `Optional` but use the
-#    default factory pattern: "pydantic mark as optional with default factory"
-# 6. We'll leave in `TokenResponse` in for now, which is another example of
-#    a `response_model=` or response type. This is our `return` value!
-#    - This is used for our `/signin` route.
+# Pydantic
+# --------
+# > Our JWT holds some data about the user, which we can retrieve and format
+# > as a Pydantic model.
+#
+# `TokenResponse` can be added to the `response_model=` or `-> ResponseType`. It
+# is only used for our `/signin` route.
+#
+# Pydantic will automatically check `EmailStr` is valid, but the `email-validator`
+# package must be installed.
+#
+# WISHLIST
+# --------
+# 1. #! Should we have a list of `Event` IDs on the `User` model?
+#     - Is this the way they've got it in the book?
+
+from pydantic import BaseModel, EmailStr
+
 
 class User(BaseModel):
-    #! `UserData.id` generated automatically with PeeWee! So our request body
-    #! doesn't require it. However, `None` must be set or Pydantic will complain.
-    id: Optional[int] = None 
-    public: str = Field(default_factory=nanoid.generate) #! Handled by Pydantic (3), (4)
-    email: EmailStr #! This should be unique
+    """ User model for incoming requests.
+    
+    Piccolo will automatically handle the `ID` field (which is an indexed `UUID`).
+    See `planner.models.tables.py` for unique constraints etc.
+    """
+    username: str
+    email: EmailStr
     password: str
-    # events: Optional[List[int]] #! (1), (2)
 
-class TokenResponse(BaseModel): #! (5)
+class TokenResponse(BaseModel):
     access_token: str
     token_type: str

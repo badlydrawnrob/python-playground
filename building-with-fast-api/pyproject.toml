@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "email-validator",
     "fastapi[standard]>=0.115.6",
     "piccolo[orjson,sqlite]>=1.28.0",
     "python-decouple>=3.8.0",
@@ -32,9 +33,6 @@ chapter-older = [
     "svix-ksuid>=0.6.2",
     "uuid>=1.30",
 ]
-
-[tool.uv]
-dev-dependencies = []
 
 [tool.pyright]
 strict = ["."]

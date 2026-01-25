@@ -139,6 +139,7 @@ name = "building-with-fast-api"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "email-validator" },
     { name = "fastapi", extra = ["standard"] },
     { name = "piccolo", extra = ["orjson", "sqlite"] },
     { name = "python-decouple" },
@@ -169,6 +170,7 @@ chapter-older = [
 
 [package.metadata]
 requires-dist = [
+    { name = "email-validator" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.115.6" },
     { name = "piccolo", extras = ["orjson", "sqlite"], specifier = ">=1.28.0" },
     { name = "python-decouple", specifier = ">=3.8.0" },

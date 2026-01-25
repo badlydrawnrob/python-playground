@@ -1,15 +1,3 @@
-from contextlib import asynccontextmanager
-
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
-
-from planner.routes.users import user_router
-from planner.routes.events import event_router
-from planner.tables import Event
-
-import uvicorn
-
 # ------------------------------------------------------------------------------
 # A PLANNER app (SQLModel)
 # ==============================================================================
@@ -156,7 +144,25 @@ import uvicorn
 # 13. Disallow some email addresses if we're not in control of signup
 #    - For example `user+test@gmail` which allows multiple accounts.
 
-app = FastAPI()
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
+
+from planner.routes.users import user_router
+from planner.routes.events import event_router
+from planner.tables import Event
+
+import uvicorn
+
+
+# ------------------------------------------------------------------------------
+# Create the app instance
+# ==============================================================================
+# See the `lifespan` function below.
+
+app = FastAPI(lifespan=lifespan)
 
 
 # ------------------------------------------------------------------------------
@@ -195,8 +201,6 @@ app.add_middleware(
 async def lifespan(app: FastAPI):
     await create_db_tables(Event, if_not_exists=True)
     yield
-
-app = FastAPI(lifespan=lifespan)
 
 @app.get("/")
 def home():
