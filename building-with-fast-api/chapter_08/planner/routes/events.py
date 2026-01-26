@@ -211,6 +211,7 @@ def create_event(
     
     # Create record from request body excluding `None` values
     event = body.model_dump(exclude_none=True)
+    # `event["creator"] = value` isn't possible here
 
     query = await (
         data.Event.insert(**event)
