@@ -16,8 +16,8 @@
 # Piccolo ORM uses Active Record pattern, rather than Data Mapper (like SQLAlchemy).
 #
 #
-# SQLite
-# ------
+# SQLite and Piccolo
+# ------------------
 # 1. Piccolo does not use `STRICT TABLES` by default (SQLite allows anything)[^1]
 #     - Values are stored as basic data types: `Integer`, `Real`, `Text`
 #     - Insertion values are ordered by class field order (not alphabetically) ...
@@ -43,6 +43,16 @@
 # [^1]: You can use https://sqlite.org/stricttables.html if you wish, but it limits
 #       the range of Piccolo Column types you can use (generally stored as strings
 #       or json strings).
+#
+#
+# Piccolo `ForeignKey`
+# --------------------
+# > Piccolo always joins on any foreign keys, so you can traverse them to get
+# > any data field you'd need.
+#
+# For example: `.where(Event.creator.username == "rob")` to get all events:
+#
+#    @ https://piccolo-orm.readthedocs.io/en/latest/piccolo/query_types/joins.html#joins
 #
 #
 # Piccolo `BaseUser`
