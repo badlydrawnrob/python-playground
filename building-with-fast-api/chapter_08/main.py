@@ -76,7 +76,8 @@
 #
 # 1. It's great because it's easy to backup and move around (just a file)
 # 2. It's rubbish because it's not strict by default (like Postgres)
-#     - So for type safety you always validate with Pydantic models first. 
+#     - So for type safety you always validate with Pydantic models first.
+# 3. It does not have to deal with sessions (unlike client-server DBs)
 #
 #
 # The downsides of FastApi and ORMs

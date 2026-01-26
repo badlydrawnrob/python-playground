@@ -7,9 +7,20 @@
 # `response_model=` with the correct Pydantic model.
 #
 #
+# Coding style
+# ------------
+# > `tables.Event` and `models.Event` are different!
+# > Namespaces look kind of fugly, but I'll keep them in to be clear.
+#
+# We're namespacing our modules to make it clear whis is API and Data. You may
+# find this version difficult to read and prefer to be explicit with your models,
+# such as `EventData` and `EventAPI` or similar. Modules should be lowercase in
+# Python PEP8 styleguide (unlike Elm).
+#
+#
 # Async only
 # ----------
-# > Beware of routes that contain both read and write functions!
+# > ⚠️ Beware of routes that contain both read and write functions!
 #
 # For atomic data (for now) it's much easier for any update/insert/delete function
 # NOT to also contain reads within the same endpoint. Otherwise you get the same
@@ -18,6 +29,9 @@
 #
 #     @ https://piccolo-orm.readthedocs.io/en/latest/piccolo/tutorials/using_sqlite_and_asyncio_effectively.html
 #     @ https://github.com/piccolo-orm/piccolo/issues/1319
+#
+# Unfortunately we've got to pepper our code with `async` and `await` keywords,
+# which is a shame.
 #
 #
 # Data validation
@@ -41,15 +55,21 @@
 #
 # FastApi functions
 # -----------------
-# 1. `Depends(authenticate)` runs before the route function
-#     - It fails if user is not logged in
-# 2. Use a Pydantic `-> Response` type -or- `response_model=`
+# > I generally prefer Elm-style, whereby you'd avoid "magic" and convert the
+# > data directly to whatever form (types) you needed. Pydantic response types
+# > do saves us time and are quite graceful.
+#
+# 1. Response types come in two flavours:
+#     - `-> Response` -or- `response_model=`
 #     - You generally do not want (or need) to use both!
+# 2. `Depends(authenticate)` runs before the route function
+#     - It fails if user is not logged in
 #
 #
 # Questions
 # ---------
-# 1. How best to check for `None` or `[]`?
+# 1. #! How best to check for `None` or `[]`?
+#     - Write a very short article on this?
 #     - `RETURNING` -vs- `SELECT` guards (opt for the former generally)
 # 2. Positive or negative guards?
 # 3. Do I understand what `Depends()` is doing? (visualise)
@@ -61,35 +81,39 @@
 # --------
 # > Make sure routes are properly secured
 #
-# 1. Event creator should be `User.id` not `User.email`
-# 2. We no longer have sessions (SQLite doesn't need them) - remove.
-# 3. Assure all routes that need authentication have it with
-#     - `user: str = Depends(authenticate)`
-# 4. Are there any obvious errors we're not handling?
+# 1. #! ⚠️ Do we need to tighten up TYPES?
+#     - Test SQLite inserts with wrong data. Can I do that?
+#     - Do we need a `DataIn` type before `data.Event` is inserted?
+# 2. When we `DELETE` (or other operations) what error codes?
+#     - See the "APIs you won't hate 2" book
+#     - For `DELETE` operations security, what should we NOT return?
+# 3. What obvious errors are we not currently handling?
+#     - Sqlite integrity or null constraint errors?
 #     - Write a duplicate ID function (SQLite unique constraint error)
-# 5. Remove ALL documentation from Bruno
+# 4. Remove ALL documentation from Bruno
 #     - Follow the "APIs you won't hate" guidelines
 #     - Bruno could be the "high level viewpoint" of your API?
-# 6. Write a brief note about the difference between response type ...
-#     - And `response_model=` ... and which to prefer
-#     - `response_model=` is always prioritised if used.
-# 7. Write an article about making `/signup` more graceful with Piccolo:
-#    - How does it effect usability and the user experience? (Artifacts)
+# 5. Write an article about making `/signup` more graceful with Piccolo, and how
+#    each option affects usability and experience (Artifacts):
 #    - Option 1: Have a simple "invite" process and manually create accounts
 #    - Option 2: Find a professional and delegate the process
 #        - Just how much would this cost? (via Ai / via Human)
 #        - Signup -> Email -> Verify (code) -> Login -> Onboarding
-# 8. Create different `include_router` packages for authentication routes?
+# 6. Create different `include_router` packages for authentication routes?
 #    - @ https://fastapi.tiangolo.com/tutorial/bigger-applications/
 #    - @ https://stackoverflow.com/a/67318405
 
 from auth.authenticate import authenticate
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
-from planner.tables import Event
-from planner.models.events import Event, EventUpdate, EventJustTitle, EventWithCreator
+from piccolo.apps.user.tables import BaseUser
+from piccolo.engine.sqlite import TransactionType #! ⚠️ Try to avoid using this!
+
+import planner.tables as data # data.Event
+import planner.models.events as api # api.Event
 
 from typing import List
+
 
 event_router = APIRouter(
     tags=["Events"] # used for `/redoc` (menu groupings)
@@ -100,54 +124,59 @@ event_router = APIRouter(
 # Read routes
 # ==============================================================================
 
-# Routes -----------------------------------------------------------------------
-
-@event_router.get("/", response_model=List[EventJustTitle])
-def retrieve_all_events() -> List[EventJustTitle]:
-    """Return a simple list of event titles!
+@event_router.get("/", response_model=List[api.Event])
+async def retrieve_all_events() -> List[api.Event]:
+    """Return a simple list of events!
     
-    A little different than our book example, but just to show the flexibility
-    and speed of a Pythonic solution. I generally type in an Elm-style, but this
-    is quite graceful!
+    You could use Piccolo's `create_pydantic_model` to generate our response
+    types, but we're being explicit in `planner.models.events`. You could also
+    return a particular data point explicitly if you prefer:
+
+    ```
+    [{"title": user.title} for user in query]
+    ```
     """
-    sqlite_db.connect()
+    query = await data.Event.select()
 
-    query = EventData.select() #! 'SELECT * FROM Event'
-    events = [{"title": user.title} for user in query] # List comprehension
-
-    sqlite_db.close()
-
-    return events
+    return query
 
 
-@event_router.get("/{id}", response_model=Event)
-def retrieve_event(id: int) -> Event:
+@event_router.get("/{id}")
+async def retrieve_event(id: int) -> api.Event:
     """Retrieve a single event by ID
     
-    Should we always close connection OUTSIDE of the `if` statement? PeeWee holds
-    on to the object, even if the connection has been closed. I guess the next
-    call will recycle the `event` variable (Python is mutable).
-
-    I don't like `try/except/finally` blocks (`finally` closes the connection),
-    so we're avoding that with the `get_or_none()` function, which makes behaviour
-    similar to SQLModel.
-    
-    Otherwise we get a big exception we'd need to deal with, if there are no
-    results for the database query.
+    Avoid `try/except/finally` blocks like the plague! Piccolo is a lot more
+    terse and pleasant than Peewee in some ways. Any expections should be dealt
+    with by using `HTTPException`.
     """
-    sqlite_db.connect()
-    event = EventData.get_or_none(EventData.id == id) #! See (1) in Qs
+    event = await data.Event.select().where(data.Event.id == id).first()
 
-    if event:
-        return model_to_dict(event)
+    if not event:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Event with ID: {id} does not exist"
+        )
     
-    sqlite_db.close()
+    return event
 
-    raise HTTPException(
-        status_code=404,
-        detail=f"Event with ID: {id} does not exist"
-    )
 
+@event_router.get("/profile/me")
+async def retrieve_user_profile() -> dict:
+    """Retrieve user profile and all their events
+    
+    > #! TO DO: Finish this route properly.
+    > Only retrieve events created by the (current) authenticated user.
+
+    This isn't in the book, but think it's a useful (and necessary) addition.
+    You're definitely going to allow the user to view and edit their profile!
+    """
+
+
+# ------------------------------------------------------------------------------
+# Write routes
+# ==============================================================================
+# I've left in the old `PATCH` update route with `SQLModel` for reference, but
+# I feel it's safer to use `PUT` to replace the entire resource. (Be explicit!)
 
 @event_router.post("/new")
 def create_event(
@@ -155,68 +184,49 @@ def create_event(
     user: str = Depends(authenticate)) -> EventWithCreator:
     """Create a new event
 
-    The `user` value should really be a `nanoid`, which we use to reference the
-    user in the database, and do any real work with `User.id` (a simple
-    incrementing `int`. However ...
+    > `Event.id` is auto-generated by Piccolo.
+    >
+    > ⚠️ Are our types strict enough? [ @ https://sqlite.org/stricttables.html ]
+    > ⚠️ Are we confident that each entry is 100% unique?
 
-    We may as well let PeeWee do the work for us, and just supply a `User` object,
-    and it'll extract the `id` for us. This feels a bit icky to me coming from
-    a statically typed (I'd rather explicitly set the `id`), but it works.
+    1. Our user `id` is required to create the event.
+    2. Our event has a `UUID` which can be shortened for prettier URLs.
+    3. We do not use guards to check if a user exists (`authenticate` will error)
+    4. We do not use guards to check if an event exists (use SQLite errors)
+
+    #! Unfortunately we've got to make two database calls here ...
+    one to get the user `ID` from the `username`, another to post the event.
     
-    Speed
-    -----
-    > ⚠️ The first time I ran this function, it was pretty slow ...
-    
-    Subsequent calls were much faster. I don't know why this is.
-    """    
-    sqlite_db.connect(reuse_if_open=True) #! ⚠️ This feels a bit BRITTLE!
-    username = UserData.get(UserData.email == user) #! Create a `UserData` object
+    #! Never expose sensitive information like `ID` in production APIs.
+    This will potentially expose you to nasty hacking attacks.
+    """
+    with Band._meta.db.transaction(transaction_type=TransactionType.immediate):
 
-    # Our `EventData.id` field is auto-generated by PeeWee and not set in our 
-    # `Event` request body, so ... `User`` either `exclude_none=True` or the
-    # setting below. Also, our `PeeWee` type `EventData` will need a proper
-    # `UserData.id` value. It's not strict by default, and the book uses an
-    # `EmailString` value.
-    # 
-    # Even though PeeWee should stop our `Event.creator` (an `int` value) from
-    # submitting, it doesn't. SQLite accepts whatever you give it by default ... 
-    # ANY data. Any data at all. In order to force strictness, we need to set our
-    # tables to `strict` mode. Postgres doesn't have this problem (always strict).
-    #
-    # @ https://sqlite.org/stricttables.html
-    # 
-    query = EventData(creator=username, **body.model_dump(exclude_none=True))
-    query.save() # You could've used `EventData.create(**kwargs)` instead
-    
-    sqlite_db.close()
+        find_user = await (
+            data.BaseUser.select()
+            .where(data.BaseUser.email == user) # username
+            .first() # Rather than `find_user[0]`
+        )
 
-    #! Debugging ONLY. NEVER expose sensitive details in production.
-    #!
-    #! In order to hide our `UserData.email` and `UserData.password`,
-    #! (I think) we MUST do this manually, unlike SQLModel, which can
-    #! have a model that excludes sensitive data.
-    #!
-    #! We could also use FastApi's `response_model=` to exclude sensitive data.
-    #! Preparing for other frameworks however, it's not a bad idea to do things
-    #! manually, as I imagine OCaml and Elm would do it like that. 
+        query = await (
+            # Insert the new event and return all columns,
+            # See `ForeignKey` in `planner.tables` ...
+            data.Event.insert(
+            creator=find_user["id"], 
+            **body.model_dump(exclude_none=True)) # Exclude `None` values
+            .returning(*data.Event.all_columns())
+        )
 
-    return model_to_dict(query) # You could write this _before_ `close()`
-
-
-"""
-********************************************************************************
-A user profile with user details and all their (only their) events route
-********************************************************************************
-"""
-
-# ------------------------------------------------------------------------------
-# Write routes
-# ==============================================================================
+    return query[0] #! Is there a more graceful way to do this?
 
 
 
 
 
+
+
+# Old (deprecated) route
+# ----------------------
 # @event_router.patch("/edit/{id}", response_model=Event)
 # def update_event(id: int, data: EventUpdate, user: str = Depends(authenticate)) -> Event:
 #     event = session.get(Event, id) # Get `Event` object from database
@@ -240,25 +250,50 @@ A user profile with user details and all their (only their) events route
 #     return event # If you don't return something you'll get `Internal Server Error`!
 
 
-@event_router.delete("/{id}")
-def delete_event(id: int, user: str = Depends(authenticate)) -> dict:
-    event = EventData.get(EventData.id == id)
+# ------------------------------------------------------------------------------
+# Delete routes (destructive actions)
+# ==============================================================================
+# > ⚠️ `DELETE` all route has been removed for safety (just admin raw SQL)
+#
+# Be super careful with any `DELETE` routes! You should always notify the user
+# and have them confirm the action. In production you may wish to avoid certain
+# `DELETE` routes altogether (like deleting all events).
 
-    if event.creator != user:
-        raise HTTPException(
-            status_code=404,
-            detail="Event not found" #! This is a lie, but it's more secure
+@event_router.delete("/{id}")
+async def delete_event(id: int, user: str = Depends(authenticate)) -> dict:
+    """Delete an event by ID
+    
+    > ⚠️ Only delete if user is the creator!
+    > 🔐 Avoids a "database locked" error with SQLite async
+
+    It's wise to not give away too many details in your error messages, or
+    return values with `DELETE` which can help reduce attacks.
+
+    #! Because `authenticate()` will return a `username` or error, I'm fairl
+    certain you don't need to also check user exists within this function.
+
+    #! Due to async behaviour with SQLite, we must use an `IMMEDIATE` transaction
+    as we've got both read and write operations within this route. See the
+    `planner.tables` file for more information on concurrency.
+    """
+    with Band._meta.db.transaction(transaction_type=TransactionType.immediate):
+
+        find_user = await (
+            data.BaseUser.select()
+            .where(data.BaseUser.email == user) # username
+            .first() # Rather than `find_user[0]`
         )
 
-    if event:
-        row = event.delete_instance()
+        query = await (
+            data.Event.delete()
+            .where(data.Event.id == id)
+            .returning(data.Event.id and data.Event.creator == find_user["id"])
+        )
 
-        return { "message": f"{row} Event deleted with ID# {id}!" }
-    
-    raise HTTPException(
-        status_code=404,
-        detail=f"Event with supplied ID {id} does not exist"
-    )
+        if not query: # Empty list?
+            raise HTTPException(
+                status_code=404,
+                detail=f"Event with supplied ID: {id} does not exist"
+            )
 
-#! See WISHLIST above. Removed route to delete all events ...
-#! With `sqlite3 planner.db` in terminal `DELETE FROM event;`
+        return { "message": f"Event with ID# {id} deleted!" }

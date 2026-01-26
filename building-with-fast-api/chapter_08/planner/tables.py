@@ -24,7 +24,8 @@
 #     - So be extra careful to validate data with Pydantic before inserting!
 #     - PRAGMA settings like `journal_mode=WAL`, `foreign_keys`, `cache_size`,
 #       aren't available in Piccolo yet. You can set `TIMEOUT` however.
-# 2. All values are optional by default (can be `None`) so be specific w/ `tables.py`
+# 2. All values are optional by default
+#     - Can be `None` so be specific with `tables.py`
 # 3. `ID`s are auto-incrementing and unique by default (null values are not distinct)
 #     - `ID`s are `secret=` by default with API responses, and you can make other
 #       values secret in the response if you like.
@@ -44,6 +45,16 @@
 #       or json strings).
 #
 #
+# Piccolo `BaseUser`
+# ------------------
+# > By default Piccolo's user management system `/signup` with `username` and
+# > `password` only. You can extend it if you prefer.
+#
+# We're targeting the `ID` field here, but it's probably easier to use `username`,
+# as we'd need a `select()` to get the `ID` first. See "Concurrent connections"
+# notes below.
+#
+#
 # General SQL notes
 # -----------------
 # > An ORM and Pydantic handles data conversion for you, whereas with raw SQL you
@@ -57,6 +68,11 @@
 # 6. Understand the difference between columns and fields.
 #
 #    @ https://stackoverflow.com/q/11586986 (disadvantages of composite key)
+#
+#
+# Concurrency with read and write
+# -------------------------------
+# > Piccolo has some issues with SQLite and concurrent connections.
 #
 # Concurrent connections with SQLite are only an issue if you combine read and
 # write operations at the same time. See here for more info:
@@ -87,6 +103,7 @@
 # --------
 # 1. Which field should `ForeignKey` reference?
 #     - `ID` or `username`?
+#     - `ID` requires both read and write operations (slower and async issues)
 # 2. Many-to-many relationships (tags, categories, etc)
 #     - Previous versions this was a `JSONField`
 
@@ -103,7 +120,7 @@ class Event(Table):
     we've changed it to automatically generate a `UUID` for us.
     """
     id = UUID(primary_key=True, index=True)
-    creator = ForeignKey(references=BaseUser, target_column=BaseUser.username) #! (1)
+    creator = ForeignKey(references=BaseUser, target_column=BaseUser.id) #! (1)
     title = Varchar(length=255, null=False)
     image = Varchar(length=255, null=True)
     description = Text() # `None` values allowed
