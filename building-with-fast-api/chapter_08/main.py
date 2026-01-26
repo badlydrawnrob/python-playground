@@ -151,7 +151,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
-from planner.routes.users import user_router
+from piccolo.table import create_db_tables
+
+#! from planner.routes.users import user_router
 from planner.routes.events import event_router
 from planner.tables import Event
 
@@ -161,16 +163,29 @@ import uvicorn
 # ------------------------------------------------------------------------------
 # Create the app instance
 # ==============================================================================
-# See the `lifespan` function below.
+# > See also my `data-playground/mocking/fruits` repo for further explanations
+#
+# 1. Build the database (if doesn't already exist)
+# 2. Use the `lifespan` setup
+# 3. Set a simple home route
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await create_db_tables(Event, if_not_exists=True)
+    yield
 
 app = FastAPI(lifespan=lifespan)
+
+@app.get("/")
+def home():
+    return RedirectResponse(url="/event/")
 
 
 # ------------------------------------------------------------------------------
 # Routers (register)
 # ==============================================================================
 
-app.include_router(user_router, prefix="/user") # prefixes the `/user` url
+#! app.include_router(user_router, prefix="/user") # prefixes the `/user` url
 app.include_router(event_router, prefix="/event") # prefixes the `/event` url
 
 
@@ -190,22 +205,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"]
 )
-
-
-# ------------------------------------------------------------------------------
-# Build the database and set the home route
-# ==============================================================================
-# If it does not already exist. See also my `data-playground/mocking/fruits`
-# repo for further explanation.
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    await create_db_tables(Event, if_not_exists=True)
-    yield
-
-@app.get("/")
-def home():
-    return RedirectResponse(url="/event/")
 
 
 # ------------------------------------------------------------------------------
