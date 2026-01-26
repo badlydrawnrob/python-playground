@@ -107,43 +107,47 @@
 # > Remove code duplication and keep code simple (your future stupid self!)
 #
 # 1. Go through the "5 steps" Tesla uses to build their cars.
-#    - @ https://tinyurl.com/tesla-5-steps
+#     - @ https://tinyurl.com/tesla-5-steps
 # 2. Make sure all routes that require a logged in user are secured.
-#    - Does this user "own" this data point?
-#    - Remove any unecessary routes (`DELETE` all will torpedo your app!)
-# 3. Consider using some GUI to aid "birds eye view" of schema/data
-#    - I think Piccolo has some rudimentary version of this, and Admin
-#    - See "APIs you won't hate" for more ideas (error codes, etc)
-# 4. Consider shortening the `UUID` type for prettier URLs.
-#    - This can be done after the fact (`UUID` -> `ShortUUID`)
-#    - @ https://github.com/piccolo-orm/piccolo/issues/1271
-#    - #! Order of speed for lookup/joins: `Int` > `Bytes` > `String`
-# 5. Bombardier test for concurrency and speed
-#    - Remember 100s of connections may be unlikely; prefer solid to speedy
-# 6. Write down the reason to prefer `PUT` over `PATCH`
-#    - Patch is harder to predict which optional values are present
-#    - Similar to the Elm `Decode.maybe` problem
-#    - @ https://sqlmodel.tianglo.com/tutorial/fastapi/update
-# 7. Make sure only the "this" user "this" time can view (authentication)
-#    - Add a condition that only a particular user can grab their events?
-#    - `user.email == events.creator` guards (or USE SQL `WHERE`!)
-# 8. `List Int` for tags is far more complicated than simple join
-#    - Would this be a many-to-many relationship?
-#    - What difference does this make to UI and architecture?
-#    - Does it make the Elm Lang code easier or harder?
-#    - How are others handling this and their endpoints?
-# 9. Do we need any caching? (on the server or with SQlite)
-#    - @ https://github.com/long2ice/fastapi-cache
-#    - @ https://www.powersync.com/blog/sqlite-optimizations-for-ultra-high-performance
-# 10. Consider a `User.role` with `BaseUser` ... possible?
-#    - @ https://fastapi.tiangolo.com/advanced/security/oauth2-scopes/
-# 11. Understand middleware a little better
-#    - @ https://fastapi.tiangolo.com/tutorial/middleware/
-# 12. Logging for FastApi live server to prepare for launch:
-#    - @ Search Brave "fastapi logging production"
-#    - @ https://tinyurl.com/prep-fastapi-for-production (hire a professional!)
-# 13. Disallow some email addresses if we're not in control of signup
-#    - For example `user+test@gmail` which allows multiple accounts.
+#     - Does this user "own" this data point?
+#     - Remove any unecessary routes (`DELETE` all will torpedo your app!)
+# 3. Can we tighten up security any more? (low hanging fruit)
+#     - XSS attacks and SQL injections
+#     - Error messages that give away too much info
+#     - Destructive endpoints that aren't necessary
+# 4. Consider using some GUI to aid "birds eye view" of schema/data
+#     - I think Piccolo has some rudimentary version of this, and Admin
+#     - See "APIs you won't hate" for more ideas (error codes, etc)
+# 5. Consider shortening the `UUID` type for prettier URLs.
+#     - This can be done after the fact (`UUID` -> `ShortUUID`)
+#     - @ https://github.com/piccolo-orm/piccolo/issues/1271
+#     - #! Order of speed for lookup/joins: `Int` > `Bytes` > `String`
+# 6. Bombardier test for concurrency and speed
+#     - Remember 100s of connections may be unlikely; prefer solid to speedy
+# 7. Write down the reason to prefer `PUT` over `PATCH`
+#     - Patch is harder to predict which optional values are present
+#     - Similar to the Elm `Decode.maybe` problem
+#     - @ https://sqlmodel.tianglo.com/tutorial/fastapi/update
+# 8. Make sure only the "this" user "this" time can view (authentication)
+#     - Add a condition that only a particular user can grab their events?
+#     - `user.email == events.creator` guards (or USE SQL `WHERE`!)
+# 9. `List Int` for tags is far more complicated than simple join
+#     - Would this be a many-to-many relationship?
+#     - What difference does this make to UI and architecture?
+#     - Does it make the Elm Lang code easier or harder?
+#     - How are others handling this and their endpoints?
+# 10. Do we need any caching? (on the server or with SQlite)
+#     - @ https://github.com/long2ice/fastapi-cache
+#     - @ https://www.powersync.com/blog/sqlite-optimizations-for-ultra-high-performance
+# 11. Consider a `User.role` with `BaseUser` ... possible?
+#     - @ https://fastapi.tiangolo.com/advanced/security/oauth2-scopes/
+# 12. Understand middleware a little better
+#     - @ https://fastapi.tiangolo.com/tutorial/middleware/
+# 13. Logging for FastApi live server to prepare for launch:
+#     - @ Search Brave "fastapi logging production"
+#     - @ https://tinyurl.com/prep-fastapi-for-production (hire a professional!)
+# 14. Disallow some email addresses if we're not in control of signup
+#     - For example `user+test@gmail` which allows multiple accounts.
 
 from contextlib import asynccontextmanager
 

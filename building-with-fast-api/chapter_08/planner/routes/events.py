@@ -218,7 +218,7 @@ async def create_event(
 # `DELETE` routes altogether (like deleting all events).
 
 @event_router.delete("/{id}")
-async def delete_event(id: int, user: str = Depends(authenticate)) -> dict:
+async def delete_event(id: str, user: str = Depends(authenticate)) -> dict:
     """Delete an event by ID
     
     > ⚠️ Only delete if user is the creator!
@@ -227,15 +227,12 @@ async def delete_event(id: int, user: str = Depends(authenticate)) -> dict:
     Errors
     ------
     1. `authenticate()` returns `username` or `error` so no need to check user.
-
-    Security
-    --------
-    It's wise to not give away too many details in your error messages, or
-    return values with `DELETE` which can help reduce attacks.
     """
     query = await (
         data.Event.delete()
-        .where(data.Event.id == id & data.Event.creator.username == user) #! Needs brackets?
+        .where(
+            (data.Event.id == id) & (data.Event.creator.username == user)
+        )
         .returning(data.Event.id)
     )
 

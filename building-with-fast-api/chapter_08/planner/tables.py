@@ -3,6 +3,7 @@
 # ==============================================================================
 # > Docs: @ https://piccolo-orm.readthedocs.io/en/latest/piccolo/schema/index.html
 # > Column types: @ https://github.com/piccolo-orm/piccolo/issues/1257
+# > SQL guide: @ https://www.dofactory.com/sql
 #
 # For full documentation see the `mocking/fruits` example here:
 #
@@ -18,6 +19,9 @@
 #
 # SQLite and Piccolo
 # ------------------
+# > ⚠️ `EVENT` is a reserved keyword in SQLite and should not be used as a table
+# > name or other identifier without proper "quoting".
+#
 # 1. Piccolo does not use `STRICT TABLES` by default (SQLite allows anything)[^1]
 #     - Values are stored as basic data types: `Integer`, `Real`, `Text`
 #     - Insertion values are ordered by class field order (not alphabetically) ...
@@ -63,6 +67,12 @@
 # We're targeting the `ID` field here, but it's probably easier to use `username`,
 # as we'd need a `select()` to get the `ID` first. See "Concurrent connections"
 # notes below.
+#
+#
+# UUID for security
+# -----------------
+# > Not strictly necessary (Stackoverflow uses `Serial` IDs), but more secure.
+# > Prevents hackers from blitzing by incrementing IDs. Prevents Ai scraping.
 #
 #
 # General SQL notes

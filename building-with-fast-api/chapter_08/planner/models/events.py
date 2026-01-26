@@ -76,6 +76,8 @@
 #     - But rarely will you need both. The former takes presedence.
 # 2. Make sure data entry and return values are typed and predictable.
 #     - @ https://mypy.readthedocs.io/en/stable/typed_dict.html
+# 3. Do you ALWAYS need a response model?
+#     - When would it be OK to just return `dict`?
 
 from pydantic import BaseModel, EmailStr, Field
 from typing import List
@@ -96,28 +98,17 @@ class Event(BaseModel):
 
 
 # ------------------------------------------------------------------------------
-# Response
+# Response model (examples)
 # ==============================================================================
-# > Some examples I've provided of potential response models. I prefer a flatter
-# > dictionary as Elm Lang prefers this. By default Piccolo responses leave out
-# > the `ID`; depending on your design choices, you may not need a response model!
-# 
-# You _could_ have a different `response_model=` to the `-> ResponseType` to
-# hide certain fields you want to keep private. In practice though, it seems best
-# to use one or the other (not both) to keep things simple.
+# > You can generally get by with the `Event` model alone, but here's some ideas.
+# > Elm Lang prefers a flatter model, whereas Piccolo's `create_pydantic_model()`
+# > is better used with `nested` mode. Piccolo removes the `ID` by default.
 #
-# 1. Use a Piccolo query to get the data from the database.
-# 2. Convert the Piccolo dictionary response into a Pydantic model.
-# 3. I've given some examples below of different response models.
-#     - But we're only using the `EventWithCreator` model in this app.
+# Generally you only need a `response_model=` OR a `-> ResponseType`, not both.
+# You may like to use them together for removing sensitive fields like `password`.
 #
-#
-# Old problems:
-# -------------
-#! ⚠️ For some reason `response_model=` doesn't work with `EventWithCreator`.
-#! ⚠️ It works if you use it as the _return type_ of the function. So, it might
-#! ⚠️ be better to just be explicit and do this manually.
-
+# 1. Convert a Piccolo query response to a Pydantic model
+# 2. We're not currently using any of these models, but try them out if you like.
 
 class EventWithCreator(BaseModel):
     """ A response model with event creator.
@@ -125,7 +116,7 @@ class EventWithCreator(BaseModel):
     We've removed sensitive fields like `ID` and `password`.
     """
     creator_username: str = Field(alias="username")
-    creator_email: EmailStr = Field(alias="email")
+    creator_email: EmailStr = Field(alias="email") #! ⚠️ Security risk?
     title: str
     image: str
     description: str
