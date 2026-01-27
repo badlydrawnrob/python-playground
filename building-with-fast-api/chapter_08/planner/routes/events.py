@@ -81,26 +81,23 @@
 # --------
 # > Make sure routes are properly secured
 #
-# 1. #! ⚠️ Are our TYPES strong enough?
+# 1. ⚠️ Are our TYPES strong enough?
 #     - Are we confident that each entry is 100% unique?
 #     - Test SQLite inserts with wrong data. Is it possible?
 #     - We may need a `DataIn` type to verify types are correct before insert.
-# 2. When we `DELETE` (or other operations) what error codes?
+# 2. ⚠️ When we `DELETE` (or other operations) what error codes?
 #     - See the "APIs you won't hate 2" book
 #     - For `DELETE` operations security, what should we NOT return?
-# 3. What obvious errors are we not currently handling?
+# 3. 🐛 What obvious errors are we not currently handling?
 #     - Sqlite integrity or null constraint errors?
 #     - Write a duplicate ID function (SQLite unique constraint error)
-# 4. Remove ALL documentation from Bruno
-#     - Follow the "APIs you won't hate" guidelines
-#     - Bruno could be the "high level viewpoint" of your API?
-# 5. Write an article about making `/signup` more graceful with Piccolo, and how
+# 4. Write an article about making `/signup` more graceful with Piccolo, and how
 #    each option affects usability and experience (Artifacts):
 #    - Option 1: Have a simple "invite" process and manually create accounts
 #    - Option 2: Find a professional and delegate the process
 #        - Just how much would this cost? (via Ai / via Human)
 #        - Signup -> Email -> Verify (code) -> Login -> Onboarding
-# 6. Create different `include_router` packages for authentication routes?
+# 5. Create different `include_router` packages for authentication routes?
 #    - @ https://fastapi.tiangolo.com/tutorial/bigger-applications/
 #    - @ https://stackoverflow.com/a/67318405
 

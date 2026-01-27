@@ -16,8 +16,7 @@
 #
 # WISHLIST
 # --------
-# 1. #! Should we have a list of `Event` IDs on the `User` model?
-#     - Is this the way they've got it in the book?
+# 1. Our `/user/me` profile endpoint may need `List (Event ID)`
 
 from pydantic import BaseModel, EmailStr
 

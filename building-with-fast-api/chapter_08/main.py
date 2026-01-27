@@ -106,9 +106,11 @@
 # --------
 # > Remove code duplication and keep code simple (your future stupid self!)
 #
-# 1. Go through the "5 steps" Tesla uses to build their cars.
+# 1. ✂️ Go through the "5 steps" Tesla uses to build their cars.
 #     - @ https://tinyurl.com/tesla-5-steps
-# 2. Make sure all routes that require a logged in user are secured.
+# 2. 🔐 Make sure all routes that require a logged in user are secured.
+#     - Make sure users can only view their own events for the `/user/me`
+#       endpoint: `user.email == events.creator` guards (or `WHERE`)
 #     - Does this user "own" this data point?
 #     - Remove any unecessary routes (`DELETE` all will torpedo your app!)
 # 3. Can we tighten up security any more? (low hanging fruit)
@@ -122,19 +124,17 @@
 #     - This can be done after the fact (`UUID` -> `ShortUUID`)
 #     - @ https://github.com/piccolo-orm/piccolo/issues/1271
 #     - #! Order of speed for lookup/joins: `Int` > `Bytes` > `String`
-# 6. Bombardier test for concurrency and speed
+# 6. ⏰ Bombardier test for concurrency and speed
 #     - Remember 100s of connections may be unlikely; prefer solid to speedy
+#     - ⚠️ Any `POST` endpoints require getting the `BaseUser.id` first.
 # 7. SQLite pragma optimizations for performance
 #     - Things like `-wal` and `-shm` modes
 #     - @ https://github.com/piccolo-orm/piccolo/discussions/1247
-# 7. Write down the reason to prefer `PUT` over `PATCH`
+# 8. Write down the reason to prefer `PUT` over `PATCH`
 #     - Patch is harder to predict which optional values are present
 #     - Similar to the Elm `Decode.maybe` problem
 #     - @ https://sqlmodel.tianglo.com/tutorial/fastapi/update
-# 8. Make sure only the "this" user "this" time can view (authentication)
-#     - Add a condition that only a particular user can grab their events?
-#     - `user.email == events.creator` guards (or USE SQL `WHERE`!)
-# 9. `List Int` for tags is far more complicated than simple join
+# 9. ⚠️ `List Int` for tags is far more complicated than simple join
 #     - Would this be a many-to-many relationship?
 #     - What difference does this make to UI and architecture?
 #     - Does it make the Elm Lang code easier or harder?

@@ -25,7 +25,8 @@ open -a TextEdit /sqlite.md
 
 ## Bruno
 
-> See "APIs You Won't Hate 2" book.
+> Follow the "APIs you won't hate 2" guidelines
+> Bruno could be the "high level viewpoint" of your API?
 
 You can load the `../bruno/collection/chapter-*` files to test out the endpoints.
 For most routes you'll need to generate a JWT token at `Collection settings -> Auth`.

@@ -39,8 +39,8 @@
 #
 # WISHLIST
 # --------
-# 1. Figure out how to `/signin` with Elm and CURL
-# 2. Check the error status code and create custom one
+# 1. ⭐️ Figure out how to `/signin` with Elm and CURL
+# 2. ⚠️ Check the error status code and create custom one
 # 3. Use a `TypedDictionary` for the `/signin` response type?
 # 4. Change `username` to `public` UUID for JWT?
 

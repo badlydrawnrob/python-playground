@@ -82,10 +82,9 @@
 # --------
 # 1. You can choose either `response_model=` or `-> ResponseType`
 #     - But rarely will you need both. The former takes presedence.
-# 2. Make sure data entry and return values are typed and predictable.
+#     - Do you ALWAYS need a response model? When is a `dict` OK?
+# 2. ⚠️ Make sure data entry and return values are typed and predictable.
 #     - @ https://mypy.readthedocs.io/en/stable/typed_dict.html
-# 3. Do you ALWAYS need a response model?
-#     - When would it be OK to just return `dict`?
 
 from pydantic import BaseModel, EmailStr, Field
 from typing import List
