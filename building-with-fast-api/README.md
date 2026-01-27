@@ -28,6 +28,8 @@ open -a TextEdit /sqlite_utils.sql
 > See "APIs You Won't Hate 2" book.
 
 You can load the `../bruno/collection/chapter-*` files to test out the endpoints.
+For most routes you'll need to generate a JWT token at `Collection settings -> Auth`.
+
 Perhaps Bruno should stick to testing, wishlists, and bugs?
 
 - It doesn't seem a good idea to store detailed schema docs in Bruno
