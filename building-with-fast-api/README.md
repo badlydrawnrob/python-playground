@@ -20,7 +20,7 @@ piccolo migrations forwards user
 piccolo user create
 
 # Populate the database
-open -a TextEdit /sqlite_utils.sql
+open -a TextEdit /sqlite.md
 ```
 
 ## Bruno
