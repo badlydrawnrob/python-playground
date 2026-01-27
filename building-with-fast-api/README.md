@@ -1,5 +1,43 @@
 # README
 
+
+<!-- ***************************************************************************
+     PRINT OUT AND REVISE: CUT OUT ANYTHING UNECESSARY
+**************************************************************************** -->
+
+## Setup
+
+> Setup `/chapter-08`, which is the most substantial code in the book
+
+```bash
+# Activate the virtual environment, then run the app
+# Also sets up the database with `Event` table
+uv run main.py
+
+# Setup the user table
+piccolo migrations forwards user
+# Create the first user (follow the prompts)
+piccolo create user
+
+# Populate the database
+open -a TextEdit /planner/sqlite.csv
+open -a TextEdit /sqlite_utils.sql
+```
+
+## Bruno
+
+> See "APIs You Won't Hate 2" book.
+
+Perhaps Bruno might be best for test data to aid unit testing? Wishlists? Bugs?
+
+- It doesn't seem a good idea to store detailed schema docs in Bruno
+- FastAPI provides `/docs` (and `/redoc`) so house your types info there
+- To detail these properly requires messy code annotations (I don't prefer)
+- You can write `""" """` comments in your functions (and view in `/docs`)
+
+
+## Intro
+
 > This repo is my working copy of the book [Building Python APIs with FastAPI](https://www.packtpub.com/en-us/product/building-python-web-apis-with-fastapi-9781801074513)
 
 **There's so much to think about when writing an API and considering your app architecture** and it can feel very overwhelming, even with the small examples in this book. There's a tendency to have a lot of questions and a big old wishlist of things you'd like to add, but try and keep it simple wherever possible. Make working code first. Understand it thoroughly later (or never). There's lots of things that can go wrong, and tackling them (and learning) just-in-time is perhaps a saner approach.

@@ -1,7 +1,7 @@
 meta {
   name: planner-post-event
   type: http
-  seq: 3
+  seq: 2
 }
 
 post {
@@ -12,28 +12,11 @@ post {
 
 body:json {
   {
+    "creator": null,
     "title": "Glastonbury",
-    "image": "https://somegood.com/song.jpg",
-    "description": "Ed Sheeran singing his best song 'Class A Team'!",
+    "image": "https://tinyurl.com/ed-sheeran-with-shakira",
+    "description": "Ed Sheeran sings with Shakira at Glastonbury!",
     "location": "Live",
     "tags": ["music", "adults", "event"]
   }
-}
-
-docs {
-  # Event: add new
-  
-  > Now posting to the `planner.db`
-  
-  Post a new event.
-  
-  - All fields are required ...
-  - But `id` is optional (primary key)
-      - It's set up to **auto-generate** and **auto-increment**
-  
-  ## 🐞 Bugs
-  
-  > #! If you try to post `:id` that already exists, you'll get a big fat SQL error!
-  
-  
 }

@@ -157,7 +157,7 @@ from fastapi.responses import RedirectResponse
 
 from piccolo.table import create_db_tables
 
-#! from planner.routes.users import user_router
+from planner.routes.users import user_router
 from planner.routes.events import event_router
 from planner.tables import Event
 
@@ -189,7 +189,7 @@ def home():
 # Routers (register)
 # ==============================================================================
 
-#! app.include_router(user_router, prefix="/user") # prefixes the `/user` url
+app.include_router(user_router, prefix="/user") # prefixes the `/user` url
 app.include_router(event_router, prefix="/event") # prefixes the `/event` url
 
 

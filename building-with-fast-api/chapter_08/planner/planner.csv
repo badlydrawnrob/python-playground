@@ -1,4 +1,0 @@
-"id", "creator", "title", "image","description","location","tags"
-"0a466c53-14a7-4a57-9a67-cf3122ed8c3b", 1, "Glastonbury", "https://somegood.com/song.jpg", "Ed Sheeran singing his best song 'Class A Team'!", "Live", '["music", "adults", "event"]'
-"f5922d35-bec4-40f1-8d57-28cf4b6772a4", 1, "Comic Con", "https://somegood.com/comic.jpg", "A fun event for all things comics!", "Convention Center", '["comics", "sci-fi", "fantasy"]'
-"7b5e11f5-47f7-4dd3-a8ae-da81fc84ebe2", 1, "Farmers Market", "https://somegood.com/market.jpg", "Fresh fruits and vegetables", "Town Square", '["food", "local", "outdoors"]'
