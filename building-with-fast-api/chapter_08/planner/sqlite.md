@@ -5,8 +5,8 @@
 
 ## Export from original database:
 
-1. `sqlite-utils planner.sqlite "select * from events" --arrays --nl` from original
-2. `sqlite-utils planner.sqlite "select * from piccolo_user" --arrays --nl`
+1. `sqlite-utils planner.sqlite "select * from events" --arrays --nl` for events
+2. `sqlite-utils planner.sqlite "select * from piccolo_user" --arrays --nl` for users
 
 
 ## Insert into new database:
