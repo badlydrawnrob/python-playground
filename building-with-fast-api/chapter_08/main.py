@@ -124,6 +124,9 @@
 #     - #! Order of speed for lookup/joins: `Int` > `Bytes` > `String`
 # 6. Bombardier test for concurrency and speed
 #     - Remember 100s of connections may be unlikely; prefer solid to speedy
+# 7. SQLite pragma optimizations for performance
+#     - Things like `-wal` and `-shm` modes
+#     - @ https://github.com/piccolo-orm/piccolo/discussions/1247
 # 7. Write down the reason to prefer `PUT` over `PATCH`
 #     - Patch is harder to predict which optional values are present
 #     - Similar to the Elm `Decode.maybe` problem

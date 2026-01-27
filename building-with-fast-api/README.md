@@ -17,10 +17,9 @@ uv run main.py
 # Setup the user table
 piccolo migrations forwards user
 # Create the first user (follow the prompts)
-piccolo create user
+piccolo user create
 
 # Populate the database
-open -a TextEdit /planner/sqlite.csv
 open -a TextEdit /sqlite_utils.sql
 ```
 
@@ -28,7 +27,8 @@ open -a TextEdit /sqlite_utils.sql
 
 > See "APIs You Won't Hate 2" book.
 
-Perhaps Bruno might be best for test data to aid unit testing? Wishlists? Bugs?
+You can load the `../bruno/collection/chapter-*` files to test out the endpoints.
+Perhaps Bruno should stick to testing, wishlists, and bugs?
 
 - It doesn't seem a good idea to store detailed schema docs in Bruno
 - FastAPI provides `/docs` (and `/redoc`) so house your types info there
