@@ -86,7 +86,7 @@
 #     - Test SQLite inserts with wrong data. Is it possible?
 #     - We may need a `DataIn` type to verify types are correct before insert.
 # 2. ⚠️ When we `DELETE` (or other operations) what error codes?
-#     - See the "APIs you won't hate 2" book
+#     - See the "APIs you won't hate 2" book (are `HTTPException`s enough?)
 #     - For `DELETE` operations security, what should we NOT return?
 # 3. 🐛 What obvious errors are we not currently handling?
 #     - Sqlite integrity or null constraint errors?

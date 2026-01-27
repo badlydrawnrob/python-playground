@@ -39,6 +39,14 @@ Perhaps Bruno should stick to testing, wishlists, and bugs?
 - You can write `""" """` comments in your functions (and view in `/docs`)
 
 
+## Errors
+
+> FastApi errors generally use a `HTTPException`.
+> See also [APIs you won't hate](https://leanpub.com/build-apis-you-wont-hate-2) by Phil Sturgeon.
+
+According to _APIs you won't hate_, `HTTPException` might not be good enough. It seems a bit tricky to follow his guide in Part 4, with FastAPI, but you could use a [plugin](https://github.com/NRWLDev/fastapi-problem) to manage errors for you. For example, `rfc9457` and `rfc7807` are error standards.
+
+
 ## Intro
 
 > This repo is my working copy of the book [Building Python APIs with FastAPI](https://www.packtpub.com/en-us/product/building-python-web-apis-with-fastapi-9781801074513)
@@ -120,6 +128,7 @@ The downsides ...
         - We've also deviated from the folder structure to suit Piccolo better.
         - We used `piccolo schema generate` to migrate our tables and no longer
           need the `UserData` table (Piccolo handles this with `BaseUser`).
+        - Better error codes and a pydantic model
 
 
 ## Errata
