@@ -76,6 +76,7 @@ As I've written before, I'm [not a huge fan](https://github.com/badlydrawnrob/py
 
 - **My learning frame** is a personal learning "do" and "don't do" list
 - **The [5 finger rule](#the-5-finger-rule)** to choose books, tuts, and packages
+- **Shallow learning is (mostly) ok** as programming knowledge is a gigantic rabbit hole.
 - **Some things can be a [black box](#a-black-box)** that are set and forget (or outsource)
 - **I don't enjoy low-level detail** so will avoid that kind of work[^1]
 

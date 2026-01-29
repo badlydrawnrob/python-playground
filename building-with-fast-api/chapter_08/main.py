@@ -38,6 +38,7 @@
 # 6. There's a lot could go wrong (fix just-in-time).
 # 7. Prefer explicit code over implicit code (`PUT` > `PATCH`).
 # 8. Ignore the hard bits (delegate, or learn later).
+# 9. Never satisfice. Cross out all the wrong (or complex) routes.
 #
 #
 # The hard bits

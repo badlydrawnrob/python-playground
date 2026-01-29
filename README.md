@@ -50,8 +50,8 @@ Aim for simple language and minimal terminology. Stick the 5 finger rule when pi
 
 ## Coding style
 
-> It doesn't feel as intuitive or consistent as Elm.
-> Python's main benefit is it's shorter learning curve.
+> Python doesn't feel as intuitive or consistent as Elm.
+> It's main benefits are a shorter learning curve and larger ecosystem.
 
 Perhaps you get shorter code at scale, but is it more readable? I'm not so sure.
 
@@ -65,7 +65,7 @@ Perhaps you get shorter code at scale, but is it more readable? I'm not so sure.
     - `[1, 2, 3][-1]`
     - `List.elemIndex (List.reverse [1, 2, 3])`
 
-It's also not at all type safe by default (and type annotations are awkward). Even the naming conventions feel messy (capitals and lowercase)! Here are some examples and comparisons for Python versus Elm Lang. It's important to understand "why would I use [functional programming](https://dev.to/cherryramatis/ending-the-war-or-continuing-it-lets-bring-functional-programming-to-oop-codebases-3mhd) over object-oriented?" as it makes you a better programmer!
+Python is not at all type safe by default! Almost anything goes. Type annotations feel awkward, some of it's naming conventions and formatting a little messier, and the coding (classes, OOP) not to my tastes after dealing with other languages. Here are examples showing the difference between Python versus Elm Lang. "Why would I use a statically typed [functional programming](https://dev.to/cherryramatis/ending-the-war-or-continuing-it-lets-bring-functional-programming-to-oop-codebases-3mhd) language over object-oriented one?". That's simple. Types and type errors force better design-thinking and reduce bugs. It makes you a better programmer!
 
 ### Python
 
