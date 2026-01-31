@@ -120,41 +120,56 @@
 #     - XSS attacks and SQL injections
 #     - Error messages that give away too much info
 #     - Destructive endpoints that aren't necessary
-# 4. Consider using some GUI to aid "birds eye view" of schema/data
+# 4. ⚠️ Are our TYPES strong enough (we've only got API layer models)?
+#     - `user` should probably have a `UserInt` type to assure value?
+#     - Test SQLite inserts with wrong data. Is it possible?
+#     - Are we confident that each entry is 100% unique?
+#     - We may need a `DataIn` type to verify types are correct before insert.
+# 5. ⚠️ Handling errors better (and some light unit testing)
+#     - See the "APIs you won't hate 2" book (are `HTTPException`s enough?)
+#     - Check all routes: what is the low hanging fruit for errors?
+#     - `DELETE` (and other operations) error code, responses, and security?
+#         - 👩‍🦳 A user who doesn't own a piece of data tried to delete it.
+#         - 💾 SQLite error (`null` not allowed, duplicate value failed, etc)
+#         - ⚠️ Sensitive data we should never return (the `ID` or "BE VAGUE")
+#     - 🐛 What obvious errors are we not currently handling?
+#         - Sqlite integrity or null constraint errors?
+#         - Write a duplicate ID function (SQLite unique constraint error)
+# 6. Consider using some GUI to aid "birds eye view" of schema/data
 #     - I think Piccolo has some rudimentary version of this, and Admin
 #     - See "APIs you won't hate" for more ideas (error codes, etc)
-# 5. Consider shortening the `UUID` type for prettier URLs.
+# 7. Consider shortening the `UUID` type for prettier URLs.
 #     - This can be done after the fact (`UUID` -> `ShortUUID`)
 #     - @ https://github.com/piccolo-orm/piccolo/issues/1271
 #     - #! Order of speed for lookup/joins: `Int` > `Bytes` > `String`
-# 6. ⏰ Bombardier test for concurrency and speed
+# 8. ⏰ Bombardier test for concurrency and speed
 #     - Remember 100s of connections may be unlikely; prefer solid to speedy
 #     - ⚠️ Any `POST` endpoints require getting the `BaseUser.id` first.
-# 7. SQLite pragma optimizations for performance
+# 9. SQLite pragma optimizations for performance
 #     - Things like `-wal` and `-shm` modes
 #     - @ https://github.com/piccolo-orm/piccolo/discussions/1247
-# 8. Write down the reason to prefer `PUT` over `PATCH`
+# 10. Write down the reason to prefer `PUT` over `PATCH`
 #     - Patch is harder to predict which optional values are present
 #     - Similar to the Elm `Decode.maybe` problem
 #     - @ https://sqlmodel.tianglo.com/tutorial/fastapi/update
-# 9. ⚠️ `List Int` for tags is far more complicated than simple join
+# 11. ⚠️ `List Int` for tags is far more complicated than simple join
 #     - Would this be a many-to-many relationship?
 #     - What difference does this make to UI and architecture?
 #     - Does it make the Elm Lang code easier or harder?
 #     - How are others handling this and their endpoints?
-# 10. Do we need any caching? (on the server or with SQlite)
+# 12. Do we need any caching? (on the server or with SQlite)
 #     - @ https://github.com/long2ice/fastapi-cache
 #     - @ https://www.powersync.com/blog/sqlite-optimizations-for-ultra-high-performance
-# 11. `BaseUser` could contain a `UUID` and `User.role`?
+# 13. `BaseUser` could contain a `UUID` and `User.role`?
 #     - A `UUID` might be hard to retrofit on the main user table
 #     - @ https://tinyurl.com/piccolo-extending-base-user
 #     - @ https://fastapi.tiangolo.com/advanced/security/oauth2-scopes/
-# 12. Understand middleware a little better
+# 14. Understand middleware a little better
 #     - @ https://fastapi.tiangolo.com/tutorial/middleware/
-# 13. Logging for FastApi live server to prepare for launch:
+# 15. Logging for FastApi live server to prepare for launch:
 #     - @ Search Brave "fastapi logging production"
 #     - @ https://tinyurl.com/prep-fastapi-for-production (hire a professional!)
-# 14. Disallow some email addresses if we're not in control of signup
+# 16. Disallow some email addresses if we're not in control of signup
 #     - For example `user+test@gmail` which allows multiple accounts.
 
 from contextlib import asynccontextmanager
