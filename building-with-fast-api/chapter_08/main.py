@@ -110,10 +110,12 @@
 # 1. ✂️ Go through the "5 steps" Tesla uses to build their cars.
 #     - @ https://tinyurl.com/tesla-5-steps
 # 2. 🔐 Make sure all routes that require a logged in user are secured.
-#     - Make sure users can only view their own events for the `/user/me`
-#       endpoint: `user.email == events.creator` guards (or `WHERE`)
-#     - Does this user "own" this data point?
-#     - Remove any unecessary routes (`DELETE` all will torpedo your app!)
+#     - ⭐️ Understand `aud`ience and `client_id` in auth better:
+#       @ https://stackoverflow.com/a/28503265
+#     - Users can only view their own events for `/user/me` endpoint:
+#       `user.email == events.creator` guards (or `WHERE`)
+#     - Any actions on an event (like, delete) should check user "owns" it.
+#     - Any unecessary destructive routes should be removed (will it torpedo the app?)
 # 3. Can we tighten up security any more? (low hanging fruit)
 #     - XSS attacks and SQL injections
 #     - Error messages that give away too much info
@@ -143,7 +145,9 @@
 # 10. Do we need any caching? (on the server or with SQlite)
 #     - @ https://github.com/long2ice/fastapi-cache
 #     - @ https://www.powersync.com/blog/sqlite-optimizations-for-ultra-high-performance
-# 11. Consider a `User.role` with `BaseUser` ... possible?
+# 11. `BaseUser` could contain a `UUID` and `User.role`?
+#     - A `UUID` might be hard to retrofit on the main user table
+#     - @ https://tinyurl.com/piccolo-extending-base-user
 #     - @ https://fastapi.tiangolo.com/advanced/security/oauth2-scopes/
 # 12. Understand middleware a little better
 #     - @ https://fastapi.tiangolo.com/tutorial/middleware/

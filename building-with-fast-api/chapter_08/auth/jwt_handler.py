@@ -18,14 +18,21 @@
 # 2. A signature (key used to sign the payload)
 # 3. It's algorithm (most common is HS256)
 #
+#     @ https://www.jwt.io/ (check your tokens are valid)
+#
 # A JWT can be encoded/decoded with `base64`. Our signature will NOT decode, as
 # that requires the `SECRET` which will be handled on the backend.
 #
 #
-# Security
-# --------
-# > #! Keep your `SECRET` very safe and refresh it on a regular basis!
-# > @ https://en.wikipedia.org/wiki/Key_size (128-256 bits)
+# Security: secrets
+# -----------------
+# > ⚠️ Never expose `SECRET` key. Keep it safe and refreshed on a regular basis!
+#
+# JWTs are signed using a unique key known only to the server and client, which
+# avoids the encoded string being tampered with. If someone gets a hold of it,
+# they could torpedo your app. KISKIS.
+#
+#     @ https://en.wikipedia.org/wiki/Key_size (128-256 bits)
 # 
 # Double check all security settings with an expert! To generate a random 256
 # bit (32 char) key in terminal, you can use `openssl`:
@@ -34,25 +41,46 @@
 # openssl rand -hex 32
 # ```
 #
-# 1. Your JWT should expire in a couple of hours (not days)
+# Security: best practices
+# ------------------------
+# > @ https://datatracker.ietf.org/doc/html/rfc7519
+# > @ https://curity.io/resources/learn/jwt-best-practices/
+# > @ https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-token-claims
+# > @ https://auth0.com/docs/secure/tokens/json-web-tokens/json-web-token-structure
+#
+# 1. Your JWT should expire in a 30mins—2hrs (not days)
 # 2. Your JWT should include minimal non-identifying info (username/userid)
-# 3. Make sure your `SECRET` key is the correct length (256 bits / 32 chars)
-# 4. If someone gets your `SECRET` they can torpedo your app. KISKIS.
-# 5. Refresh your `SECRET` often, every couple of weeks or so.
-# 6. You could refresh the JWT, but have to be extremely careful (YAGNI)
+# 3. Your `SECRET` key should be the correct length (256 bits / 32 chars)
+# 4. Your `SECRET` should never be exposed! Keep it secure and safe!
+# 5. Your `SECRET` should be refreshed often (every couple of weeks or so).
+# 6. Your claims should include at least `iss`uer, `aud`ience, and `exp`iry
+# 7. Your website should always use HTTPS (never HTTP)
+#
+# Never add sensitive data to the JWT payload!
+# If you add a token refresh endpoint (YAGNI), be extremely careful.
+# Always have a mentor or professional check your code!
+#
+# Security: expiry
+# ----------------
+# > Your JWT should expire in a couple of hours (not days)
+#
+# Use the `Time` module in Elm with the same method that `"expiry"` is encoded.
+# You can then notify the user "Login expires in ___ minutes, you'll have to
+# login again".
 #
 #
 # User details
 # ------------
-# > A site like Auth0 has a separate endpoint for user information.
+# > If you require user info, use the `authenticate()` function or ping a
+# > `/profile` endpoint like Auth0 as it's more secure.
 #
 # Once you've verified the JWT, you can use the `"user"` value to lookup user,
 # and get their details from the database. This might be their preferences, the
 # user type (admin/regular), etc.
 #
 #
-# Time
-# ----
+# Understanding Time
+# ------------------
 # > `time.time()` gives us a POSIX timestamp, also known as UNIX time. This
 # > represents the number of seconds elapsed since the UNIX epoch.
 #
@@ -83,23 +111,11 @@
 # 9. If you require a timezone to display to a user, convert UTC timestamp
 #     - `utc_now.astimezone(ZoneInfo("Asia/Tokyo"))`
 #
-# 
-# Expiration checks
-# -----------------
-# > Your JWT should expire in a couple of hours (not days)
 #
-# Use the `Time` module in Elm with the same method that `"expiry"` is encoded.
-# You can then notify the user "Login expires in ___ minutes, you'll have to
-# login again".
-#
-#
-# Wishlist
+# WISHLIST
 # --------
-# > We need a public id that's short enough for a URL ...
-#
-# 1. Use the `UUID` (eventually `shortuuid`) as the `"user"` value
-#     - From this we can use indexing for the selects and joins we need
-#       our public/private IDs (encode/decode with `base57`)
+# 1. Add the `iss`uer and `aud`ience (and verify in the function)
+# 2. Check the `iss` and `aud` fields when verifying token
 
 from datetime import datetime, timezone
 from fastapi import HTTPException
@@ -109,9 +125,20 @@ import time
 
 
 def create_access_token(username: str) -> str:
+    """Base64url-encoded string with three parts
+    
+    > Encodes user info securely.
+    > @ https://datatracker.ietf.org/doc/html/rfc7519
+    
+    1. JOSE header: metadata about type of token
+    2. JWS payload: set of claims about user and permissions
+    3. JWS signature: access token signed with SECRET key
+    """
     payload = {
-        "user": username, #! UUID is too hard to retrofit with `BaseUser`?
-        "expires": time.time() + 3600 # Expires in 1 hour (60 * 60)
+        # "iss": "https://stringoruri.com",
+        # "aud": "https://stringoruri.com",
+        "sub": username, # Was called `user`
+        "exp": time.time() + 3600 # 60sec * 60min = 1 hour
     }
     
     token = jwt.encode(payload, SECRET, algorithm="HS256")
@@ -119,18 +146,23 @@ def create_access_token(username: str) -> str:
 
 
 def verify_access_token(token: str) -> dict:
+    """Decode JWT and verify it's valid.
+    
+    Currently only checks:
+    
+    1. Was the token supplied?
+    2. Expiry with a UTC timestamp.
+    """
     try:
         data = jwt.decode(token, SECRET, algorithms=["HS256"])
-        expire = data.get("expires")
+        expire = data.get("exp")
 
-        # No token was supplied?
         if expire is None:
             raise HTTPException(
                 status_code=400, # bad request
                 detail="No access token supplied"
             )
 
-        # Token has expired? UTC is the single source of truth!
         if datetime.now(tz=timezone.utc) > datetime.fromtimestamp(expire, tz=timezone.utc):
             raise HTTPException(
                 status_code=403, # forbidden
@@ -141,6 +173,6 @@ def verify_access_token(token: str) -> dict:
 
     except JWTError: # @ https://github.com/mpdavis/python-jose/issues/25
         raise HTTPException(
-            status_code=400, # bad request
+            status_code=400,
             detail="Invalid token"
         )

@@ -49,6 +49,17 @@
 #       or json strings).
 #
 #
+# SQLite and Async problems
+# -------------------------
+# > A read and write together in one endpoint can lead to "database locked" error
+#
+#     @ https://piccolo-orm.readthedocs.io/en/latest/piccolo/tutorials/using_sqlite_and_asyncio_effectively.html
+#     @ https://github.com/piccolo-orm/piccolo/issues/1319
+#
+# With atomic inserts/edits you can generally avoid having to worry about this,
+# but in cases where it's unavoidable, you'll need an `IMMEDIATE` transaction.
+#
+#
 # Piccolo `ForeignKey`
 # --------------------
 # > Piccolo always joins on any foreign keys, so you can traverse them to get
