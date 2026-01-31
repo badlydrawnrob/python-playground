@@ -62,37 +62,44 @@ user_router = APIRouter(
 # ==============================================================================
 # Convert from a Pydantic API type -> Pydantic DATA type
 
-# @user_router.post("/signup")
-# def sign_new_user(data: User) -> dict:
-#     """Convert `User` -> `UserData` object, then add it to the database.
+@user_router.post("/signup")
+async def sign_new_user(data: User) -> dict:
+    """Register a new user account.
     
-#     `.get()` "does this user exist" problem by default throws an exception if
-#     row doesn't exist. To make it handle similar to SQLModel's `None` if does not
-#     exist, we use the `get_or_none()` method. Otherwise we get a load of
-#     traceback error nonsense we have to `try` and catch. Hate `None`, but it's
-#     easier to work with in this case (rather than `user.exists()`)
-#     """
-#     sqlite_db.connect()
-#     user = UserData.get_or_none(UserData.email == data.email) # Does user exist?
+    > ⚠️ Do not use in production! This isn't secure enough.
+    > Piccolo's `BaseUser` handles password hashing and salting for us.
     
-#     if user: # `None` if user doesn't exist
-#         raise HTTPException(status_code=409, detail="Username already exists")
+    This route allows new users to sign up. In a production app you'd want
+    email verification, captcha, and other security measures to avoid bots
+    signing up fake accounts (that's a lot of work!).
+    
+    Startups can use an invite-only system and manually create users with
+    Piccolo's CLI.
 
-#     # Secure the password and replace `User.password` with hash
-#     hashed_password = hash_password.create_hash(data.password)
-#     data.password = hashed_password
+    Errors
+    ------
+    > Possible things that can go wrong ...
+    
+    1. 🔐 Does not create a secure password (Piccolo checks `< 6` characters)
+    2. 📧 Email is not a proper email (Piccolo does not check this)
+    3. 📧 Email already exists (sqlite3.IntegrityError)
+    4. 👤 Username already exists (sqlite3.IntegrityError)
+    5. 🛑 Account not approved by admin (`active=False`)
+    """
+    try:
+        new_user = BaseUser.create_user(
+            username=data.username,
+            email=data.email,
+            password=data.password
+            active=True #! (4)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Username or email already exists | {e}"
+        )
 
-#     # Add user to database (`User` -> `UserData`)
-#     # 1. Convert `User` to a dictionary (excluding `None` key/values)
-#     # 2. Create a `UserData` object (with `**kwargs`)
-#     # 3. Save it to the database (similar to SQLModel's `commit()`)
-#     new_user = UserData.create(**data.model_dump())
-#     new_user.save() # should return `1` affected row
-
-#     #! Close the connection (4)
-#     sqlite_db.close()
-
-#     return { "message": f"User with {new_user.email} registered!" }
+    return { "message": f"User with {new_user.email} registered!" }
 
 
 # ------------------------------------------------------------------------------
@@ -121,9 +128,9 @@ async def sign_in_user(data: OAuth2PasswordRequestForm = Depends()):
     access_token = create_access_token(data.username)
 
     return {
-            "access_token": access_token, # (5)
-            "token_type": "Bearer"
-        }
+        "access_token": access_token, # (5)
+        "token_type": "Bearer"
+    }
 
 
 @user_router.get("/me")
