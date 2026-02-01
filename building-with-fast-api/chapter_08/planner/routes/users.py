@@ -85,10 +85,11 @@ async def sign_new_user(data: User) -> dict:
     3. 📧 Email already exists (sqlite3.IntegrityError)
     4. 👤 Username already exists (sqlite3.IntegrityError)
     5. ❌ Value is `None` for required fields (sqlite3.IntegrityError)
-    5. 🛑 Account not approved by admin (`active=False`)
+    6. ❌ Response value giving away sensitive info (avoid this!)
+    7. 🛑 Account not approved by admin (`active=False`)
     """
     try:
-        new_user = BaseUser.create_user(
+        new_user = await BaseUser.create_user(
             username=data.username,
             email=data.email,
             password=data.password,
@@ -100,7 +101,7 @@ async def sign_new_user(data: User) -> dict:
             detail=f"Username or email already exists | {e}"
         )
 
-    return { "message": f"User with {new_user.email} registered!" }
+    return { "message": f"User with email: {new_user.email} and username: {new_user.username} registered!" }
 
 
 # ------------------------------------------------------------------------------

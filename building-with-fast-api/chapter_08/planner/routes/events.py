@@ -212,7 +212,7 @@ async def delete_event(id: str, user: int = Depends(authenticate)) -> dict:
 
     1. ⚠️ User who doesn't own data tried to delete it
     2. 🔐 "Database locked" error with SQLite async (now not possible)
-    3. ...
+    3. <s>👩‍🦳 "Does not have permission to delete"</s> (left out of error message)
     """
     query = await (
         data.Event.delete()
@@ -234,8 +234,10 @@ async def delete_event(id: str, user: int = Depends(authenticate)) -> dict:
 # ------------------------------------------------------------------------------
 # Deprecated routes (old SQLModel code for reference)
 # ==============================================================================
-# I've left in the old `PATCH` update route with `SQLModel` for reference, but
-# I feel it's safer to use `PUT` to replace the entire resource. (Be explicit!)
+# > Use `PUT` and not `PATCH` to be explicit with missing values!
+# 
+# Here's the old `PATCH` update route (using `SQLModel`) for reference. I feel
+# it's generally safer to be explicit, and removes any doubt about supplied data.
 
 
 # @event_router.patch("/edit/{id}", response_model=Event)

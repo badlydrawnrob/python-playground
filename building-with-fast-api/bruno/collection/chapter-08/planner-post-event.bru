@@ -24,6 +24,9 @@ body:json {
 docs {
   # 🐞 Bugs
   
-  1. 🕰 **Slow response time?**
-      - Because we have to get the `BaseUser.id` firs!
+  1. **`NULL`able by default**
+      - Currently `Event.creator` foreign key can be `None`
+      - However, the endpoint _always_ adds the `BaseUser.id` of the logged in user.
+  2. 🕰 **Slow response time?**
+      - Because we have to get the `BaseUser.id` first!
 }
