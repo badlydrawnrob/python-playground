@@ -12,9 +12,14 @@
 #
 # Data model
 # ----------
-# It's best to make sure your DATA model and API model are distinct. Previously
-# I used `EventData` and `Event` classes, but Piccolo is a bit better organised.
-# Piccolo ORM uses Active Record pattern, rather than Data Mapper (like SQLAlchemy).
+# > ⚠️ We only have SQL models (not Pydantic `DataIn` validation), which could
+# > potentially pollute our database with BAD DATA. SQLite is NOT being run in
+# > strict more, so you may want to add a DATA validation layer.
+#
+# It's best to make sure your DATA model and API model are distinct. Piccolo is
+# quite well organised, but you may want to name your models explicitly: `Table`
+# for SQL models, and `DataIn`/`ApiIn` validation with Pydantic. Piccolo ORM uses
+# the Active Record pattern, rather than SQLAlchemy's Data Mapper.
 #
 #
 # SQLite and Piccolo
@@ -28,21 +33,22 @@
 #     - So be extra careful to validate data with Pydantic before inserting!
 #     - PRAGMA settings like `journal_mode=WAL`, `foreign_keys`, `cache_size`,
 #       aren't available in Piccolo yet. You can set `TIMEOUT` however.
-# 2. All values are optional by default
-#     - Can be `None` so be specific with `tables.py`
-# 3. Column types are `null=False` by default (null values are not distinct)
+# 2. Column types are required (`null=False`) by default, but ...
+#     - `null`` values are not distinct if used
+#     - `unique=True` must be used to enforce uniqueness
+#     - Foreign key columns are `NULL`able if not explicitly `null=False`
 #     - `ID`s auto-increment and are unique/`secret=` by default
 #     - Any field can be made `secret=` in API responses (hide it from display)
 #     - Pydantic models can be made with `create_pydantic_model`, but generally
 #       lean towards bespoke models (and ommit secret fields there)
-# 4. `UUID`s and lookup fields should always be indexed and not null
+# 3. `UUID`s and lookup fields should always be indexed and not null
 #     - Indexing increases lookup and join speed (`int` > `UUID` > `string`)
 #     - Shorten the `UUID` for prettier URLs on the frontend, or replace with a
 #       `shortuuid`/nanoid`/`fastnanoid`. It's debatable which method is best.
 #     - `UUID` reduces chance of collisions: @ https://zelark.github.io/nano-id-cc/
 #     - Is there any benefit in having both `Serial` and `UUID` columns?
 #       @ https://github.com/piccolo-orm/piccolo/issues/1271#issuecomment-3395347091
-# 5. Always test performance with both `UUID` types and SQL queries ...
+# 4. Always test performance with both `UUID` types and SQL queries ...
 #     - But don't overoptimize too early!
 #     - `Int` is faster than `bytes`, which is faster than `String` (joins/lookups)
 #     - @ https://tinyurl.com/da2acfb-uuid-fast-api-08 (speed testing short UUIDs)
@@ -55,7 +61,8 @@
 #
 # SQLite and Async problems
 # -------------------------
-# > A read and write together in one endpoint can lead to "database locked" error
+# > A read and write together in one endpoint can lead to "database locked" error,
+# > when performing concurrent requests.
 #
 #     @ https://piccolo-orm.readthedocs.io/en/latest/piccolo/tutorials/using_sqlite_and_asyncio_effectively.html
 #     @ https://github.com/piccolo-orm/piccolo/issues/1319
@@ -105,17 +112,6 @@
 #    @ https://stackoverflow.com/q/11586986 (disadvantages of composite key)
 #
 #
-# Concurrency with read and write
-# -------------------------------
-# > Piccolo has some issues with SQLite and concurrent connections.
-#
-# Concurrent connections with SQLite are only an issue if you combine read and
-# write operations at the same time. See here for more info:
-#
-#    @ https://github.com/piccolo-orm/piccolo/issues/1319
-#    @ https://piccolo-orm.readthedocs.io/en/1.3.2/piccolo/tutorials/using_sqlite_and_asyncio_effectively.html
-#
-#
 # General architecture notes
 # --------------------------
 # > A good API book is "APIs you won't hate" by Phil Sturgeon (version 2)
@@ -137,6 +133,7 @@
 # WISHLIST
 # --------
 # 1. Which field should `ForeignKey` reference?
+#     - Should it be `null=False` by default?
 #     - We're using `ID` which is a faster lookup ...
 #     - But currently have to ping `authenticate()` to get it.
 # 2. Many-to-many relationships (tags, categories, etc)
@@ -151,13 +148,15 @@ class Event(Table):
     """
     We'll use `UUID` instead of auto-incrementing `ID` for more security.
 
+    > Fields are `null=False` by default
+
     Piccolo defaults to a `Serial()` auto-incrementing integer primary key, but
     we've changed it to automatically generate a `UUID` for us.
     """
     id = UUID(primary_key=True, index=True)
     creator = ForeignKey(references=BaseUser, target_column=BaseUser.id) #! (1)
-    title = Varchar(length=255, null=False)
+    title = Varchar(length=255)
     image = Varchar(length=255, null=True)
-    description = Text() # `None` values allowed
+    description = Text()
     location = Varchar(length=50, null=True)
-    tags = Array(base_column=Varchar(length=50)) #! (2)
+    tags = Array(base_column=Varchar(length=50), null=True) #! (2)

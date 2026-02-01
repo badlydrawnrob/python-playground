@@ -91,7 +91,7 @@ async def sign_new_user(data: User) -> dict:
         new_user = BaseUser.create_user(
             username=data.username,
             email=data.email,
-            password=data.password
+            password=data.password,
             active=True #! (4)
         )
     except Exception as e:

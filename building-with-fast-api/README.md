@@ -39,6 +39,13 @@ Perhaps Bruno should stick to testing, wishlists, and bugs?
 - You can write `""" """` comments in your functions (and view in `/docs`)
 
 
+## Models
+
+> As your app evolves, make sure models accurately reflect your needs.
+
+If you add `null` or `unique` constraints later, you'd have to update or replace your original tables.
+
+
 ## Errors
 
 > FastApi errors generally use a `HTTPException`.

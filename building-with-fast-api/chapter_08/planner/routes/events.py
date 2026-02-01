@@ -35,14 +35,15 @@
 #
 # Data validation
 # ---------------
-# > We're not running SQLite in strict mode!
-# > Postgres doesn't have this problem (it's always strict).
-# > Pyright complains if you return vague `dict` types!
-# 
-# Which means SQLite will accept whatever you give it by default ... ANY data.
-# Any data at all. We could set `STRICT TABLES` but that'd limit our Piccolo
-# column types, so instead be sure to validate with Pydantic _before_ inserting
-# data into a row.
+# > ⚠️ SQLite is NOT in strict mode. We're also currently validating our `DataIn`
+# > types when inserted (only the API layer has validation). You may want to add
+# > those for a more concrete validation (DATA) layer!
+#
+# SQLite will validate `null` and `unique` constraints, but other data types are
+# more lax, so we're leaning on the API layer to validate things. Meaning, SQLite
+# will potentially accept whatever you throw at it ... ANY data. We could set
+# `STRICT TABLES` but that'd limit our Piccolo column types. Postgres doesn't
+# have this problem (it's always strict).
 #
 #
 # User experience
