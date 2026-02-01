@@ -31,12 +31,14 @@ open -a TextEdit /sqlite.md
 You can load the `../bruno/collection/chapter-*` files to test out the endpoints.
 For most routes you'll need to generate a JWT token at `Collection settings -> Auth`.
 
-Perhaps Bruno should stick to testing, wishlists, and bugs?
+All comments (as documentation) for endpoints can be found at `localhost:8000/docs` (or `/redoc`),
+which seems to be the right place for types and instructions. Perhaps Bruno should stick to testing and logging bugs?
 
-- It doesn't seem a good idea to store detailed schema docs in Bruno
-- FastAPI provides `/docs` (and `/redoc`) so house your types info there
-- To detail these properly requires messy code annotations (I don't prefer)
-- You can write `""" """` comments in your functions (and view in `/docs`)
+- "APIs you won't hate" suggests to detail schema in one place as your API evolves
+- FastAPI comes with an OpenAPI.json way to document your API endpoints ...
+- ... It doesn't seem a good idea to re-write in Bruno (comments live with code)
+- To detail OpenAPI properly requires messy code annotations (which I don't prefer)
+- Instead use docstring comments (`""" """`) in your functions for documentation.
 
 
 ## Models
