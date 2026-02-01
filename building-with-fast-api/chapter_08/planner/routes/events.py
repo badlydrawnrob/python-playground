@@ -176,7 +176,9 @@ async def create_event(
     ------
     > Possible things that can go wrong ...
 
-    - We do not use guards to check if an event exists (use SQLite errors)    
+    1. ❌ User enters text that isn't a plain string
+    2. ❌ Ensure content is stripped of HTML before storage
+    3. ❌ Currently no guards to check event exists (sqlite3.IntegrityError) 
     """
     event = body.model_dump(exclude_none=True) # Event -> dict
 

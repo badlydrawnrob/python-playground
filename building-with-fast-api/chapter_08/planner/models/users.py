@@ -17,6 +17,8 @@
 # WISHLIST
 # --------
 # 1. Our `/user/me` profile endpoint may need `List (Event ID)`
+# 2. Hide the `password` fields in logs?
+#     - @ https://docs.pydantic.dev/2.2/usage/types/secrets/
 
 from pydantic import BaseModel, EmailStr
 

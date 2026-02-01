@@ -120,21 +120,28 @@
 #     - XSS attacks and SQL injections
 #     - Error messages that give away too much info
 #     - Destructive endpoints that aren't necessary
-# 4. ⚠️ Are our TYPES strong enough (we've only got API layer models)?
-#     - `user` should probably have a `UserInt` type to assure value?
-#     - Test SQLite inserts with wrong data. Is it possible?
-#     - Are we confident that each entry is 100% unique?
-#     - We may need a `DataIn` type to verify types are correct before insert.
+# 4. ⚠️ Are our TYPES strong enough? (we've only got API layer models)
+#     - `int` is probably fine for `BaseUser.id`
+#     - 💾 Try to insert bad data (does SQLite allow it?)
+#     - 💾 Does SQLite always error on unique constraints? Any holes?
+#     - Is there any need for `DataIn` types to verify insert/update?
 # 5. ⚠️ Handling errors better (and some light unit testing)
-#     - See the "APIs you won't hate 2" book (are `HTTPException`s enough?)
-#     - Check all routes: what is the low hanging fruit for errors?
-#     - `DELETE` (and other operations) error code, responses, and security?
-#         - 👩‍🦳 A user who doesn't own a piece of data tried to delete it.
-#         - 💾 SQLite error (`null` not allowed, duplicate value failed, etc)
-#         - ⚠️ Sensitive data we should never return (the `ID` or "BE VAGUE")
+#     - See "APIs you won't hate 2" book for error codes (out of scope). FastAPI
+#       doesn't make it particularly easy to use best practice return values.
+#     - In Elm you can `case` over errors more easily than Python.
 #     - 🐛 What obvious errors are we not currently handling?
-#         - Sqlite integrity or null constraint errors?
-#         - Write a duplicate ID function (SQLite unique constraint error)
+#         - ⚠️ Are all error codes correct (status, return values, etc)
+#         - Low hanging fruit? What's YAGNI and just-in-time handling?
+#     - What's the correct response and error codes per route?
+#         - Are `HTTPExceptions` enough? What error codes should we use?
+#         - Must you use `try/except` blocks in certain cases?
+#         - Must you use particular error types? (`RecordNotFound`, etc)
+#         - 💾 SQLite integrity, null constraint, duplicate value errors?
+#         - 💾 Write AT LEAST a duplicate ID function (SQLite unique constraint)
+#     - Any `DELETE` operations need careful error handling"
+#         - 🔐 Are all routes secured properly?
+#         - 👩‍🦳 Can a user who doesn't own a piece of data delete it?
+#         - ⚠️ Sensitive data we should never return (the `ID` or "BE VAGUE")
 # 6. Consider using some GUI to aid "birds eye view" of schema/data
 #     - I think Piccolo has some rudimentary version of this, and Admin
 #     - See "APIs you won't hate" for more ideas (error codes, etc)

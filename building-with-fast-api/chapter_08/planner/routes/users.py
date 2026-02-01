@@ -84,6 +84,7 @@ async def sign_new_user(data: User) -> dict:
     2. 📧 Email is not a proper email (Piccolo does not check this)
     3. 📧 Email already exists (sqlite3.IntegrityError)
     4. 👤 Username already exists (sqlite3.IntegrityError)
+    5. ❌ Value is `None` for required fields (sqlite3.IntegrityError)
     5. 🛑 Account not approved by admin (`active=False`)
     """
     try:

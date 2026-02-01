@@ -30,14 +30,18 @@
 #       aren't available in Piccolo yet. You can set `TIMEOUT` however.
 # 2. All values are optional by default
 #     - Can be `None` so be specific with `tables.py`
-# 3. `ID`s are auto-incrementing and unique by default (null values are not distinct)
-#     - `ID`s are `secret=` by default with API responses, and you can make other
-#       values secret in the response if you like.
-#     - You can use Piccolo's `create_pydantic_model` or make your own models and
-#       exclude secret values there.
-# 4. `UUID`s should always be indexed (increases lookup speed) and `NOT NULL`
-#     - `UUID` can be shortened for prettier URLs, or use `shortuuid`/nanoid`/`fastnanoid`
-#     - Be careful of collisions if you do: https://zelark.github.io/nano-id-cc/
+# 3. Column types are `null=False` by default (null values are not distinct)
+#     - `ID`s auto-increment and are unique/`secret=` by default
+#     - Any field can be made `secret=` in API responses (hide it from display)
+#     - Pydantic models can be made with `create_pydantic_model`, but generally
+#       lean towards bespoke models (and ommit secret fields there)
+# 4. `UUID`s and lookup fields should always be indexed and not null
+#     - Indexing increases lookup and join speed (`int` > `UUID` > `string`)
+#     - Shorten the `UUID` for prettier URLs on the frontend, or replace with a
+#       `shortuuid`/nanoid`/`fastnanoid`. It's debatable which method is best.
+#     - `UUID` reduces chance of collisions: @ https://zelark.github.io/nano-id-cc/
+#     - Is there any benefit in having both `Serial` and `UUID` columns?
+#       @ https://github.com/piccolo-orm/piccolo/issues/1271#issuecomment-3395347091
 # 5. Always test performance with both `UUID` types and SQL queries ...
 #     - But don't overoptimize too early!
 #     - `Int` is faster than `bytes`, which is faster than `String` (joins/lookups)
@@ -130,11 +134,11 @@
 # See the `sqlite_utils.sql` file.
 #
 #
-# Wishlist
+# WISHLIST
 # --------
 # 1. Which field should `ForeignKey` reference?
-#     - `ID` or `username`?
-#     - `ID` requires both read and write operations (slower and async issues)
+#     - We're using `ID` which is a faster lookup ...
+#     - But currently have to ping `authenticate()` to get it.
 # 2. Many-to-many relationships (tags, categories, etc)
 #     - Previous versions this was a `JSONField`
 
