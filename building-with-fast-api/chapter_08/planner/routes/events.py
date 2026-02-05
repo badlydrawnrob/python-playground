@@ -94,9 +94,6 @@
 from auth.authenticate import authenticate
 from fastapi import APIRouter, Depends, HTTPException
 
-from piccolo.apps.user.tables import BaseUser
-from piccolo.engine.sqlite import TransactionType #! ⚠️ Try to avoid using this!
-
 import planner.tables as data # data.Event
 import planner.models.events as api # api.Event
 
@@ -177,9 +174,8 @@ async def create_event(
     ------
     > Possible things that can go wrong ...
 
-    1. ❌ User enters text that isn't a plain string
-    2. ❌ Ensure content is stripped of HTML before storage
-    3. ❌ Currently no guards to check event exists (sqlite3.IntegrityError) 
+    1. ❌ User enters text that isn't a plain string (strip HTML before insert)
+    2. ❌ Event already exists (we're not properly checking duplicate values)
     """
     event = body.model_dump(exclude_none=True) # Event -> dict
 
@@ -210,9 +206,9 @@ async def delete_event(id: str, user: int = Depends(authenticate)) -> dict:
     ------
     > Possible things that can go wrong ...
 
-    1. ⚠️ User who doesn't own data tried to delete it
-    2. 🔐 "Database locked" error with SQLite async (now not possible)
-    3. <s>👩‍🦳 "Does not have permission to delete"</s> (left out of error message)
+    1. <s>🔐 "Database locked" error with SQLite async<s> (no read then writes)
+    2. <s>⚠️ User who doesn't own data tried to delete it</s> (we've handled this)
+    3. <s>👩‍🦳 "Does not have permission to delete"</s> (we're not checking this properly)
     """
     query = await (
         data.Event.delete()

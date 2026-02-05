@@ -125,10 +125,19 @@
 #     - 💾 Try to insert bad data (does SQLite allow it?)
 #     - 💾 Does SQLite always error on unique constraints? Any holes?
 #     - Is there any need for `DataIn` types to verify insert/update?
-# 5. ⚠️ Handling errors better (and some light unit testing)
-#     - See "APIs you won't hate 2" book for error codes (out of scope). FastAPI
+# 5. ⚠️ Handling errors better (and some light unit testing). For now, simply list
+#       any potential errors you can think of in the endpoint comments.
+#     - 🔍 See "APIs you won't hate 2" book for error codes (out of scope). FastAPI
 #       doesn't make it particularly easy to use best practice return values.
-#     - In Elm you can `case` over errors more easily than Python.
+#     - ✅ List all common errors in the README that could possibly happen.
+#     - ✅ Currently returns a single `HTTPException` for most errors.
+#     - ❌ `try/except` blocks are probably needed to properly handle errors. 
+#       don't like them as it makes code more complex and ugly!
+#       @ https://realpython.com/python-exceptions/
+#     - ❌ Unfortunately Python's new `match` isn't similar enough to `case` (which
+#       we'd use in Elm) and it doesn't seem to work properly for error handling ...
+#       @ https://discuss.python.org/t/python-3-10-match-case-syntax-for-catching-exceptions/11076/22
+#       @ https://www.freecodecamp.org/news/python-switch-statement-switch-case-example/
 #     - 🐛 What obvious errors are we not currently handling?
 #         - ⚠️ Are all error codes correct (status, return values, etc)
 #         - Low hanging fruit? What's YAGNI and just-in-time handling?

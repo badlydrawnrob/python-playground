@@ -55,6 +55,20 @@ If you add `null` or `unique` constraints later, you'd have to update or replace
 
 According to _APIs you won't hate_, `HTTPException` might not be good enough. It seems a bit tricky to follow his guide in Part 4, with FastAPI, but you could use a [plugin](https://github.com/NRWLDev/fastapi-problem) to manage errors for you. For example, `rfc9457` and `rfc7807` are error standards.
 
+### Common errors
+
+> We're currently not handling errors "correctly" but I dislike `try/except` blocks.
+> You can add logging to a file in production and catch errors there as well.
+
+1. ✅ SQLite database is locked error (handling concurrent connections)
+2. [ ] `sqlite.IntegrityError` for `null` and duplicate values (won't insert)
+3. [ ] Response giving away sensitive data (not 100% handled)
+4. [ ] `TEXT` contains HTML or other non-plain text values
+5. ✅ User is able to delete data that doesn't belong to them
+6. ✅ Email is not a proper email (Pydantic handles this, `BaseUser.create_user()` doesn't)
+7. [ ] Password field is not secure enough
+8. [ ] Account not approved by admin
+
 
 ## Intro
 

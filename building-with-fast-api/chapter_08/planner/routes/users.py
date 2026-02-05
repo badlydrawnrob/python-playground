@@ -39,10 +39,11 @@
 #
 # WISHLIST
 # --------
-# 1. ⭐️ Figure out how to `/signin` with Elm and CURL
-# 2. ⚠️ Check the error status code and create custom one
-# 3. Use a `TypedDictionary` for the `/signin` response type?
-# 4. Change `username` to `public` UUID for JWT?
+# 1. 👩‍🦳 Fix the `/me` endpoint to split `User` from `List[Event]`
+# 2. ⭐️ Figure out how to `/signin` with Elm and CURL
+# 3. ⚠️ Check the error status code and create custom one
+# 4. Use a `TypedDictionary` for the `/signin` response type?
+# 5. Change `username` to `public` UUID for JWT?
 
 from auth.authenticate import authenticate
 from auth.jwt_handler import create_access_token
@@ -50,6 +51,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 
 from piccolo.apps.user.tables import BaseUser
+import planner.tables as data
+import planner.models.events as api
 from planner.models.users import User, TokenResponse
 
 user_router = APIRouter(
@@ -66,27 +69,33 @@ user_router = APIRouter(
 async def sign_new_user(data: User) -> dict:
     """Register a new user account.
     
-    > ⚠️ Do not use in production! This isn't secure enough.
+    > ⚠️ Not fully secure ... do not use in production!
     > Piccolo's `BaseUser` handles password hashing and salting for us.
     
-    This route allows new users to sign up. In a production app you'd want
-    email verification, captcha, and other security measures to avoid bots
-    signing up fake accounts (that's a lot of work!).
-    
-    Startups can use an invite-only system and manually create users with
-    Piccolo's CLI.
+    In a production app you'd want email verification, captcha, and other security
+    measures to avoid bots signing up fake accounts (that's a lot of work!). If
+    your app is a startup, you could use an invite-only system and manually create
+    users with Piccolo's CLI.
+
+    Exceptions
+    ----------
+    > This is the only endpoint we're "properly" dealing with errors!
+
+    I do not like `try/except` blocks much, and there's no particularly graceful
+    way to handle errors: Python's `match` is NOT the same as `case` in Elm. I'd
+    possibly rather deal with logging errors than pepper these everywhere.
 
     Errors
     ------
     > Possible things that can go wrong ...
     
     1. 🔐 Does not create a secure password (Piccolo checks `< 6` characters)
-    2. 📧 Email is not a proper email (Piccolo does not check this)
-    3. 📧 Email already exists (sqlite3.IntegrityError)
-    4. 👤 Username already exists (sqlite3.IntegrityError)
-    5. ❌ Value is `None` for required fields (sqlite3.IntegrityError)
+    2. <s>📧 Email is not a proper email</s> (Only Pydantic handles this, not Piccolo)
+    3. <s>📧 Email already exists (sqlite3.IntegrityError)</s> (handled by SQLite)
+    4. <s>👤 Username already exists (sqlite3.IntegrityError)</s> (handled by SQLite)
+    5. <s>❌ Value is `None` for required fields</s> (handled by Pydantic/SQlite)
     6. ❌ Response value giving away sensitive info (avoid this!)
-    7. 🛑 Account not approved by admin (`active=False`)
+    7. 🛑 Account not approved by admin (change to `active=False` if needed)
     """
     try:
         new_user = await BaseUser.create_user(
@@ -101,7 +110,7 @@ async def sign_new_user(data: User) -> dict:
             detail=f"Username or email already exists | {e}"
         )
 
-    return { "message": f"User with email: {new_user.email} and username: {new_user.username} registered!" }
+    return { "message": f"User {new_user.username} with email {new_user.email} registered!" }
 
 
 # ------------------------------------------------------------------------------
@@ -136,12 +145,28 @@ async def sign_in_user(data: OAuth2PasswordRequestForm = Depends()):
 
 
 @user_router.get("/me")
-async def retrieve_user_profile() -> dict:
+async def retrieve_user_profile(user: int = Depends(authenticate)):
     """Retrieve user profile and all their events
     
-    > #! TO DO: Finish this route properly.
-    > Only retrieve events created by the (current) authenticated user.
+    > ⚠️ Only current user events should be returned (no sensitive details)
 
-    This isn't in the book, but think it's a useful (and necessary) addition.
+    This isn't in the book, but it's a useful (and necessary) addition.
     You're definitely going to allow the user to view and edit their profile!
+    If you need to _edit_ the user details, consider looking around at how
+    other apps do it (Google has edit password alone on it's own page).
+    
+    Joins
+    -----
+    > Piccolo full joins behind the scenes, so you can access columns.
+
+    Unfortunately we've got a repeating user profile in each event. Ideally,
+    we'd want to have a dictionary of `User` and _then_ the `List[Event]`. To do
+    that we could (a) manipulate the current data, (b) use raw SQL, (c) create
+    our own custom `join_on`, or (d) grab the `User` first, then the `List[Event]`.
     """
+    return await (
+        data.Event.select(
+            data.Event.creator.username,
+            data.Event.all_columns()
+        ).where(data.Event.creator == user)
+    )
