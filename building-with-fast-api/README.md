@@ -77,7 +77,7 @@ which seems to be the right place for types and instructions. Perhaps Bruno shou
 
 > As your app evolves, make sure models accurately reflect your needs.
 
-If you add `null` or `unique` constraints later, you'd have to update or replace your original tables.
+As your app evolves, you'll need to update the `planner.tables` model. For example, if you add `null` or `unique` constraints to certain fields, you'll have to update or replace your original tables. This can be helped along with `sqlite-utils` and JQ.
 
 
 ## Errors
