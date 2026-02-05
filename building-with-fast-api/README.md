@@ -23,6 +23,38 @@ piccolo user create
 open -a TextEdit /sqlite.md
 ```
 
+## Book chapters
+
+> Each step of the book is reflected in the tags. I've decided to ommit the final
+> two chapters around testing and deployment, as I don't prefer that method.
+
+You can use the REPL in early chapters. We're error checking with Bruno (lots of methods to [test](https://docs.usebruno.com/testing/automate-test/manual-test) APIs and I prefer GUIs). Generally with prototypes it's best not to prematurely optimise and fix errors "just-in-time".
+
+1. Hello World
+2. Routing (`1.6.0` — `1.6.6`)
+3. Response models and error handling (`1.7.0` — `1.7.4`)
+4. Templating with Jinja (`1.8.0` — `1.8.2`)
+    — See `1.8.1` for our `json` version
+5. Structuring FastApi applications (`1.9.0` — `1.9.1`)
+6. Working with the database
+    - SQLModel (`1.10.0` — `1.10.6`)
+    - ~~MongoDB~~[^2] (I'm sticking with SQLite)
+7. Securing FastApi applications (`1.11.0` — `1.11.9`)
+    - Hash and compare passwords
+    - Generating JWT tokens
+    - Securing routes (with authentication)
+    - CORS policy (middleware)
+8. Testing (`1.12.0` - `1.12.14`)
+    - Picking an ORM, authentication, JWTs, and error checking
+    - ~~SQLModel (original version)~~ (`1.12.4`)
+    - ~~Peewee (modified version)~~ (`1.12.11`)
+    - Piccolo (chosen version)
+        - API testing with Bruno app
+        - `BaseUser.login()` to handle hashing (`1.12.12`)
+        - Tidying up errors, data entry, and JWT claims
+        - A more suitable folder structure with helpful comments
+
+
 ## Bruno
 
 > Follow the "APIs you won't hate 2" guidelines
@@ -125,34 +157,7 @@ The downsides ...
     - Cryptic errors and hard to pin down what's wrong
 
 
-## Chapters
 
-> The tags relate to important stages in our app's development ...
-> Use the REPL to practice and discover functionality quickly!
-
-1. Hello World
-2. Routing (`1.6.0` — `1.6.6`)
-3. Response models and error handling (`1.7.0` — `1.7.4`)
-4. Templating with Jinja (`1.8.0` — `1.8.2`)
-    — See `1.8.1` for our `json` version
-5. Structuring FastApi applications (`1.9.0` — `1.9.1`)
-6. Working with the database
-    - SQLModel (`1.10.0` — `1.10.6`)
-    - ~~MongoDB~~[^2] (I'm sticking with SQLite)
-7. Securing FastApi applications (`1.11.0` — `1.11.9`)
-    - Hash and compare passwords
-    - Generating JWT tokens
-    - Securing routes (with authentication)
-    - CORS policy (middleware)
-8. Testing (`1.12.0` - ...)
-    - ~~Original version: SQLModel, authentication, jwt~~ (`1.12.4`)
-    - ~~Peewee version: ORM, authentication, jwt~~ (`1.12.11`)
-    - Piccolo version: ORM, jwt, `BaseUser.login()` hashing (`1.12.12`)
-        - **TO DO: implement with Piccolo**
-        - We've also deviated from the folder structure to suit Piccolo better.
-        - We used `piccolo schema generate` to migrate our tables and no longer
-          need the `UserData` table (Piccolo handles this with `BaseUser`).
-        - Better error codes and a pydantic model
 
 
 ## Errata
