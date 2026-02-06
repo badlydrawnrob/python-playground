@@ -55,22 +55,24 @@ You can use the REPL in early chapters. We're error checking with Bruno (lots of
         - A more suitable folder structure with helpful comments
 
 
-## Bruno
+## Documentation
 
-> Follow the "APIs you won't hate 2" guidelines
-> Bruno could be the "high level viewpoint" of your API?
+> I use comments as documentation which can be found in `localhost:8000/docs`.
 
-You can load the `../bruno/collection/chapter-*` files to test out the endpoints.
-For most routes you'll need to generate a JWT token at `Collection settings -> Auth`.
+This seems to be the best way to handle docs for types and API instructions. There's also `/redoc`, although I don't prefer it's layout.
 
-All comments (as documentation) for endpoints can be found at `localhost:8000/docs` (or `/redoc`),
-which seems to be the right place for types and instructions. Perhaps Bruno should stick to testing and logging bugs?
-
-- "APIs you won't hate" suggests to detail schema in one place as your API evolves
+- "[APIs you won't hate](https://leanpub.com/build-apis-you-wont-hate-2)" suggests to detail schema in one place as your API evolves
 - FastAPI comes with an OpenAPI.json way to document your API endpoints ...
-- ... It doesn't seem a good idea to re-write in Bruno (comments live with code)
 - To detail OpenAPI properly requires messy code annotations (which I don't prefer)
 - Instead use docstring comments (`""" """`) in your functions for documentation.
+
+### Bruno
+
+> Bruno could be the "high level viewpoint" of your API
+
+Ideally, Bruno can be kept for error checking and logging bugs only. You can load the `../bruno/collection/chapter-*` files into Bruno to test out endpoints for each chapter. For most routes you'll need to generate a JWT token at `Collection settings -> Auth`. It doesn't seem a good idea to re-write documentation in the Bruno endpoint READMEs.
+
+In this repo I'm [_manually_ checking](https://docs.usebruno.com/testing/automate-test/manual-test) endpoints but in production you'd probably want to automate this (either unit testing or a GUI/Ai).
 
 
 ## Models
