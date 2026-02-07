@@ -1,0 +1,15 @@
+meta {
+  name: planner-get-all-events-ABC-title
+  type: http
+  seq: 6
+}
+
+get {
+  url: http://localhost:8000/event/?q=location
+  body: none
+  auth: none
+}
+
+params:query {
+  q: location
+}

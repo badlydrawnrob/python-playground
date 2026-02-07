@@ -13,10 +13,10 @@ post {
 body:json {
   {
     "creator": null,
-    "title": "Glastonbury",
+    "title": "Pyramid Stage",
     "image": "https://tinyurl.com/ed-sheeran-with-shakira",
     "description": "Ed Sheeran sings with Shakira at Glastonbury!",
-    "location": "Live",
+    "location": "Glastonbury",
     "tags": ["music", "adults", "event"]
   }
 }
@@ -24,9 +24,12 @@ body:json {
 docs {
   # 🐞 Bugs
   
-  1. **`NULL`able by default**
-      - Currently `Event.creator` foreign key can be `None`
-      - However, the endpoint _always_ adds the `BaseUser.id` of the logged in user.
-  2. 🕰 **Slow response time?**
+  1. **Foreign keys are `NULL`able by default**
+      - So I've left in `.creator` as `null` ...
+      - This should **not** pass validation however ...
+      - As `.creator` is **not** in `Event` API layer
+  2. **`exclude_none=True` is set so (1) validates** 
+      - If this is set to `False` (1) should fail!
+  3. 🕰 **Slow response time?**
       - Because we have to get the `BaseUser.id` first!
 }

@@ -35,15 +35,17 @@
 #
 # Data validation
 # ---------------
-# > ⚠️ SQLite is NOT in strict mode. We're also currently validating our `DataIn`
-# > types when inserted (only the API layer has validation). You may want to add
-# > those for a more concrete validation (DATA) layer!
+# > ⚠️ SQLite is NOT in strict mode. We only have API layer models.
+# 
+# SQLite will validate `null` and `unique` constraints. We are not currently
+# validating our `DataIn` types; SQLite is lax at typing, and we are NOT operating
+# in strict mode! You may also wish to add a DATA layer for more concrete validation,
+# so that we can assure correct types on insert and update.
 #
-# SQLite will validate `null` and `unique` constraints, but other data types are
-# more lax, so we're leaning on the API layer to validate things. Meaning, SQLite
-# will potentially accept whatever you throw at it ... ANY data. We could set
-# `STRICT TABLES` but that'd limit our Piccolo column types. Postgres doesn't
-# have this problem (it's always strict).
+# This means SQLite will potentially accept whatever you throw at it ... ANY data.
+# We could set `STRICT TABLES` but that'd limit our Piccolo column types. For
+# now we're leaning on the API layer to validate things. Postgres doesn't have
+# this problem (it's always strict).
 #
 #
 # User experience
@@ -81,23 +83,27 @@
 # --------
 # > Make sure routes are properly secured
 #
-# 1. Write an article about making `/signup` more graceful with Piccolo, and how
+# 1. ⏰ What's the quickest way to return?
+#    - (a) Store the query and then `await` on `if`s
+#    - (b) Each `if` has it's own full queries
+#    - (c) Using a `match` and `case` (or some other method)
+# 2. ✏️ Write an article about making `/signup` more graceful with Piccolo, and how
 #    each option affects usability and experience (Artifacts):
 #    - Option 1: Have a simple "invite" process and manually create accounts
 #    - Option 2: Find a professional and delegate the process
 #        - Just how much would this cost? (via Ai / via Human)
 #        - Signup -> Email -> Verify (code) -> Login -> Onboarding
-# 2. Create different `include_router` packages for authentication routes?
+# 3. Create different `include_router` packages for authentication routes?
 #    - @ https://fastapi.tiangolo.com/tutorial/bigger-applications/
 #    - @ https://stackoverflow.com/a/67318405
 
 from auth.authenticate import authenticate
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 import planner.tables as data # data.Event
 import planner.models.events as api # api.Event
 
-from typing import List
+from typing import Annotated, List
 
 
 event_router = APIRouter(
@@ -110,20 +116,49 @@ event_router = APIRouter(
 # ==============================================================================
 
 @event_router.get("/", response_model=List[api.Event])
-async def retrieve_all_events() -> List[api.Event]:
-    """Return a simple list of events!
+async def retrieve_all_events(
+        q: Annotated[str | None, Query(min_length=4, max_length=8)] = None
+    ) -> List[api.Event]:
+    """Return a queryable list of events!
+
+    > Default order is by primary key INDEXED number, which means the `Event.id`
+    > will appear in the order it was inserted (not by ABC123 order).
     
-    You could use Piccolo's `create_pydantic_model` to generate our response
-    types, but we're being explicit in `planner.models.events`. You could also
-    return a particular data point explicitly if you prefer:
+    Out API layer models are custom and we can use them as response types. You
+    could also return particular data points explicitly if you prefered:
 
     ```
     [{"title": event.title} for event in query]
     ```
-    """
-    query = await data.Event.select()
 
-    return query
+    Queries (list by column)
+    ------------------------
+    > We'll replicate a table sort by column (ASCENDING by only)
+
+    1. By title
+    2. By location
+
+    Annotated
+    ---------
+    > @ https://fastapi.tiangolo.com/tutorial/query-params-str-validations/
+
+    `Annotated` is used so that we can keep our typing `str | None = None`,
+    otherwise the typing would need a workaround. We can add metadata such as
+    `deprecated=True`, `pattern="RegEx"`, and further validation methods to check
+    our `?q`uery keys and arguments. FastAPI will automatically add relevant `/docs`
+    information.
+    """
+    # query = data.Event.select()
+
+    if q == "title":
+        # return await query.order_by(data.Event.title)
+        return await data.Event.select().order_by(data.Event.title)
+    elif q == "location":
+        # return await query.order_by(data.Event.location)
+        return await data.Event.select().order_by(data.Event.location)
+    else:
+        # return await query
+        return await data.Event.select()
 
 
 @event_router.get("/{id}")
@@ -176,6 +211,7 @@ async def create_event(
 
     1. ❌ User enters text that isn't a plain string (strip HTML before insert)
     2. ❌ Event already exists (we're not properly checking duplicate values)
+    3. ❌ Event should not pass validation if `exclude_none=False` (see Bruno)
     """
     event = body.model_dump(exclude_none=True) # Event -> dict
 

@@ -12,9 +12,12 @@
 #
 # Data model
 # ----------
-# > ⚠️ We only have SQL models (not Pydantic `DataIn` validation), which could
-# > potentially pollute our database with BAD DATA. SQLite is NOT being run in
-# > strict more, so you may want to add a DATA validation layer.
+# > We're crafting our own API models, but you could use `create_pydantic_model`
+# > to allow Piccolo to auto-generate our response types.
+# 
+# ⚠️ We only have SQL models (without `DataIn` Pydantic validation), which could
+# potentially pollute our database with BAD DATA. SQLite is NOT being run in
+# strict mode, so you may want to add a DATA validation layer.
 #
 # It's best to make sure your DATA model and API model are distinct. Piccolo is
 # quite well organised, but you may want to name your models explicitly: `Table`
@@ -41,7 +44,7 @@
 #     - Any field can be made `secret=` in API responses (hide it from display)
 #     - Pydantic models can be made with `create_pydantic_model`, but generally
 #       lean towards bespoke models (and ommit secret fields there)
-# 3. `UUID`s and lookup fields should always be indexed and not null
+# 3. `UUID`s and lookup fields should always be indexed and not nulls
 #     - Indexing increases lookup and join speed (`int` > `UUID` > `string`)
 #     - Shorten the `UUID` for prettier URLs on the frontend, or replace with a
 #       `shortuuid`/nanoid`/`fastnanoid`. It's debatable which method is best.
@@ -96,6 +99,8 @@
 # > Not strictly necessary (Stackoverflow uses `Serial` IDs), but more secure.
 # > Prevents hackers from blitzing by incrementing IDs. Prevents Ai scraping.
 #
+# #! Downside of using indexed UUID is it adds ~80 bytes to row size.
+#
 #
 # General SQL notes
 # -----------------
@@ -132,10 +137,12 @@
 #
 # WISHLIST
 # --------
-# 1. Which field should `ForeignKey` reference?
-#     - Should it be `null=False` by default?
-#     - We're using `ID` which is a faster lookup ...
-#     - But currently have to ping `authenticate()` to get it.
+# 1. Which fields should be `unique=True`?
+#     - Duplicate `Event.title`s are currently possible
+# 2. Which field should be the `ForeignKey` reference?
+#     - Ideally you'd set this to `null=False` (it's `True` by default)
+#     - `ID` is fastest at lookup as it's indexed automatically
+#     - Currently we must ping `authenticate()` to get `BaseUser.id`
 # 2. Many-to-many relationships (tags, categories, etc)
 #     - Previous versions this was a `JSONField`
 
@@ -154,8 +161,8 @@ class Event(Table):
     we've changed it to automatically generate a `UUID` for us.
     """
     id = UUID(primary_key=True, index=True)
-    creator = ForeignKey(references=BaseUser, target_column=BaseUser.id) #! (1)
-    title = Varchar(length=255)
+    creator = ForeignKey(references=BaseUser, target_column=BaseUser.id) #! (2)
+    title = Varchar(length=255) #! (1)
     image = Varchar(length=255, null=True)
     description = Text()
     location = Varchar(length=50, null=True)

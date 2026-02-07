@@ -28,7 +28,7 @@ open -a TextEdit /sqlite.md
 > Each step of the book is reflected in the tags. I've decided to ommit the final
 > two chapters around testing and deployment, as I don't prefer that method.
 
-You can use the REPL in early chapters. We're error checking with Bruno (lots of methods to [test](https://docs.usebruno.com/testing/automate-test/manual-test) APIs and I prefer GUIs). Generally with prototypes it's best not to prematurely optimise and fix errors "just-in-time".
+You can use the REPL in early chapters. We're error checking with Bruno (lots of methods to [test](https://docs.usebruno.com/testing/automate-test/manual-test) APIs and I prefer GUIs or simple CLI tools). Generally with prototypes it's best not to prematurely optimise and fix errors "just-in-time".
 
 1. Hello World
 2. Routing (`1.6.0` — `1.6.6`)
@@ -102,6 +102,14 @@ According to _APIs you won't hate_, `HTTPException` might not be good enough. It
 6. ✅ Email is not a proper email (Pydantic handles this, `BaseUser.create_user()` doesn't)
 7. [ ] Password field is not secure enough
 8. [ ] Account not approved by admin
+9. [ ] ⚠️ `POST` value `{ "creator": null }` not excluded (is not Pydantic field)
+
+### Performance
+
+> It's folly to prematurely optimise! Are you selling? Do you have customers?
+> Some error checking methods can potentially be slow (like `try`/`except` blocks).
+
+You can either "catch" or "throw" an error. Think of it like baseball, whereby catching the ball allows us to handle or examine an error (`try`/`except`), and a throw sends a helpful error to our user (`raise`). It seems that _throwing_ an error is more performant than _catching_ it first.
 
 
 ## Intro
