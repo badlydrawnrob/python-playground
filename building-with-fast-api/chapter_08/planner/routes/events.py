@@ -155,17 +155,14 @@ async def retrieve_all_events(
     1. ✅ `event/?q=title` (feels wrong but is right)
     2. ❌ `event?q=title` (feels right but is wrong)
     """
-    # query = data.Event.select()
+    query = data.Event.select()
 
     if q == "title":
-        # return await query.order_by(data.Event.title)
-        return await data.Event.select().order_by(data.Event.title)
+        return await query.order_by(data.Event.title)
     elif q == "location":
-        # return await query.order_by(data.Event.location)
-        return await data.Event.select().order_by(data.Event.location)
+        return await query.order_by(data.Event.location)
     else:
-        # return await query
-        return await data.Event.select()
+        return await query
 
 
 @event_router.get("/{id}")

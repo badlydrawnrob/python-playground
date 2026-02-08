@@ -112,6 +112,18 @@ According to _APIs you won't hate_, `HTTPException` might not be good enough. It
 You can either "catch" or "throw" an error. Think of it like baseball, whereby catching the ball allows us to handle or examine an error (`try`/`except`), and a throw sends a helpful error to our user (`raise`). It seems that _throwing_ an error is more performant than _catching_ it first.
 
 
+## Tooling
+
+### Bombardier
+
+> Never prematurely optimise your prototype! We can stress test our API with Bombardier.
+> Handy for checking which design routes are more performant (and which slow us down).
+
+If all things are (more or less) equal, always use the easiest-to-read, most consistent, simplest design route. It's more important that code is understood and easy to maintain, over a [few `ms` bump](https://www.reddit.com/r/dotnet/comments/1hgmwvj/what_would_you_considered_a_good_api_response_time/) in speed.
+
+
+-----
+
 ## Intro
 
 > This repo is my working copy of the book [Building Python APIs with FastAPI](https://www.packtpub.com/en-us/product/building-python-web-apis-with-fastapi-9781801074513)
