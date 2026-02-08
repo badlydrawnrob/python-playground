@@ -111,6 +111,38 @@ According to _APIs you won't hate_, `HTTPException` might not be good enough. It
 
 You can either "catch" or "throw" an error. Think of it like baseball, whereby catching the ball allows us to handle or examine an error (`try`/`except`), and a throw sends a helpful error to our user (`raise`). It seems that _throwing_ an error is more performant than _catching_ it first.
 
+<!-- *******************************************************************************
+`value | Exception` is NOT enough and catching an error can be expensive.
+Cheap and easy way could be `OneOf error` in the `detail` with generic STATUS code.
+
+[ write a little about different error matching techniques and speeds (with links) ]
+@ https://realpython.com/python-exceptions/ 
+
+`match` doesn't work quite the same as Elm's `case` does with error types.
+@ https://discuss.python.org/t/python-3-10-match-case-syntax-for-catching-exceptions/11076/22
+@ https://www.freecodecamp.org/news/python-switch-statement-switch-case-example/
+
+Any `DELETE` operations need careful error handling"
+- 🔐 Are all routes secured properly?
+- 👩‍🦳 Can a user who doesn't own a piece of data delete it?
+- ⚠️ Sensitive data we should never return (the `ID` or "BE VAGUE")
+
+# 7. ⚠️ Handling errors better (and some light unit testing).
+#     - 🔍 See "APIs you won't hate 2" book for error codes (out of scope). FastAPI
+#       doesn't make it particularly easy to use best practice return values.
+#     - ✅ List all common errors in the README that could possibly happen. You can
+#       add them to the endpoint too.
+#     - ✅ Both `HTTPException` (or error codes) and correct STATUS (404 etc) returned
+#         - ❌ Sometimes different status codes are needed for endpoint errors
+#     - 🐛 What obvious errors are we not currently handling?
+#         - ⚠️ What's the correct response and error codes per route?
+#         - ⚠️ What's the correct status code for each branch?
+#         - ⚠️ Low hanging fruit? What's YAGNI and just-in-time handling?
+#         - 💾 SQLite integrity, null constraint, duplicate value errors?
+#         - 💾 Write AT LEAST a duplicate ID function (SQLite unique constraint)
+#         - Must you use particular error types? (`RecordNotFound`, etc)
+******************************************************************************** -->
+
 
 ## Tooling
 

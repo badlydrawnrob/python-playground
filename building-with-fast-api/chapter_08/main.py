@@ -135,32 +135,8 @@
 # 6. Consider using some GUI to aid "birds eye view" of schema/data
 #     - I think Piccolo has some rudimentary version of this, and Admin
 #     - See "APIs you won't hate" for more ideas (error codes, etc)
-# 7. ⚠️ Handling errors better (and some light unit testing). For now, simply list
-#       any potential errors you can think of in the endpoint comments.
-#     - 🔍 See "APIs you won't hate 2" book for error codes (out of scope). FastAPI
-#       doesn't make it particularly easy to use best practice return values.
-#     - ✅ List all common errors in the README that could possibly happen.
-#     - ✅ Currently returns a single `HTTPException` for most errors.
-#     - ❌ `try/except` blocks are probably needed to properly handle errors. 
-#       don't like them as it makes code more complex and ugly!
-#       @ https://realpython.com/python-exceptions/
-#     - ❌ Unfortunately Python's new `match` isn't similar enough to `case` (which
-#       we'd use in Elm) and it doesn't seem to work properly for error handling ...
-#       @ https://discuss.python.org/t/python-3-10-match-case-syntax-for-catching-exceptions/11076/22
-#       @ https://www.freecodecamp.org/news/python-switch-statement-switch-case-example/
-#     - 🐛 What obvious errors are we not currently handling?
-#         - ⚠️ Are all error codes correct (status, return values, etc)
-#         - Low hanging fruit? What's YAGNI and just-in-time handling?
-#     - What's the correct response and error codes per route?
-#         - Are `HTTPExceptions` enough? What error codes should we use?
-#         - Must you use `try/except` blocks in certain cases?
-#         - Must you use particular error types? (`RecordNotFound`, etc)
-#         - 💾 SQLite integrity, null constraint, duplicate value errors?
-#         - 💾 Write AT LEAST a duplicate ID function (SQLite unique constraint)
-#     - Any `DELETE` operations need careful error handling"
-#         - 🔐 Are all routes secured properly?
-#         - 👩‍🦳 Can a user who doesn't own a piece of data delete it?
-#         - ⚠️ Sensitive data we should never return (the `ID` or "BE VAGUE")
+# 7. Are the essential errors handled? (response codes, error messages, status codes)
+#     - Don't prematurely optimise, but make sure there's a reasonable `HTTPException`
 # 8. Use short `UUID` for `BaseUser` and prettier URLs
 #     - This can be done after the fact (`UUID` -> `ShortUUID`)
 #     - @ https://github.com/piccolo-orm/piccolo/issues/1271
