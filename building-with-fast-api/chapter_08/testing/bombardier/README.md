@@ -1,13 +1,13 @@
 # Bombardier
 
-> This gives a rough idea of speed and concurrency ...
+> ⏱ This gives a rough idea of speed and concurrency ...
 
 But running bombardier a few times can have quite different results; running `-c 125` and `-n 10000000` (as in docs) takes a _really_ long time and is very unlikely for a startup prototype. Also worth considering is how likely your endpoint will have concurrent (or bulk) hits: this is a test in theory, but not always in practice.
 
 If results are similar for different setups, prefer the simplest, most consistent, easiest-to-read version.
 
 
-## `/event/`
+## `/event/`
 
 ### Each branch using full query
 
@@ -15,7 +15,7 @@ If results are similar for different setups, prefer the simplest, most consisten
 
 Round 1
 
-```bash
+```text
 Bombarding http://localhost:8000/event/ with 10000 request(s) using 125 connection(s)
  10000 / 10000 [=============================================] 100.00% 275/s 36s
 Done!
@@ -30,7 +30,7 @@ Statistics        Avg      Stdev        Max
 
 Round 2
 
-```bash
+```text
 Bombarding http://localhost:8000/event/ with 10000 request(s) using 125 connection(s)
  10000 / 10000 [=============================================] 100.00% 255/s 39s
 Done!
@@ -49,7 +49,7 @@ Statistics        Avg      Stdev        Max
 
 Round 1
 
-```bash
+```text
 Bombarding http://localhost:8000/event/ with 10000 request(s) using 125 connection(s)
  10000 / 10000 [=============================================] 100.00% 268/s 37s
 Done!
@@ -64,7 +64,7 @@ Statistics        Avg      Stdev        Max
 
 Round 2
 
-```bash
+```text
 Bombarding http://localhost:8000/event/ with 10000 request(s) using 125 connection(s)
  10000 / 10000 [=============================================] 100.00% 266/s 37s
 Done!
@@ -78,13 +78,13 @@ Statistics        Avg      Stdev        Max
 ```
 
 
-## `/event?=location`
+## `/event?=location`
 
 ### Each branch using full query
 
 Round 1
 
-```bash
+```text
 Bombarding http://localhost:8000/event/?q=location with 10000 request(s) using 125 connection(s)
  10000 / 10000 [=============================================] 100.00% 266/s 37s
 Done!
@@ -99,7 +99,7 @@ Statistics        Avg      Stdev        Max
 
 Round 2
 
-```bash
+```text
 Bombarding http://localhost:8000/event/?q=location with 10000 request(s) using 125 connection(s)
  10000 / 10000 [=============================================] 100.00% 230/s 43s
 Done!
@@ -116,7 +116,7 @@ Statistics        Avg      Stdev        Max
 
 Round 1
 
-```bash
+```text
 Bombarding http://localhost:8000/event/?q=location with 10000 request(s) using 125 connection(s)
  10000 / 10000 [=============================================] 100.00% 259/s 38s
 Done!
@@ -131,7 +131,7 @@ Statistics        Avg      Stdev        Max
 
 Round 2
 
-```bash
+```text
 Bombarding http://localhost:8000/event/?q=location with 10000 request(s) using 125 connection(s)
  10000 / 10000 [=============================================] 100.00% 258/s 38s
 Done!
