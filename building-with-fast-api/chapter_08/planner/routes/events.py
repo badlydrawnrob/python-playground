@@ -83,19 +83,14 @@
 # --------
 # > Make sure routes are properly secured
 #
-# 1. ⏰ What's the quickest way to return?
-#    - (a) Store the query and then `await` on `if`s
-#    - (b) Each `if` has it's own full queries
-#    - (c) Using a `match` and `case` (or some other method)
+# 1. ⏰ Are there any design routes that are QUICKER?
+#    - E.g: using `match` and `case` (or some other method)
 # 2. ✏️ Write an article about making `/signup` more graceful with Piccolo, and how
 #    each option affects usability and experience (Artifacts):
 #    - Option 1: Have a simple "invite" process and manually create accounts
 #    - Option 2: Find a professional and delegate the process
 #        - Just how much would this cost? (via Ai / via Human)
 #        - Signup -> Email -> Verify (code) -> Login -> Onboarding
-# 3. Create different `include_router` packages for authentication routes?
-#    - @ https://fastapi.tiangolo.com/tutorial/bigger-applications/
-#    - @ https://stackoverflow.com/a/67318405
 
 from auth.authenticate import authenticate
 from fastapi import APIRouter, Depends, HTTPException, Query

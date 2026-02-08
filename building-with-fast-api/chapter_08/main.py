@@ -109,6 +109,10 @@
 #
 # 1. ✂️ Go through the "5 steps" Tesla uses to build their cars.
 #     - @ https://tinyurl.com/tesla-5-steps
+#     - ⚠️ `List Int` tags far more complicated than simple join (many-to-many?)
+#     - How is UI architecture affected by endpoint design? (easier/harder?)
+#     - How are others handling this and their endpoints?
+#     - Elm code be made easier? (e.g: don't check UNIQUE values on client)
 # 2. 🔐 Make sure all routes that require a logged in user are secured.
 #     - ⭐️ Understand `aud`ience and `client_id` in auth better:
 #       @ https://stackoverflow.com/a/28503265
@@ -116,16 +120,22 @@
 #       `user.email == events.creator` guards (or `WHERE`)
 #     - Any actions on an event (like, delete) should check user "owns" it.
 #     - Any unecessary destructive routes should be removed (will it torpedo the app?)
-# 3. Can we tighten up security any more? (low hanging fruit)
+# 3. Create different `include_router` packages for authentication routes?
+#    - @ https://fastapi.tiangolo.com/tutorial/bigger-applications/
+#    - @ https://stackoverflow.com/a/67318405
+# 4. Can we tighten up security any more? (low hanging fruit)
 #     - XSS attacks and SQL injections
 #     - Error messages that give away too much info
 #     - Destructive endpoints that aren't necessary
-# 4. ⚠️ Are our TYPES strong enough? (we've only got API layer models)
+# 5. ⚠️ Are our TYPES strong enough? (we've only got API layer models)
 #     - `int` is probably fine for `BaseUser.id`
 #     - 💾 Try to insert bad data (does SQLite allow it?)
 #     - 💾 Does SQLite always error on unique constraints? Any holes?
 #     - Is there any need for `DataIn` types to verify insert/update?
-# 5. ⚠️ Handling errors better (and some light unit testing). For now, simply list
+# 6. Consider using some GUI to aid "birds eye view" of schema/data
+#     - I think Piccolo has some rudimentary version of this, and Admin
+#     - See "APIs you won't hate" for more ideas (error codes, etc)
+# 7. ⚠️ Handling errors better (and some light unit testing). For now, simply list
 #       any potential errors you can think of in the endpoint comments.
 #     - 🔍 See "APIs you won't hate 2" book for error codes (out of scope). FastAPI
 #       doesn't make it particularly easy to use best practice return values.
@@ -151,42 +161,33 @@
 #         - 🔐 Are all routes secured properly?
 #         - 👩‍🦳 Can a user who doesn't own a piece of data delete it?
 #         - ⚠️ Sensitive data we should never return (the `ID` or "BE VAGUE")
-# 6. Consider using some GUI to aid "birds eye view" of schema/data
-#     - I think Piccolo has some rudimentary version of this, and Admin
-#     - See "APIs you won't hate" for more ideas (error codes, etc)
-# 7. Consider shortening the `UUID` type for prettier URLs.
+# 8. Use short `UUID` for `BaseUser` and prettier URLs
 #     - This can be done after the fact (`UUID` -> `ShortUUID`)
 #     - @ https://github.com/piccolo-orm/piccolo/issues/1271
-#     - #! Order of speed for lookup/joins: `Int` > `Bytes` > `String`
-# 8. ⏰ Bombardier test for concurrency and speed
-#     - Remember 100s of connections may be unlikely; prefer solid to speedy
-#     - ⚠️ Any `POST` endpoints require getting the `BaseUser.id` first.
-# 9. SQLite pragma optimizations for performance
-#     - Things like `-wal` and `-shm` modes
-#     - @ https://github.com/piccolo-orm/piccolo/discussions/1247
-# 10. Write down the reason to prefer `PUT` over `PATCH`
+#     - This might be hard to retrofit and may require custom user table
+# 9. `BaseUser` could contain a `UUID` and `User.role`?
+#     - @ https://tinyurl.com/piccolo-extending-base-user
+#     - @ https://fastapi.tiangolo.com/advanced/security/oauth2-scopes
+# 10. ✏️ Write down the reason to prefer `PUT` over `PATCH`
 #     - Patch is harder to predict which optional values are present
 #     - Similar to the Elm `Decode.maybe` problem
 #     - @ https://sqlmodel.tianglo.com/tutorial/fastapi/update
-# 11. ⚠️ `List Int` for tags is far more complicated than simple join
-#     - Would this be a many-to-many relationship?
-#     - What difference does this make to UI and architecture?
-#     - Does it make the Elm Lang code easier or harder?
-#     - How are others handling this and their endpoints?
-# 12. Do we need any caching? (on the server or with SQlite)
-#     - @ https://github.com/long2ice/fastapi-cache
-#     - @ https://www.powersync.com/blog/sqlite-optimizations-for-ultra-high-performance
-# 13. `BaseUser` could contain a `UUID` and `User.role`?
-#     - A `UUID` might be hard to retrofit on the main user table
-#     - @ https://tinyurl.com/piccolo-extending-base-user
-#     - @ https://fastapi.tiangolo.com/advanced/security/oauth2-scopes/
-# 14. Understand middleware a little better
+# 11. Understand middleware a little better
 #     - @ https://fastapi.tiangolo.com/tutorial/middleware/
-# 15. Logging for FastApi live server to prepare for launch:
+# 12. 🔍 Logging for FastApi live server to prepare for launch:
 #     - @ Search Brave "fastapi logging production"
 #     - @ https://tinyurl.com/prep-fastapi-for-production (hire a professional!)
-# 16. Disallow some email addresses if we're not in control of signup
+# 13. Disallow some email addresses if we're not in control of signup
 #     - For example `user+test@gmail` which allows multiple accounts.
+# 14. ⏰ Speed optimisations with Bombardier and SQLite PRAGMA optimizations
+#     - ⚠️ "Premature optimization is the devil’s volleyball!"
+#     - Check if using `BaseUser.id` directly is faster than retrieval?
+#     - Order of speed for lookup/joins: `Int` > `Bytes` > `String` (see 8)
+#     - `-wal` and `-shm` modes and other pragmas for SQLite
+#         - @ https://github.com/piccolo-orm/piccolo/discussions/1247
+#     - Do we need any caching? (on the server or with SQlite)
+#         - @ https://github.com/long2ice/fastapi-cache
+#         - @ https://www.powersync.com/blog/sqlite-optimizations-for-ultra-high-performance
 
 from contextlib import asynccontextmanager
 
