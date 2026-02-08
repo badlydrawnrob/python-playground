@@ -147,6 +147,13 @@ async def retrieve_all_events(
     `deprecated=True`, `pattern="RegEx"`, and further validation methods to check
     our `?q`uery keys and arguments. FastAPI will automatically add relevant `/docs`
     information.
+
+    Errors
+    ------
+    > Be careful of your endpoint url structure
+
+    1. ✅ `event/?q=title` (feels wrong but is right)
+    2. ❌ `event?q=title` (feels right but is wrong)
     """
     # query = data.Event.select()
 
