@@ -137,7 +137,7 @@ def create_access_token(username: str) -> str:
     payload = {
         # "iss": "https://stringoruri.com",
         # "aud": "https://stringoruri.com",
-        "sub": username, # Was called `user`
+        "sub": username, # Was called `user` (must be a string)
         "exp": time.time() + 3600 # 60sec * 60min = 1 hour
     }
     
