@@ -5,6 +5,11 @@
      PRINT OUT AND REVISE: CUT OUT ANYTHING UNECESSARY
 **************************************************************************** -->
 
+> Currently SQLite struggles with concurrent writes.
+
+This README is predominantly for `chapter_08/` but some information is relevant for earlier chapters. There really is an _insane_ amount to think about with APIs and app architecture. It's a real timesink. Keep it light for startup prototypes and hire later.
+
+
 ## Setup
 
 > Setup `/chapter-08`, which is the most substantial code in the book
@@ -17,10 +22,18 @@ uv run main.py
 # Setup the user table
 piccolo migrations forwards user
 # Create the first user (follow the prompts)
+# See `../bruno/collection.bru` for user details
 piccolo user create
 
 # Populate the database
 open -a TextEdit /sqlite.md
+
+# Stress test your API
+bombardier -c 10 -n 10000 -H \
+"Authorization: Bearer [Generate a JWT token with Bruno]" \
+-H 'accept: application/json' -H 'content-type: application/json' --method=POST \
+-b '{"creator": null,"title": "Pyramid Stage","image": "https://tinyurl.com/ed-sheeran-with-shakira","description": "Ed Sheeran sings with Shakira at Glastonbury!","location": "Glastonbury","tags": ["music","adults","event"]}' \
+http://localhost:8000/event/new
 ```
 
 ## Book chapters
@@ -49,10 +62,11 @@ You can use the REPL in early chapters. We're error checking with Bruno (lots of
     - ~~SQLModel (original version)~~ (`1.12.4`)
     - ~~Peewee (modified version)~~ (`1.12.11`)
     - Piccolo (chosen version)
-        - API testing with Bruno app
-        - `BaseUser.login()` to handle hashing (`1.12.12`)
+        - API testing with Bruno app (documents bugs)
+        - `BaseUser.login()` to handle sign-in and hashing (`1.12.12`)
         - Tidying up errors, data entry, and JWT claims
-        - A more suitable folder structure with helpful comments
+        - Piccolo-friendly folder structure with helpful comments
+        - A `/user/me` endpoint (for username and settings)
 
 
 ## Documentation
@@ -61,10 +75,10 @@ You can use the REPL in early chapters. We're error checking with Bruno (lots of
 
 This seems to be the best way to handle docs for types and API instructions. There's also `/redoc`, although I don't prefer it's layout.
 
-- "[APIs you won't hate](https://leanpub.com/build-apis-you-wont-hate-2)" suggests to detail schema in one place as your API evolves
+- See _[APIs you won't hate](https://leanpub.com/build-apis-you-wont-hate-2)_ for error, design, schema, and documentation guides
 - FastAPI comes with an OpenAPI.json way to document your API endpoints ...
-- To detail OpenAPI properly requires messy code annotations (which I don't prefer)
-- Instead use docstring comments (`""" """`) in your functions for documentation.
+- The book uses `/doc` code annotations which I prefer not to use (feels messy)
+- I prefer to use docstring comments (`""" """`) within functions for documentation.
 
 ### Bruno
 
@@ -82,6 +96,13 @@ In this repo I'm [_manually_ checking](https://docs.usebruno.com/testing/automat
 As your app evolves, you'll need to update the `planner.tables` model. For example, if you add `null` or `unique` constraints to certain fields, you'll have to update or replace your original tables. This can be helped along with `sqlite-utils` and JQ.
 
 
+## Security
+
+> Production API needs to protect itself from XSS and DDoS, or other hacks.
+
+This is out of scope for this repo.
+
+
 ## Errors
 
 > FastApi errors generally use a `HTTPException`.
@@ -94,22 +115,50 @@ According to _APIs you won't hate_, `HTTPException` might not be good enough. It
 > We're currently not handling errors "correctly" but I dislike `try/except` blocks.
 > You can add logging to a file in production and catch errors there as well.
 
-1. ✅ SQLite database is locked error (handling concurrent connections)
-2. [ ] `sqlite.IntegrityError` for `null` and duplicate values (won't insert)
-3. [ ] Response giving away sensitive data (not 100% handled)
-4. [ ] `TEXT` contains HTML or other non-plain text values
-5. ✅ User is able to delete data that doesn't belong to them
-6. ✅ Email is not a proper email (Pydantic handles this, `BaseUser.create_user()` doesn't)
-7. [ ] Password field is not secure enough
-8. [ ] Account not approved by admin
-9. [ ] ⚠️ `POST` value `{ "creator": null }` not excluded (is not Pydantic field)
+Errors marked with ✅ should be resolved. **Bold** is a big issue.
+
+1. ✅ **SQLite database is locked error** (async and concurrent connections)
+2. [ ] API timeout due to (1) (immediately returns a `SQLITE_BUSY` error)
+3. [ ] `sqlite.IntegrityError` for `null` and duplicate values (won't insert)
+4. [ ] Response giving away sensitive data (not 100% handled)
+5. [ ] `TEXT` contains HTML or other non-plain text values
+6. ✅ User is able to delete data that doesn't belong to them
+7. ✅ Email is not a proper email (handled by Pydantic only, not Piccolo)
+8. [ ] Password field is not secure enough (currently `> 6` characters)
+9. [ ] Account not approved by admin (you can handle this internally)
+10. [ ] `POST` values validate when they shouldn't (`{ "creator": null }` passes)
+11. ✅ Endpoint redirects instead of resolving (see `307` redirects below)
+12. ✅ Endpoint gives `422` Unprocessable Content (make sure `-H`eaders are set)
+
+### `307` redirects (trailing slash error)
+
+> If your endpoint url has `/no-ending-slash`, do **not** include it in API call. FastAPI treats paths with and without trailing slashes as distinct endpoints by default.
+
+It took me ages to figure out that Bombardier and CURL were returning `307` because my endpoint was setup _without_ a trailing slash and I'm including it. For some reason Bruno doesn't seem to have this problem? See also [NGINX proxy](https://fastapi.tiangolo.com/advanced/behind-a-proxy/#redirects-with-https) for redirects.
+
+Also make sure you're calling the API with the correct method (e.g: `POST`).
+
+### Authenticated routes
+
+> I'm not 100% sure if `/user/signup` is free from "database locked" error.
+
+We must fetch `BaseUser.id` from `authenticate()` and that _could_ be a read then a write. See "SQLite and Async problems" in `planner/tables.py`. There's a lot of debate over which value should be stored in a JWT (the less user info revealed the better), but ideally we'd have `id` at hand.
 
 ### Performance
 
 > It's folly to prematurely optimise! Are you selling? Do you have customers?
 > Some error checking methods can potentially be slow (like `try`/`except` blocks).
 
+1. SQLite is not very good at _sustained_ high load writes.
+2. Catching errors can be time-expensive, throwing is faster.
+
 You can either "catch" or "throw" an error. Think of it like baseball, whereby catching the ball allows us to handle or examine an error (`try`/`except`), and a throw sends a helpful error to our user (`raise`). It seems that _throwing_ an error is more performant than _catching_ it first.
+
+#### Timeout and broken pipe
+
+> ⛔️ Contrary to what I expected, `timeout=200` does NOT improve things.
+
+SQLite `sqlite3.connect()` takes a timeout (in seconds). The query logs were all out of whack and (I don't think) response numbers in order of operation.
 
 <!-- *******************************************************************************
 `value | Exception` is NOT enough and catching an error can be expensive.
@@ -151,7 +200,7 @@ Any `DELETE` operations need careful error handling"
 > Never prematurely optimise your prototype! We can stress test our API with Bombardier.
 > Handy for checking which design routes are more performant (and which slow us down).
 
-If all things are (more or less) equal, always use the easiest-to-read, most consistent, simplest design route. It's more important that code is understood and easy to maintain, over a [few `ms` bump](https://www.reddit.com/r/dotnet/comments/1hgmwvj/what_would_you_considered_a_good_api_response_time/) in speed.
+See `testing/bombardier` for results. If all things are (more or less) equal, always use the easiest-to-read, most consistent, simplest design route. It's more important that code is understood and easy to maintain, over a [few `ms` bump](https://www.reddit.com/r/dotnet/comments/1hgmwvj/what_would_you_considered_a_good_api_response_time/) in speed. Here's an example:
 
 
 -----
