@@ -136,6 +136,9 @@
 #     - I think Piccolo has some rudimentary version of this, and Admin
 #     - See "APIs you won't hate" for more ideas (error codes, etc)
 # 7. Are the essential errors handled? (response codes, error messages, status codes)
+#     - ❌ `sqlite3.OperationalError: database is locked` is a BIG problem at scale.
+#       I tried `PRAGMA journal_mode=WAL;` but not sure it helped much. Setting the
+#       `timeout` actually made it a little _worse_!
 #     - Don't prematurely optimise, but make sure there's a reasonable `HTTPException`
 # 8. Use short `UUID` for `BaseUser` and prettier URLs
 #     - This can be done after the fact (`UUID` -> `ShortUUID`)

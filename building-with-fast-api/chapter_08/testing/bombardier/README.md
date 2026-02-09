@@ -1,10 +1,34 @@
 # Bombardier
 
 > ⏱ This gives a rough idea of speed and concurrency ...
+> ❌ `sqlite3.OperationalError: database is locked` is going to be a problem.
 
 But running bombardier a few times can have quite different results; running `-c 125` and `-n 10000000` (as in docs) takes a _really_ long time and is very unlikely for a startup prototype. Also worth considering is how likely your endpoint will have concurrent (or bulk) hits: this is a test in theory, but not always in practice.
 
 If results are similar for different setups, prefer the simplest, most consistent, easiest-to-read version.
+
+## `/event/new`
+
+> There's a moderate improvement if you use `id` directly in the SQL (rather than fetching `authenticate()`), but not a whole lot.
+
+`sqlite3.OperationalError: database is locked` error but recovered with 50% success rate. Piccolo SQL query logs stop working properly after a while. Changing to `-c 10` almost resolves the problem (99% success). 
+
+```text
+Bombarding http://localhost:8000/event/new with 10000 request(s) using 125 connection(s)
+ 10000 / 10000 [==========================================] 100.00% 119/s 1m23s
+Done!
+Statistics        Avg      Stdev        Max
+  Reqs/sec       120.27     110.36    5143.13
+  Latency         1.03s   777.08ms      2.10s
+  HTTP codes:
+    1xx - 0, 2xx - 5531, 3xx - 0, 4xx - 0, 5xx - 0
+    others - 4469
+  Errors:
+       timeout - 4469
+  Throughput:    83.73KB/s
+```
+
+With `timeout=` set (even to `300`) the first few 1000 return `200` status code but then problems start with Bombardier broken pipe or closed connection errors, even though rows are still being added.
 
 
 ## `/event/`

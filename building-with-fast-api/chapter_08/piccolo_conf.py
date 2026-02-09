@@ -12,7 +12,8 @@
 # Notes
 # -----
 # 1. Remember that query logs are NOT return values (responses)!
-# 2. SQLite `PRAGMA` settings aren't currently available in Piccolo.
+# 2. `SQLiteEngine(timeout=60)` doesn't seem to help much; `> 60` gives MORE timeouts!
+# 3. SQLite `PRAGMA` settings aren't currently available in Piccolo.
 #
 # Wishlist
 # --------
