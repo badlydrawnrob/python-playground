@@ -149,11 +149,11 @@ We must fetch `BaseUser.id` from `authenticate()` and that _could_ be a read the
 > It's folly to prematurely optimise! Are you selling? Do you have customers?
 > Some [error checking](https://realpython.com/python-exceptions/) methods can potentially be slow (like `try`/`except` blocks).
 
-1. SQLite is not very good at _sustained_ high load concurrent writes
-2. Catching errors can be time-expensive; throwing them is cheap and fast
-3. Shorthand is `value | Exception` but different status codes may be needed
-4. Elm's `OneOf` could catch stringly `detail` types, but that's bad practice
-5. Python's [`match`](https://www.freecodecamp.org/news/python-switch-statement-switch-case-example/) [doesn't work](https://discuss.python.org/t/python-3-10-match-case-syntax-for-catching-exceptions/11076/22) in the way you'd expect (unlike Elm's `case`)
+1. **Catching errors can be time-expensive;** throwing them is cheap and fast
+2. Elm's `OneOf` could catch stringly `detail` types, but that's bad practice
+3. **Python's [`match`](https://www.freecodecamp.org/news/python-switch-statement-switch-case-example/) [doesn't work](https://discuss.python.org/t/python-3-10-match-case-syntax-for-catching-exceptions/11076/22)** in the way you'd expect (unlike Elm's `case`)
+4. Shorthand is `value | Exception` but different status codes may be needed
+5. **SQLite is not very good at _sustained_ high load concurrent writes**
 
 You can either "catch" or "throw" an error. Think of it like baseball, whereby catching the ball allows us to handle or examine an error (`try`/`except`), and a throw sends a helpful error to our user (`raise`). It seems that _throwing_ an error is more performant than _catching_ it first.
 
