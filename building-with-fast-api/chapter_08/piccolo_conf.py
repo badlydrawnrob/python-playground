@@ -12,12 +12,15 @@
 # Notes
 # -----
 # 1. Remember that query logs are NOT return values (responses)!
-# 2. `SQLiteEngine(timeout=60)` doesn't seem to help much; `> 60` gives MORE timeouts!
+# 2. `SQLiteEngine(timeout=60)` is a wrapper for `sqlite3_busy_timeout()`
+#     - Setting to 60 doesn't seem to help very much ...
+#     - Setting to more than 60 seems to give MORE timeouts!
 # 3. SQLite `PRAGMA` settings aren't currently available in Piccolo.
 #
 # Wishlist
 # --------
 # 1. PRAGMAs for SQLite like previous versions?
+#     - Especially to reduce `database is locked` concurrent errors.
 # 2. Logging for bug-checking with a live API:
 #     - @ (article) https://betterstack.com/community/guides/logging/logging-with-fastapi/
 #     - @ (previously) https://docs.peewee-orm.com/en/latest/peewee/database.html#logging-queries

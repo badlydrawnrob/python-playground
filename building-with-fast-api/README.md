@@ -108,19 +108,19 @@ This is out of scope for this repo.
 > FastApi errors generally use a `HTTPException`.
 > See also [APIs you won't hate](https://leanpub.com/build-apis-you-wont-hate-2) by Phil Sturgeon.
 
-According to _APIs you won't hate_, `HTTPException` might not be good enough. It seems a bit tricky to follow his guide in Part 4, with FastAPI, but you could use a [plugin](https://github.com/NRWLDev/fastapi-problem) to manage errors for you. For example, `rfc9457` and `rfc7807` are error standards.
+According to _APIs you won't hate_, a `HTTPException` might not be good enough. You'd have to create your own `Error` Pydantic type, or use a [plugin](https://github.com/NRWLDev/fastapi-problem) for standards like [rfc9457](https://www.rfc-editor.org/rfc/rfc9457.html).
 
 ### Common errors
 
 > We're currently not handling errors "correctly" but I dislike `try/except` blocks.
 > You can add logging to a file in production and catch errors there as well.
 
-Errors marked with ✅ should be resolved. **Bold** is a big issue.
+List errors as they come up: errors marked with ✅ should be resolved, and marked **Bold** is a serious problem.
 
 1. ✅ **SQLite database is locked error** (async and concurrent connections)
-2. [ ] API timeout due to (1) (immediately returns a `SQLITE_BUSY` error)
-3. [ ] `sqlite.IntegrityError` for `null` and duplicate values (won't insert)
-4. [ ] Response giving away sensitive data (not 100% handled)
+2. [ ] **API timeout** due to (1) (immediately returns a `SQLITE_BUSY` error)
+3. [ ] **`sqlite.IntegrityError` for `null`** and duplicate values (won't insert)
+4. [ ] Response giving away sensitive data (vague is better, not 100% handled)
 5. [ ] `TEXT` contains HTML or other non-plain text values
 6. ✅ User is able to delete data that doesn't belong to them
 7. ✅ Email is not a proper email (handled by Pydantic only, not Piccolo)
@@ -147,10 +147,13 @@ We must fetch `BaseUser.id` from `authenticate()` and that _could_ be a read the
 ### Performance
 
 > It's folly to prematurely optimise! Are you selling? Do you have customers?
-> Some error checking methods can potentially be slow (like `try`/`except` blocks).
+> Some [error checking](https://realpython.com/python-exceptions/) methods can potentially be slow (like `try`/`except` blocks).
 
-1. SQLite is not very good at _sustained_ high load writes.
-2. Catching errors can be time-expensive, throwing is faster.
+1. SQLite is not very good at _sustained_ high load concurrent writes
+2. Catching errors can be time-expensive; throwing them is cheap and fast
+3. Shorthand is `value | Exception` but different status codes may be needed
+4. Elm's `OneOf` could catch stringly `detail` types, but that's bad practice
+5. Python's [`match`](https://www.freecodecamp.org/news/python-switch-statement-switch-case-example/) [doesn't work](https://discuss.python.org/t/python-3-10-match-case-syntax-for-catching-exceptions/11076/22) in the way you'd expect (unlike Elm's `case`)
 
 You can either "catch" or "throw" an error. Think of it like baseball, whereby catching the ball allows us to handle or examine an error (`try`/`except`), and a throw sends a helpful error to our user (`raise`). It seems that _throwing_ an error is more performant than _catching_ it first.
 
@@ -159,38 +162,6 @@ You can either "catch" or "throw" an error. Think of it like baseball, whereby c
 > ⛔️ Contrary to what I expected, `timeout=200` does NOT improve things.
 
 SQLite `sqlite3.connect()` takes a timeout (in seconds). The query logs were all out of whack and (I don't think) response numbers in order of operation.
-
-<!-- *******************************************************************************
-`value | Exception` is NOT enough and catching an error can be expensive.
-Cheap and easy way could be `OneOf error` in the `detail` with generic STATUS code.
-
-[ write a little about different error matching techniques and speeds (with links) ]
-@ https://realpython.com/python-exceptions/ 
-
-`match` doesn't work quite the same as Elm's `case` does with error types.
-@ https://discuss.python.org/t/python-3-10-match-case-syntax-for-catching-exceptions/11076/22
-@ https://www.freecodecamp.org/news/python-switch-statement-switch-case-example/
-
-Any `DELETE` operations need careful error handling"
-- 🔐 Are all routes secured properly?
-- 👩‍🦳 Can a user who doesn't own a piece of data delete it?
-- ⚠️ Sensitive data we should never return (the `ID` or "BE VAGUE")
-
-# 7. ⚠️ Handling errors better (and some light unit testing).
-#     - 🔍 See "APIs you won't hate 2" book for error codes (out of scope). FastAPI
-#       doesn't make it particularly easy to use best practice return values.
-#     - ✅ List all common errors in the README that could possibly happen. You can
-#       add them to the endpoint too.
-#     - ✅ Both `HTTPException` (or error codes) and correct STATUS (404 etc) returned
-#         - ❌ Sometimes different status codes are needed for endpoint errors
-#     - 🐛 What obvious errors are we not currently handling?
-#         - ⚠️ What's the correct response and error codes per route?
-#         - ⚠️ What's the correct status code for each branch?
-#         - ⚠️ Low hanging fruit? What's YAGNI and just-in-time handling?
-#         - 💾 SQLite integrity, null constraint, duplicate value errors?
-#         - 💾 Write AT LEAST a duplicate ID function (SQLite unique constraint)
-#         - Must you use particular error types? (`RecordNotFound`, etc)
-******************************************************************************** -->
 
 
 ## Tooling
