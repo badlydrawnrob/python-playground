@@ -116,32 +116,26 @@ async def retrieve_all_events(
     ) -> List[api.Event]:
     """Return a queryable list of events!
 
-    > Default order is by primary key INDEXED number, which means the `Event.id`
-    > will appear in the order it was inserted (not by ABC123 order).
+    > Default order is by primary key (which is an indexed number), meaning
+    > `Event.id` appears in insertion order (not by `UUID` order).
     
-    Out API layer models are custom and we can use them as response types. You
-    could also return particular data points explicitly if you prefered:
-
-    ```
-    [{"title": event.title} for event in query]
-    ```
-
-    Queries (list by column)
-    ------------------------
-    > We'll replicate a table sort by column (ASCENDING by only)
-
-    1. By title
-    2. By location
+    Out API layer models are custom and we can use them as response types.
 
     Annotated
     ---------
     > @ https://fastapi.tiangolo.com/tutorial/query-params-str-validations/
 
-    `Annotated` is used so that we can keep our typing `str | None = None`,
-    otherwise the typing would need a workaround. We can add metadata such as
-    `deprecated=True`, `pattern="RegEx"`, and further validation methods to check
-    our `?q`uery keys and arguments. FastAPI will automatically add relevant `/docs`
-    information.
+    `Annotated` is used so we can keep our typing `str | None = None`, otherwise
+    typing would need a workaround. We can add metadata such as `deprecated=True`,
+    `pattern="RegEx"`, and further validation methods to check our `?q`uery keys
+    and arguments. FastAPI will automatically add relevant `/docs` information.
+
+    List by ascending order
+    -----------------------
+    > We'll replicate a table sort by column (ASCENDING by only)
+
+    1. By title
+    2. By location
 
     Errors
     ------
