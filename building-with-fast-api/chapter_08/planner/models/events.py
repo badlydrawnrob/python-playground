@@ -40,6 +40,8 @@
 # > Pydantic fields can be declared in any order, but keep them consistent.
 # > Nested models can be used, but must be declared _before_ they are referenced.
 #
+#     @ https://docs.pydantic.dev/latest/concepts/serialization/
+#
 # 1. Use `Optional` when a data point is not required.
 #     - ALWAYS supply the fallback value. For `null`, that's `| None = None`.
 #     - @ https://sentry.io/answers/understand-optional-query-parameters-in-fastapi/

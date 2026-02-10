@@ -9,13 +9,21 @@
 # default `python-decouple` treats values as strings. We've changed from using
 # `pydantic-settings` and `peewee` here.
 #
-# Notes
-# -----
-# 1. Remember that query logs are NOT return values (responses)!
-# 2. `SQLiteEngine(timeout=60)` is a wrapper for `sqlite3_busy_timeout()`
-#     - Setting to 60 doesn't seem to help very much ...
-#     - Setting to more than 60 seems to give MORE timeouts!
-# 3. SQLite `PRAGMA` settings aren't currently available in Piccolo.
+#
+# Connection to the database
+# --------------------------
+# > `SQLiteEngine` has no `connect()` and `close()` functions to open/close the
+# > `fruits.sqlite` database. You can also add a `timeout=` paramater.
+#
+# Piccolo handles connections automatically, but you may need to add transactions
+# when you're dealing with concurrent requests (see `app.py` notes).
+#
+# Setting `timeout=60` doesn't seem to help much, and anything over this number
+# can actually make our timeouts WORSE. I'm unsure why. `SQLiteEngine(timeout=60)`
+# is a wrapper for `sqlite3_busy_timeout()`.
+#
+# SQLite `PRAGMA` settings aren't currently available in Piccolo.
+#
 #
 # Wishlist
 # --------
@@ -25,6 +33,7 @@
 #     - @ (article) https://betterstack.com/community/guides/logging/logging-with-fastapi/
 #     - @ (previously) https://docs.peewee-orm.com/en/latest/peewee/database.html#logging-queries
 #     - `from logging import getLogger, StreamHandler, DEBUG`
+#     - Remember that query logs are NOT return values (responses)!
 
 from decouple import config
 from piccolo.conf.apps import AppRegistry

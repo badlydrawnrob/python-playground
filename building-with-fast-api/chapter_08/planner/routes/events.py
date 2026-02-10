@@ -20,8 +20,8 @@
 #
 # Async only
 # ----------
-# > ⚠️ Avoid endpoints that contain both read and write functions!
-# > See the `planner.tables` file for more information on `IMMEDIATE` transactions.
+# > ⚠️ Avoid endpoints that contain both read and write functions! If we do this,
+# > we generally avoid using `IMMEDIATE` transactions (see `/planner.tables`).
 #
 # Unfortunately we've got to pepper our code with `async` and `await` keywords.
 #
@@ -57,15 +57,35 @@
 #
 # FastApi functions
 # -----------------
-# > I generally prefer Elm-style, whereby you'd avoid "magic" and convert the
-# > data directly to whatever form (types) you needed. Pydantic response types
-# > do saves us time and are quite graceful.
-#
-# 1. Response types come in two flavours:
-#     - `-> Response` -or- `response_model=`
-#     - You generally do not want (or need) to use both!
+# > Prefer function style (like Elm) and avoid "magic" like `create_pydantic_model`
+# > (create your own) and object-oriented.
+# 
+# 1. Pydantic response types save us time and format data
+#     - They come in two flavours: `-> ResponseType` / `response_model=`
+#     - You can also use `status=` in the @decorator
 # 2. `Depends(authenticate)` runs before the route function
 #     - It fails if user is not logged in
+#
+#
+# PATCH -vs- PUT
+# --------------
+# > I generally find it best to be explicit with `json` values. PUT forces us to
+# > include all fields in the request body, whether they're required or not (`null`).
+#
+# This prevents any conflicts, accidentally changing a field, or leaving two `PATCH`
+# requests in an impossible state. As a general rule, be explicit and set ALL
+# data for an endpoint with `PUT`. For something like `user` and `user.settings`,
+# you might want dedicated endpoints for sensitive data. For example, Google has
+# a single-field form on a `/edit/password` url and updates only the password.
+#
+# The problem with `PATCH` is it can have any number of `Optional` fields not set,
+# and there's no way of knowing which data is present in the request body. With
+# full data in the request body, you can be sure data is up-to-date; with `null`
+# values present, you can use @lydell's suggestion of `Json.Decode.nullable`
+# (rather than the vague and error-prone `Json.Decode.maybe`).
+#
+# **TL;DR:** `PUT` is idempotent, meaning multiple identical PUT requests always
+# has the same result.
 #
 #
 # Questions

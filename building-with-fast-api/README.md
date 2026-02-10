@@ -120,15 +120,23 @@ List errors as they come up: errors marked with ✅ should be resolved, and mark
 1. ✅ **SQLite database is locked error** (async and concurrent connections)
 2. [ ] **API timeout** due to (1) (immediately returns a `SQLITE_BUSY` error)
 3. [ ] **`sqlite.IntegrityError` for `null`** and duplicate values (won't insert)
-4. [ ] Response giving away sensitive data (vague is better, not 100% handled)
-5. [ ] `TEXT` contains HTML or other non-plain text values
-6. ✅ User is able to delete data that doesn't belong to them
-7. ✅ Email is not a proper email (handled by Pydantic only, not Piccolo)
-8. [ ] Password field is not secure enough (currently `> 6` characters)
-9. [ ] Account not approved by admin (you can handle this internally)
-10. [ ] `POST` values validate when they shouldn't (`{ "creator": null }` passes)
-11. ✅ Endpoint redirects instead of resolving (see `307` redirects below)
-12. ✅ Endpoint gives `422` Unprocessable Content (make sure `-H`eaders are set)
+4. ✅ No DB results for query (`is not None` seems like enough)
+5. [ ] Response giving away sensitive data (vague is better, not 100% handled)
+6. [ ] `TEXT` contains HTML or other non-plain text values
+7. ✅ User is able to delete data that doesn't belong to them
+8. ✅ Email is not a proper email (handled by Pydantic only, not Piccolo)
+9. [ ] Password field is not secure enough (currently `> 6` characters)
+10. [ ] Account not approved by admin (you can handle this internally)
+11. [ ] `POST` values validate when they shouldn't (`{ "creator": null }` passes)
+12. ✅ Endpoint redirects instead of resolving (see `307` redirects below)
+13. ✅ Endpoint gives `422` Unprocessable Content (make sure `-H`eaders are set)
+14. ✅ Type too permissive (e.g: `create_pydantic_model` uses `Any` type)
+
+### Impossible routes
+
+> If there's anything destructive or hackable, consider leaving it out!
+
+You can do admin stuff offline with `sqlite-utils`, GUI, or no-code. Wait until you can hire a professional to build out a secure platform (with roles). `piccolo-admin` and `piccolo user create` are good examples of this, and  `DELETE` all `Event`s is a terrible idea and not necessary.
 
 ### `307` redirects (trailing slash error)
 
