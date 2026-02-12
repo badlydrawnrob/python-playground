@@ -5,12 +5,13 @@
      PRINT OUT AND REVISE: CUT OUT ANYTHING UNECESSARY
 **************************************************************************** -->
 
-> Currently SQLite struggles with concurrent writes.
+> ⚠️ Currently SQLite struggles with concurrent writes.
+> 🔍 Which queries are run with SQL? Which on the client?
 
-This README is predominantly for `chapter_08/` but some information is relevant for earlier chapters. There really is an _insane_ amount to think about with APIs and app architecture. It's a real timesink. Keep it light for startup prototypes and hire later.
+Predominantly focusing on `chapter_08/` in this doc, but some information relevant for earlier chapters too! There's an _insane_ amount to think about with APIs and app architecture; a real timesink. Keep it light for startup prototypes and hire later. 
 
 
-## Setup
+## 🚀 Setup
 
 > Setup `/chapter-08`, which is the most substantial code in the book
 
@@ -34,9 +35,12 @@ bombardier -c 10 -n 10000 -H \
 -H 'accept: application/json' -H 'content-type: application/json' --method=POST \
 -b '{"creator": null,"title": "Pyramid Stage","image": "https://tinyurl.com/ed-sheeran-with-shakira","description": "Ed Sheeran sings with Shakira at Glastonbury!","location": "Glastonbury","tags": ["music","adults","event"]}' \
 http://localhost:8000/event/new
+
+# Optionally stress test multi-users
+https://locust.io/
 ```
 
-## Book chapters
+## 📖 Book chapters
 
 > Each step of the book is reflected in the tags. I've decided to ommit the final
 > two chapters around testing and deployment, as I don't prefer that method.
@@ -69,7 +73,7 @@ You can use the REPL in early chapters. We're error checking with Bruno (lots of
         - A `/user/me` endpoint (for username and settings)
 
 
-## Documentation
+## 🔍 Documentation
 
 > I use comments as documentation which can be found in `localhost:8000/docs`.
 
@@ -89,28 +93,28 @@ Ideally, Bruno can be kept for error checking and logging bugs only. You can loa
 In this repo I'm [_manually_ checking](https://docs.usebruno.com/testing/automate-test/manual-test) endpoints but in production you'd probably want to automate this (either unit testing or a GUI/Ai).
 
 
-## Models
+## 💾 Models
 
 > As your app evolves, make sure models accurately reflect your needs.
 
 As your app evolves, you'll need to update the `planner.tables` model. For example, if you add `null` or `unique` constraints to certain fields, you'll have to update or replace your original tables. This can be helped along with `sqlite-utils` and JQ.
 
 
-## Security
+## 🔐 Security
 
 > Production API needs to protect itself from XSS and DDoS, or other hacks.
 
-This is out of scope for this repo.
+Security is out of scope for this repo, but you might want to `app.add_middleware()` to disallow any requests that are made outside your website (such as CURL), and prevent common attacks. Nothing is foolproof, however, so you might want to _rate limit_, restrict by IP, create hard-to-guess API keys (`client_id` and `client_secret`). Optimise when it becomes a problem (YAGNI).
 
 
-## Errors
+## ⛔️ Errors
 
 > FastApi errors generally use a `HTTPException`.
 > See also [APIs you won't hate](https://leanpub.com/build-apis-you-wont-hate-2) by Phil Sturgeon.
 
 According to _APIs you won't hate_, a `HTTPException` might not be good enough. You'd have to create your own `Error` Pydantic type, or use a [plugin](https://github.com/NRWLDev/fastapi-problem) for standards like [rfc9457](https://www.rfc-editor.org/rfc/rfc9457.html).
 
-### Common errors
+### ✅ Common errors
 
 > We're currently not handling errors "correctly" but I dislike `try/except` blocks.
 > You can add logging to a file in production and catch errors there as well.
@@ -132,7 +136,7 @@ List errors as they come up: errors marked with ✅ should be resolved, and mark
 13. ✅ Endpoint gives `422` Unprocessable Content (make sure `-H`eaders are set)
 14. ✅ Type too permissive (e.g: `create_pydantic_model` uses `Any` type)
 
-### Impossible routes
+### 🪧 Impossible routes
 
 > If there's anything destructive or hackable, consider leaving it out!
 
@@ -152,16 +156,15 @@ Also make sure you're calling the API with the correct method (e.g: `POST`).
 
 We must fetch `BaseUser.id` from `authenticate()` and that _could_ be a read then a write. See "SQLite and Async problems" in `planner/tables.py`. There's a lot of debate over which value should be stored in a JWT (the less user info revealed the better), but ideally we'd have `id` at hand.
 
-### Performance
+### ⏱ Performance
 
 > It's folly to prematurely optimise! Are you selling? Do you have customers?
-> Some [error checking](https://realpython.com/python-exceptions/) methods can potentially be slow (like `try`/`except` blocks).
 
-1. **Catching errors can be time-expensive;** throwing them is cheap and fast
-2. Elm's `OneOf` could catch stringly `detail` types, but that's bad practice
-3. **Python's [`match`](https://www.freecodecamp.org/news/python-switch-statement-switch-case-example/) [doesn't work](https://discuss.python.org/t/python-3-10-match-case-syntax-for-catching-exceptions/11076/22)** in the way you'd expect (unlike Elm's `case`)
-4. Shorthand is `value | Exception` but different status codes may be needed
-5. **SQLite is not very good at _sustained_ high load concurrent writes**
+1. **SQLite is not very good at _sustained_ high load concurrent writes**
+2. **Catching errors ([`try`/`except`](https://realpython.com/python-exceptions/)) can be time-expensive;** throwing them is cheap and fast
+3. Elm's `OneOf` could catch stringly `detail` types, but that's bad practice
+4. **Python's [`match`](https://www.freecodecamp.org/news/python-switch-statement-switch-case-example/) [doesn't work](https://discuss.python.org/t/python-3-10-match-case-syntax-for-catching-exceptions/11076/22)** in the way you'd expect (unlike Elm's `case`)
+5. Shorthand is `value | Exception` but different status codes may be needed
 
 You can either "catch" or "throw" an error. Think of it like baseball, whereby catching the ball allows us to handle or examine an error (`try`/`except`), and a throw sends a helpful error to our user (`raise`). It seems that _throwing_ an error is more performant than _catching_ it first.
 
@@ -172,7 +175,7 @@ You can either "catch" or "throw" an error. Think of it like baseball, whereby c
 SQLite `sqlite3.connect()` takes a timeout (in seconds). The query logs were all out of whack and (I don't think) response numbers in order of operation.
 
 
-## Tooling
+## ⚙️ Tooling
 
 ### Bombardier
 
