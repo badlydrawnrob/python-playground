@@ -1,7 +1,7 @@
 
 # BUGS
 
-## Commands
+## Commands
 
 ```
 bombardier -c 125 -n 10000 -H \
