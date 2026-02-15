@@ -17,7 +17,7 @@ Predominantly focusing on `chapter_08/` in this doc, but some information releva
 
 ```bash
 # Activate the virtual environment, then run the app
-# Also sets up the database with `Event` table
+# which also sets up the database with `Event` table
 uv run main.py
 
 # Setup the user table
@@ -26,10 +26,10 @@ piccolo migrations forwards user
 # See `../bruno/collection.bru` for user details
 piccolo user create
 
-# Populate the database
+# Populate the database in sqlite3
 open -a TextEdit /sqlite.md
 
-# Stress test your API
+# Stress test your API (should be 99% successful)
 bombardier -c 10 -n 10000 -H \
 "Authorization: Bearer [Generate a JWT token with Bruno]" \
 -H 'accept: application/json' -H 'content-type: application/json' --method=POST \
