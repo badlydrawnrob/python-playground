@@ -1,18 +1,24 @@
+
+# BUGS
+
+## Commands
+
+```
 bombardier -c 125 -n 10000 -H \
-"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzcwNjgyNDczLjc1MzMwMX0.VQLf1lGXGs78RYnA1S5LAlP68wdbcvb68kgkwZtTiZs" \
+"Authorization: Bearer [GENERATE JWT WITH BRUNO]" \
 -H 'accept: application/json' -H 'content-type: application/json' --method=POST \
 -b '{"creator": null,"title": "Pyramid Stage","image": "https://tinyurl.com/ed-sheeran-with-shakira","description": "Ed Sheeran sings with Shakira at Glastonbury!","location": "Glastonbury","tags": ["music","adults","event"]}' \
 http://localhost:8000/event/new
+```
 
-
-
+```
 curl --request POST \
   --url http://localhost:8000/event/new \
   --header 'accept: application/json' \
   --header 'content-type: application/json' \
-  --header 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzcwNjgyNDczLjc1MzMwMX0.VQLf1lGXGs78RYnA1S5LAlP68wdbcvb68kgkwZtTiZs' \
+  --header 'authorization: Bearer [GENERATE JWT WITH BRUNO]' \
   --data '{"creator": null,"title": "Pyramid Stage","image": "https://tinyurl.com/ed-sheeran-with-shakira","description": "Ed Sheeran sings with Shakira at Glastonbury!","location": "Glastonbury","tags": ["music","adults","event"]}'
-
+```
 
 
 ## Alternative JWT `sub` with default `timeout`.
@@ -32,16 +38,13 @@ Statistics        Avg      Stdev        Max
   Throughput:    98.30KB/s
 ```
 
+### With the `timeout` set
 
-
-
---------------------------------------------------------------------------------------
 With `timeout` set it seems Bombardier doesn't fully complete (or more errors)
 However, SQLite says it has `6000`+ rows when Bombardier reads:
 
 1xx - 0, 2xx - 3392, 3xx - 0, 4xx - 0, 5xx - 1845
     others - 4763
---------------------------------------------------------------------------------------
 
 
 ## Default `timeout`
@@ -196,13 +199,16 @@ Query 29958 response:
 
 ## `timeout=60`
 
-Attempt 1
+### Attempt 1
 
+```
 rob@Robs-MacBook-Pro ~ % bombardier -c 125 -n 10000 -H \
 "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJsb3ZlbHlidW0iLCJleHAiOjE3NzA2NzY2NTcuMDk5NTA5fQ.iZb17UnN_W9n8p2vslEZv8NNGyrhtedv7NnDGK4edYI" \
 -H 'accept: application/json' -H 'content-type: application/json' --method=POST \
 -b '{"creator": null,"title": "Pyramid Stage","image": "https://tinyurl.com/ed-sheeran-with-shakira","description": "Ed Sheeran sings with Shakira at Glastonbury!","location": "Glastonbury","tags": ["music","adults","event"]}' \
 http://localhost:8000/event/new
+```
+```
 Bombarding http://localhost:8000/event/new with 10000 request(s) using 125 connection(s)
  10000 / 10000 [===========================================] 100.00% 96/s 1m43s
 Done!
@@ -241,7 +247,7 @@ Statistics        Avg      Stdev        Max
   Throughput:    56.77KB/s
 ```
 
-Attempt 2 (with `PRAGMA journal_mode=WAL`)
+### Attempt 2 (with `PRAGMA journal_mode=WAL`)
 
 ```
 Bombarding http://localhost:8000/event/new with 10000 request(s) using 125 connection(s)
@@ -286,7 +292,7 @@ Statistics        Avg      Stdev        Max
 ```
 
 
-## Resetting the `.db` then `timeout=200`
+### Resetting the `.db` then `timeout=200`
 
 ```
 Bombarding http://localhost:8000/event/new with 10000 request(s) using 125 connection(s)
