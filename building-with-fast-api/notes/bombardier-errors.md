@@ -208,6 +208,7 @@ rob@Robs-MacBook-Pro ~ % bombardier -c 125 -n 10000 -H \
 -b '{"creator": null,"title": "Pyramid Stage","image": "https://tinyurl.com/ed-sheeran-with-shakira","description": "Ed Sheeran sings with Shakira at Glastonbury!","location": "Glastonbury","tags": ["music","adults","event"]}' \
 http://localhost:8000/event/new
 ```
+
 ```
 Bombarding http://localhost:8000/event/new with 10000 request(s) using 125 connection(s)
  10000 / 10000 [===========================================] 100.00% 96/s 1m43s
