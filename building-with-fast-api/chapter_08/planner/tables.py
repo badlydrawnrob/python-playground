@@ -10,19 +10,39 @@
 #    @ https://github.com/badlydrawnrob/data-playground/tree/master/mocking/fruits
 #
 #
-# Data model
-# ----------
-# > We're crafting our own API models, but you could use `create_pydantic_model`
-# > to allow Piccolo to auto-generate our response types.
+# Data model and serialization
+# ----------------------------
+# > In general it's best to create your own models; you could use the function
+# > `create_pydantic_model` for Piccolo to auto-generate response types, but that
+# > "magic" eventually falls down.
+#
+#     @ https://docs.pydantic.dev/latest/concepts/serialization/
+#     @ https://piccolo-orm.readthedocs.io/en/latest/piccolo/serialization/index.html
 # 
-# ⚠️ We only have SQL models (without `DataIn` Pydantic validation), which could
-# potentially pollute our database with BAD DATA. SQLite is NOT being run in
-# strict mode, so you may want to add a DATA validation layer.
+# ⚠️ SQLite doesn't respect types unless it's a strict table. BAD DATA could be
+# an issue, we only have the SQL model (not DataIn Pydantic validation) and we
+# don't want bad data polluting our database. Strict tables are inconvenient with
+# Piccolo as we have helpful column types. You may want to add DATA validation.
+#
+#     @ https://sqlite.org/stricttables.html
+#     @ https://piccolo-orm.readthedocs.io/en/latest/piccolo/serialization/index.html#required-fields
 #
 # It's best to make sure your DATA model and API model are distinct. Piccolo is
 # quite well organised, but you may want to name your models explicitly: `Table`
 # for SQL models, and `DataIn`/`ApiIn` validation with Pydantic. Piccolo ORM uses
 # the Active Record pattern, rather than SQLAlchemy's Data Mapper.
+#
+# `model_dump(exclude_unset=True)` is useful for optional fields!
+#
+#
+# Serialization shape
+# -------------------
+# > Flat -vs- nested
+# 
+#     @ https://piccolo-orm.readthedocs.io/en/latest/piccolo/serialization/index.html#nested
+#
+# Piccolo defaults to a flat dictionary, which Elm prefers. You can use a nested
+# Pydantic model, but you'll need to declare it with Piccolo. 
 #
 #
 # SQLite and Piccolo
@@ -165,7 +185,7 @@ class Event(Table):
     """
     We'll use `UUID` instead of auto-incrementing `ID` for more security.
 
-    > Fields are `null=False` by default
+    > Fields are `null=False` by default (required, not optional)
 
     Piccolo defaults to a `Serial()` auto-incrementing integer primary key, but
     we've changed it to automatically generate a `UUID` for us.
