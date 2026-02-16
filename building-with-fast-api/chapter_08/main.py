@@ -155,6 +155,7 @@
 #     - @ https://fastapi.tiangolo.com/tutorial/middleware/
 # 12. 🔍 Logging for FastApi live server to prepare for launch:
 #     - @ Search Brave "fastapi logging production"
+#     - @ https://betterstack.com/community/guides/logging/logging-with-fastapi/
 #     - @ https://tinyurl.com/prep-fastapi-for-production (hire a professional!)
 # 13. Disallow some email addresses if we're not in control of signup
 #     - For example `user+test@gmail` which allows multiple accounts.

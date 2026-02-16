@@ -53,12 +53,21 @@
 # 3. Your `SECRET` key should be the correct length (256 bits / 32 chars)
 # 4. Your `SECRET` should never be exposed! Keep it secure and safe!
 # 5. Your `SECRET` should be refreshed often (every couple of weeks or so).
-# 6. Your claims should include at least `iss`uer, `aud`ience, and `exp`iry
+# 6. Your claims should include at least `iss`uer, `aud`ience, and `exp`iry`
 # 7. Your website should always use HTTPS (never HTTP)
 #
 # Never add sensitive data to the JWT payload!
 # If you add a token refresh endpoint (YAGNI), be extremely careful.
 # Always have a mentor or professional check your code!
+#
+# Security: calling the API
+# -------------------------
+# > @ https://www.oauth.com/oauth2-servers/client-registration/client-id-secret/
+#
+# You may need to use a `client_id` and `client_secret` to call your API. I think
+# if your API and client are on the same domain, you can leave out the `client_secret`,
+# and just use the `client_id` as well as HTTP headers. However, using a client
+# secret is more secure!
 #
 # Security: expiry
 # ----------------

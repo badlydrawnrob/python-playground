@@ -35,8 +35,8 @@
 # `model_dump(exclude_unset=True)` is useful for optional fields!
 #
 #
-# Serialization shape
-# -------------------
+# Shape of JSON response
+# ----------------------
 # > Flat -vs- nested
 # 
 #     @ https://piccolo-orm.readthedocs.io/en/latest/piccolo/serialization/index.html#nested
