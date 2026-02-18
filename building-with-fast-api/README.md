@@ -1,14 +1,19 @@
 # README
 
+> Instructions for Building With Fast API (with many corrections)
 
-<!-- ***************************************************************************
-     PRINT OUT AND REVISE: CUT OUT ANYTHING UNECESSARY
-**************************************************************************** -->
+The book has errors and I use my personal [coding style]([coding style](https://github.com/badlydrawnrob/python-playground?tab=readme-ov-file#coding-style)) and preferences. Mostly focused on `chapter_08/` but relevant for earlier chapters too!
 
-> ⚠️ Currently SQLite struggles with concurrent writes.
-> 🔍 Which queries are run with SQL? Which on the client?
+App architecture and APIs have an _insane_ amount to think about, so take it slowly and build incrementally. It might also be worthwhile picking up a [reference book](https://www.oreilly.com/library/view/fastapi/9781098135492/) for FastAPI, as it's documentation could be easier to read. Programming is a massive timesink, but you have less control over 3rd-party tools and Ai-gen. They do speed things up however, so I'm leaning towards prototyping the important part (data) by hand, using [tooling](.pencil.dev) for paper prototyping, and hiring a team later.
 
-Predominantly focusing on `chapter_08/` in this doc, but some information relevant for earlier chapters too! There's an _insane_ amount to think about with APIs and app architecture; a real timesink. Keep it light for startup prototypes and hire later. 
+SQLite is the most widely deployed database in the world. [Turso](https://github.com/tursodatabase/turso) is on the way. ou get a lot of control compared to 3rd-party tooling, if you understand data. Cherry-pick learning as you go.
+
+
+## 🧞 A wishlist never ends!
+
+> At some point you've got to just 🚢 ship it!
+
+There's always some new feature or bug to squash. Learning is never-ending. Your job is to stick with on idea long enough to validate it, discounting all others. Be brutal! Cut code down! Release!
 
 
 ## 🚀 Setup
@@ -52,13 +57,12 @@ git clean -dx -e .env -i
 
 ## 📖 Book chapters
 
-> Each step of the book is reflected in the tags. I've decided to ommit the final
-> two chapters around testing and deployment, as I don't prefer that method.
+> I've decided to omit the final two chapters as I dislike Docker and unit testing.
 
-You can use the REPL in early chapters. We're error checking with Bruno (lots of methods to [test](https://docs.usebruno.com/testing/automate-test/manual-test) APIs and I prefer GUIs or simple CLI tools). Generally with prototypes it's best not to prematurely optimise and fix errors "just-in-time".
+You can use the REPL in early chapters. We're [error checking](https://docs.usebruno.com/testing/automate-test/manual-test) with Bruno, and there's lots of other GUIs or CLI tools for testing. Prototyping is generally "barely tested" and premature optimization discouraged. Strong types help. Iterate and fix errors "just-in-time".
 
 1. Hello World
-2. Routing (`1.6.0` — `1.6.6`)
+2. Routing (#commit `1.6.0` — `1.6.6`)
 3. Response models and error handling (`1.7.0` — `1.7.4`)
 4. Templating with Jinja (`1.8.0` — `1.8.2`)
     — See `1.8.1` for our `json` version
@@ -80,10 +84,14 @@ You can use the REPL in early chapters. We're error checking with Bruno (lots of
 
 ## 📝 To do
 
-> See `chapter_08/main.py` for a full wishlist.
+> Mostly essentials. See `chapter_08/main.py` for a full wishlist.
 
 1. Which queries are run with SQL? Which on the client?
 2. What's the easiest way to deal with database migrations?
+3. Consider [changing](https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/) the JWT encoder package ([security risk](https://github.com/fastapi/fastapi/discussions/9587))
+4. Why does Rich Hickey dislike ORMs?
+5. Investigate `BaseUser` and the `Profile` column
+6. Test out [piccolo admin](https://github.com/piccolo-orm/piccolo_admin)
 
 
 ## 🔍 Documentation
@@ -105,6 +113,8 @@ Other documentation techniques like `Annotated[]` and `"json_schema_extra"` are 
 3. Tidying up errors, data entry, and JWT claims
 4. Piccolo-friendly folder structure with helpful comments
 5. A `/user/me` endpoint (for username and settings)
+6. Using `.returning()` instead of a `select()` guard
+    - For functions that allow it this is [non-optional](https://github.com/piccolo-orm/piccolo/issues/1319#issuecomment-3705946732)!
 
 ### Piccolo
 
@@ -112,7 +122,7 @@ Other documentation techniques like `Annotated[]` and `"json_schema_extra"` are 
 
 Piccolo takes a while to get into, but it's very capable. We use SQLite for prototyping due to it's portability and ease of use; unfortunately async is problematic for [concurrent writes](https://piccolo-orm.readthedocs.io/en/1.1.1/piccolo/tutorials/using_sqlite_and_asyncio_effectively.html) (`> 10` people inserting is a struggle), but making sure you [don't read/write](https://github.com/piccolo-orm/piccolo/issues/1319) within an endpoint and setting `WAL` mode helps a bit.
 
-Take care with your inserts as SQLite [isn't set](https://github.com/piccolo-orm/piccolo/issues/1187) to strict mode. Validate your types!
+Piccolo has other plugins, such as [admin](https://piccolo-api.readthedocs.io/en/latest/piccolo_admin/index.html) for your tables. Take care with your inserts as SQLite [isn't set](https://github.com/piccolo-orm/piccolo/issues/1187) to strict mode. Validate your types!
 
 ## SQLite
 
@@ -180,9 +190,13 @@ As your app evolves, you'll need to update the `planner.tables` model. For examp
 
 ## 🔐 Security
 
-> Production API needs to protect itself from XSS and DDoS, or other hacks.
+> **Security is a bitch.** Production API needs to protect itself from all sorts of hacks.
 
-Security is out of scope for this repo, but you might want to `app.add_middleware()` to disallow any requests that are made outside your website (such as CURL), and prevent common attacks. Nothing is foolproof, however, so you might want to _rate limit_, restrict by IP, create hard-to-guess API keys (`client_id` and `client_secret`). Optimise when it becomes a problem (YAGNI).
+Security is out of scope for this repo, but one thing you **must** change from the book `python-jose`, as it's a security risk. At the very least, use `uv add "python-jose[cryptography] >=3.5.0"` which generally uses `openssl version` [`3.0.0`](https://cryptography.io/en/latest/faq/#installing-cryptography-with-openssl-older-than-3-0-0-fails) or greater (your OS might not support it). FastAPI has recently switched to PyJWT ([issue](https://github.com/fastapi/fastapi/discussions/9587)).
+
+For attacks such as XSS and DDoS, you might also want to use `app.add_middleware()` to disallow any requests made outside your website (such as CURL), and prevent common attacks. Nothing is foolproof, so you might want to _rate limit_, restrict by IP address, create hard-to-guess API keys (`client_id` and `client_secret`). Optimise when it becomes a problem (YAGNI).
+
+**TL;DR:** have a professional check over your code, or research thoroughly.
 
 
 ## ⛔️ Errors
@@ -253,6 +267,23 @@ You can either "catch" or "throw" an error. Think of it like baseball, whereby c
 SQLite `sqlite3.connect()` takes a timeout (in seconds). The query logs were all out of whack and (I don't think) response numbers in order of operation.
 
 
+## Book errata
+
+> There are a lot of errors in this book, but technical writing is tough.
+
+1. `NewUser` model is mentioned but not created
+2. `User` fields are not yet used (`List Int`)
+3. `users.py` referred to as `user.py`
+4. Dependencies are sometimes not properly introduced
+    - `python-jose` [security risk](https://github.com/fastapi/fastapi/discussions/9587) (at the very least, use [`[cryptography]`](https://github.com/mpdavis/python-jose#cryptographic-backends))
+5. Some packages and syntax are outdated (needs updated copy)
+    - ~~`@app.on_event("startup")`~~ is now app lifecycle ...
+    - Which requires an understanding of `contextlib` and is tricky to learn!
+6. `grant_type=` missing the `password` keyword in the authentication `curl` call
+7. Double check your routes are properly formatted
+8. More unlisted errata ...
+
+
 ## ⚙️ Tooling
 
 ### Bombardier
@@ -262,6 +293,10 @@ SQLite `sqlite3.connect()` takes a timeout (in seconds). The query logs were all
 
 See `testing/bombardier` for results. If all things are (more or less) equal, always use the easiest-to-read, most consistent, simplest design route. It's more important that code is understood and easy to maintain, over a [few `ms` bump](https://www.reddit.com/r/dotnet/comments/1hgmwvj/what_would_you_considered_a_good_api_response_time/) in speed. Here's an example:
 
+
+<!-- ***************************************************************************
+     PRINT OUT AND REVISE: CUT OUT ANYTHING UNECESSARY
+**************************************************************************** -->
 
 -----
 
@@ -299,6 +334,22 @@ As I've written before, I'm [not a huge fan](https://github.com/badlydrawnrob/py
 - **I don't enjoy low-level detail** so will avoid that kind of work[^2]
 
 
+## SQLite
+
+> Piccolo is one of the easiest ways to query your data (see [ORM challenges](https://piccolo-orm.com/blog/orm-design-challenges/))
+
+- Peewee was great but not setup for `async` (although it has an [untested plugin](https://peewee-async.readthedocs.io/en/latest/index.html))
+- SQLModel is an abstraction of an abstraction (SQLAlchemy) and feels bloated to me
+
+SQLModel uses the Data Mapper pattern rather than Active Record and is a little more confusing with `.session.exec()`, add, commit, etc, whereas Piccolo needs no `connect()` or `close()` functions as it's `select()` queries are handled automatically. Peewee and Piccolo have an object oriented style, but (I think) only Piccolo has a functional data style. Piccolo feels a lot lighter and easier to wrap your head around!
+
+The downside of using SQLite over Postgres is data integrity (without [strict tables](https://www.sqlite.org/stricttables.html)) and data types. Some SQLite fields are stored as `json`, which will require a [plugin](https://sqlite.org/json1.html) to query them, or use [`sqlite-utils`](https://sqlite-utils.datasette.io/en/stable/cli-reference.html) (with `--json-cols`) and `jq`.
+    
+The upsides are Piccolo gives a wider range of [columns](https://piccolo-orm.readthedocs.io/en/latest/piccolo/schema/column_types.html) to work with, so whereas SQLite only has `1` (`True`) and `0` (`False`) for boolean values, Piccolo will add them as [proper (`json`)](https://github.com/piccolo-orm/piccolo/issues/1257) types. You also have to be careful with [empty `String`](https://github.com/piccolo-orm/piccolo/issues/353) values.
+
+Postgres is _far_ more capable than SQLite but is also harder to setup, store, and migrate data (it's documentation is huge).
+
+
 ## FastAPI pros and cons
 
 > It seems quick, as advertised, but remember it's `async`!
@@ -323,23 +374,7 @@ The downsides ...
 
 
 
-## Errata
 
-> The book has quite a lot of errors ...
-> And make sure your routes are properly formatted!
-
-Here are a few I caught (there's more)
-
-1. `NewUser` model is mentioned but not created
-2. `User` fields are not yet used (`List Int`)
-3. `users.py` is referred to as `user.py`
-4. Dependencies are sometimes not introduced clearly!
-    - `SQLModel` is imported but no download is mentioned
-    - Which `jose` package do you mean? There's more than one!
-5. Some packages and syntax are outdated and need updated copy:
-    - ~~`@app.on_event("startup")`~~ is now app lifecycle ...
-    - Which requires an understanding of `contextlib` and is tricky to learn!
-6. `grant_type=` missing the `password` keyword in the authentication `curl` call.
 
 
 ## Dependencies

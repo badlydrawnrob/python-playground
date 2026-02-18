@@ -44,6 +44,20 @@
 # Piccolo defaults to a flat dictionary, which Elm prefers. You can use a nested
 # Pydantic model, but you'll need to declare it with Piccolo. 
 #
+# 
+# Make data structures (Elm)
+# --------------------------
+# > One-to-one relationships (foreign keys)
+#
+# There's a debate about whether or not to expose `ID`s on the frontend. If you
+# must do so, make data structures. Foreign keys could be represented as ...
+#
+# 1. `(Int, Colour)` holding `Serial` ID
+# 2. `{ id: Int, color: String }`
+# 
+# In both instances we let SQLite handle the joins on the backend, but there may
+# be times it's easier to directly supply the API with an `ID` (like UUID).
+#
 #
 # SQLite and Piccolo
 # ------------------
@@ -89,7 +103,7 @@
 # SQLite and Async problems
 # -------------------------
 # > A read and write together in one endpoint can lead to "database locked" error,
-# > when performing concurrent requests.
+# > when performing concurrent requests (`SQLITE_BUSY` timeout).
 #
 #     @ https://piccolo-orm.readthedocs.io/en/latest/piccolo/tutorials/using_sqlite_and_asyncio_effectively.html
 #     @ https://github.com/piccolo-orm/piccolo/issues/1319
@@ -167,8 +181,9 @@
 # See the `sqlite_utils.sql` file.
 #
 #
+# ------------------------------------------------------------------------------
 # WISHLIST
-# --------
+# ------------------------------------------------------------------------------
 # 1. Which fields should be `unique=True`?
 #     - Duplicate `Event.title`s are currently possible
 # 2. Which field should be the `ForeignKey` reference?

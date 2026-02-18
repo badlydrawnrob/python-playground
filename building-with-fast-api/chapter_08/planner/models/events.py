@@ -80,8 +80,9 @@
 # to type it, it's a good practice to assure the correct type and fields.
 #
 #
+# ------------------------------------------------------------------------------
 # WISHLIST
-# --------
+# ------------------------------------------------------------------------------
 # 1. You can choose either `response_model=` or `-> ResponseType`
 #     - But rarely will you need both. The former takes presedence.
 #     - Do you ALWAYS need a response model? When is a `dict` OK?

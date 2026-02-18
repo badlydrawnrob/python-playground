@@ -88,19 +88,18 @@
 # has the same result.
 #
 #
-# Questions
-# ---------
-# 1. #! How best to check for `None` or `[]`?
-#     - Write a very short article on this?
-#     - `RETURNING` -vs- `SELECT` guards (opt for the former generally)
-# 2. Positive or negative guards?
-# 3. Do I understand what `Depends()` is doing? (visualise)
-# 4. Do I understand what path, query, and request parameters are?
-# 5. Do I understand what named keyword arguments are? (plus `**kwargs`)
+# ⚠️ The `.returning()` function
+# ------------------------------
+# > This helps us avoid the async read/write problem with SQLite
+# > It's faster and more efficient than using `select()` guard before insert.
+#
+# However, this `.returning()` is NON-OPTIONAL for functions that allow it, as
+# we have no other way of knowing if zero (`[]`) or many records have been affected.
 #
 #
+# ------------------------------------------------------------------------------
 # WISHLIST
-# --------
+# ------------------------------------------------------------------------------
 # > Make sure routes are properly secured
 #
 # 1. ⏰ Are there any design routes that are QUICKER?
@@ -111,6 +110,13 @@
 #    - Option 2: Find a professional and delegate the process
 #        - Just how much would this cost? (via Ai / via Human)
 #        - Signup -> Email -> Verify (code) -> Login -> Onboarding
+#
+#
+# Questions
+# ---------
+# 1. Positive or negative guards?
+# 2. What are path, query, and request parameters?
+# 3. What are named keyword arguments and `**kwargs`?
 
 from auth.authenticate import authenticate
 from fastapi import APIRouter, Depends, HTTPException, Query

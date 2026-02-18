@@ -15,8 +15,11 @@
 # > `SQLiteEngine` has no `connect()` and `close()` functions to open/close the
 # > `fruits.sqlite` database. You can also add a `timeout=` paramater.
 #
-# Piccolo handles connections automatically, but you may need to add transactions
-# when you're dealing with concurrent requests (see `app.py` notes).
+# Piccolo handles connections automatically and uses `engine_finder` under the hood
+# from this config file. You _may_ need change the transaction type if you're using
+# read and write operations together in one endpoint (the database locked issue)
+# and concurrent write requests are also problematic at scale (see `app.py` and
+# `tables.py` notes for more on this).
 #
 # Setting `timeout=60` doesn't seem to help much, and anything over this number
 # can actually make our timeouts WORSE. I'm unsure why. `SQLiteEngine(timeout=60)`
@@ -25,8 +28,9 @@
 # SQLite `PRAGMA` settings aren't currently available in Piccolo.
 #
 #
-# Wishlist
-# --------
+# ------------------------------------------------------------------------------
+# WISHLIST
+# ------------------------------------------------------------------------------
 # 1. PRAGMAs for SQLite like previous versions?
 #     - Especially to reduce `database is locked` concurrent errors.
 # 2. Logging for bug-checking with a live API:

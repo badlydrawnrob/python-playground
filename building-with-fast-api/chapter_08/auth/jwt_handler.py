@@ -96,8 +96,9 @@
 # at their correct expiry time. UTC is used here as the default timezone.
 #
 #
+# ------------------------------------------------------------------------------
 # WISHLIST
-# --------
+# ------------------------------------------------------------------------------
 # 1. Add the `iss`uer and `aud`ience (and verify in the function)
 # 2. Check the `iss` and `aud` fields when verifying token
 

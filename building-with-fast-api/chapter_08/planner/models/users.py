@@ -14,8 +14,10 @@
 # Pydantic will automatically check `EmailStr` is valid, but the `email-validator`
 # package must be installed.
 #
+#
+# ------------------------------------------------------------------------------
 # WISHLIST
-# --------
+# ------------------------------------------------------------------------------
 # 1. Our `/user/me` profile endpoint may need `List (Event ID)`
 # 2. Hide the `password` fields in logs with `SecretStr`?
 #     - @ https://docs.pydantic.dev/2.2/usage/types/secrets/

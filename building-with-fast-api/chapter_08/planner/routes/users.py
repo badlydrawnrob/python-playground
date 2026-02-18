@@ -37,8 +37,15 @@
 # But you'll still need a Pydantic type for the API layer.
 #
 #
+# Alternative authentication methods
+# ----------------------------------
+# @ https://piccolo-orm.readthedocs.io/en/latest/piccolo/authentication/index.html
+# @ https://piccolo-api.readthedocs.io/en/latest/session_auth/index.html
+#
+#
+# ------------------------------------------------------------------------------
 # WISHLIST
-# --------
+# ------------------------------------------------------------------------------
 # 1. 👩‍🦳 Fix the `/me` endpoint to split `User` from `List[Event]`
 # 2. ⭐️ Figure out how to `/signin` with Elm and CURL
 # 3. ⚠️ Check the error status code and create custom one
@@ -128,7 +135,10 @@ async def sign_in_user(data: OAuth2PasswordRequestForm = Depends()):
     
     Types are a bit of a problem at the moment with Oauth.
     """
-    user = await BaseUser.login(data.username, data.password)
+    user = await BaseUser.login(
+        username=data.username,
+        password=data.password
+    )
 
     if user is None:
         raise HTTPException(

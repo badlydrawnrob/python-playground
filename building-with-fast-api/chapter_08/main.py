@@ -30,15 +30,18 @@
 # > Prefer functional programming over OOP where possible.
 # > Have a clear goal and learning frame to operate within.
 # 
-# 1. Use as little code as possible to achieve the goal.
-# 2. Never use objects where a function will do!
-# 3. Always validate types and data with Pydantic.
-# 4. There's too much to learn, so cherry pick.
-# 5. Never prematurely optimise (fix just-in-time).
-# 6. There's a lot could go wrong (fix just-in-time).
+# 1. Always validate types and data with Pydantic.
+# 2. Brutalist, minimalist, zen (`Task._meta.primary_key` -> `Task.id`)
+# 3. Ignore the hard bits (delegate, or learn later).
+# 4. Never prematurely optimise (fix just-in-time).
+# 5. Never use objects where a function will do!.
+# 6. Never satisfice. Cross out all the wrong (or complex) routes.
+# 7. Objects only ever to be used if dramatically enhances performance
 # 7. Prefer explicit code over implicit code (`PUT` > `PATCH`).
-# 8. Ignore the hard bits (delegate, or learn later).
-# 9. Never satisfice. Cross out all the wrong (or complex) routes.
+# 8. There's a lot could go wrong (fix just-in-time).
+# 9. There's too much to learn, so cherry pick.
+# 10. Use as little code as possible to achieve the goal.
+# 11. Work directly with data (rather than classes and methods)
 #
 #
 # The hard bits
@@ -81,8 +84,8 @@
 # 3. It does not have to deal with sessions (unlike client-server DBs)
 #
 #
-# The downsides of FastApi and ORMs
-# ---------------------------------
+# Downsides of FastApi and ORMs
+# -----------------------------
 # FastApi:
 # > There's better languages for web APIs, but unless they're 10x faster, productive,
 # > or enjoyable to use, it's not really worth switching.
@@ -192,6 +195,13 @@ import uvicorn
 # 1. Build the database (if doesn't already exist)
 # 2. Use the `lifespan` setup
 # 3. Set a simple home route
+#
+# We could've also used Piccolo Admin here:
+#
+# ```
+# admin = create_admin(tables=APP_CONFIG.table_classes)
+# app.mount("/admin", admin)
+# ```
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
