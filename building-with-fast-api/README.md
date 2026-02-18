@@ -38,6 +38,10 @@ http://localhost:8000/event/new
 
 # Optionally stress test multi-users
 https://locust.io/
+
+# Cleanup Python files not tracked in `.gitignore`
+# -d recursively, -e excluding, -i interactive mode
+git clean -dx -e .env -i
 ```
 
 ## 📖 Book chapters
