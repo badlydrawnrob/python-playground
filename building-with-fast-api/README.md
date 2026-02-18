@@ -20,6 +20,9 @@ Predominantly focusing on `chapter_08/` in this doc, but some information releva
 # which also sets up the database with `Event` table
 uv run main.py
 
+# Run the app in earlier chapters
+uv run uvicorn api:app -- port 8000 --reload
+
 # Setup the user table
 piccolo migrations forwards user
 # Create the first user (follow the prompts)
@@ -38,6 +41,9 @@ http://localhost:8000/event/new
 
 # Optionally stress test multi-users
 https://locust.io/
+
+# Backup your events with `sqlite-utils` and pretty print
+sqlite-utils planner.db "select * from event" | python -m json.tool
 
 # Cleanup Python files not tracked in `.gitignore`
 # -d recursively, -e excluding, -i interactive mode
@@ -65,39 +71,107 @@ You can use the REPL in early chapters. We're error checking with Bruno (lots of
     - Generating JWT tokens
     - Securing routes (with authentication)
     - CORS policy (middleware)
-8. Testing (`1.12.0` - `1.12.14`)
-    - Picking an ORM, authentication, JWTs, and error checking
+8. **Planner app with testing** (`1.12.0` - `1.12.14`)
+    - Authentication, cherry-picking ORMs, error checking, refined JWT
     - ~~SQLModel (original version)~~ (`1.12.4`)
     - ~~Peewee (modified version)~~ (`1.12.11`)
-    - Piccolo (chosen version)
-        - API testing with Bruno app (documents bugs)
-        - `BaseUser.login()` to handle sign-in and hashing (`1.12.12`)
-        - Tidying up errors, data entry, and JWT claims
-        - Piccolo-friendly folder structure with helpful comments
-        - A `/user/me` endpoint (for username and settings)
+    - Piccolo (my ORM of choice) (`1.12.16`)
 
 
-## 🔍 Documentation
+## 📝 To do
 
-> I use comments as documentation which can be found in `localhost:8000/docs`.
+> See `chapter_08/main.py` for a full wishlist.
 
-This seems to be the best way to handle docs for types and API instructions. There's also `/redoc`, although I don't prefer it's layout.
+1. Which queries are run with SQL? Which on the client?
+2. What's the easiest way to deal with database migrations?
 
-- See _[APIs you won't hate](https://leanpub.com/build-apis-you-wont-hate-2)_ for error, design, schema, and documentation guides
-- FastAPI comes with an OpenAPI.json way to document your API endpoints ...
-- The book uses `/doc` code annotations which I prefer not to use (feels messy)
-- I prefer to use docstring comments (`""" """`) within functions for documentation.
 
-### Bruno
+## 🔍 Documentation
+
+> Full documentation can be found in file comments and `localhost:8000/docs`.
+
+I'm documenting with FastAPI using comments for errors, types, API instructions, so on. Bruno is used to test the API and documents some bugs. Alternative docs at `localhost:8000/redoc`, but I dislike it's layout. Further reading is a great book _[APIs you won't hate](https://leanpub.com/build-apis-you-wont-hate-2)_ which covers errors, design, schema, and documentation guides.
+
+For this repo I'm [_manually_ testing](https://docs.usebruno.com/testing/automate-test/manual-test) endpoints (with Bruno GUI), and bulk checking with [Bombardier](https://github.com/codesenberg/bombardier) and [Locust](https://locust.io/). In production you may prefer unit testing.[^1]
+
+Other documentation techniques like `Annotated[]` and `"json_schema_extra"` are available, but I feel they lead to messy code.
+
+### Chapter 8
+
+> My [final chapter](./chapter_08/) covers quite a bit more than the book, and I've missed out the last two chapters. I'll aim to use this for future API docs.
+
+1. API testing with Bruno app (documents bugs)
+2. `BaseUser.login()` to handle sign-in and hashing 
+3. Tidying up errors, data entry, and JWT claims
+4. Piccolo-friendly folder structure with helpful comments
+5. A `/user/me` endpoint (for username and settings)
+
+### Piccolo
+
+> A [great ORM](https://piccolo-orm.readthedocs.io/en/latest/piccolo/getting_started/playground.html) that doesn't require `open()` and `close()`ing the database.
+
+Piccolo takes a while to get into, but it's very capable. We use SQLite for prototyping due to it's portability and ease of use; unfortunately async is problematic for [concurrent writes](https://piccolo-orm.readthedocs.io/en/1.1.1/piccolo/tutorials/using_sqlite_and_asyncio_effectively.html) (`> 10` people inserting is a struggle), but making sure you [don't read/write](https://github.com/piccolo-orm/piccolo/issues/1319) within an endpoint and setting `WAL` mode helps a bit.
+
+Take care with your inserts as SQLite [isn't set](https://github.com/piccolo-orm/piccolo/issues/1187) to strict mode. Validate your types!
+
+## SQLite
+
+> Isn't run in strict mode (currently)
+
+Most ORMs support Postgres features better with stronger typing. However, SQLite is very convenient if you're aware of it's limitations.
+
+SQLite does have a `STRICT TABLES` option, but this limits the amount of column types Piccolo uses. Pragmas are not currently supported, but can be set manually by `sqlite3 planner.db -> PRAGMA journal_mode=WAL`. If your `/planner/tables.py` is setup correctly, `NULL` and `DISTINCT` values are respected (and error checked).
+
+For migrations there are GUI tools available such as [SQLite Browser](https://sqlitebrowser.org/) and [Enso](https://ensoanalytics.com/) as well as CLI tools like [`piccolo-admin`](https://piccolo-admin.readthedocs.io/en/latest/) and [`sqlite-utils`](https://sqlite-utils.datasette.io/en/stable/). For example, editing a column can be achieved by ...
+
+1. Backup data
+2. Create a new column/table
+3. Copy data over (from old column)
+4. `DROP` the old column
+
+Always use a separate mock data to test any changes before working on live data. It's best to perform **small, incremental changes** rather than big bulk changes as `planner.tables` model evolves. I'm not a big fan of `piccolo migrations forwards` and it doesn't support SQLite particularly well.
+
+### SQLite Utils
+
+> Very handy for testing, preparing, and backing up data!
+> Use in combination with [JQ](https://jqlang.org/) or [JSON Server](https://marketplace.visualstudio.com/items?itemName=sarthikbhat.json-server) for mocking.
+
+[SQLite Utils](https://sqlite-utils.datasette.io) has a lot of helpful functions for formatting data from `json`, `csv`, and `.sqlite` files. E.g: a [Tally Form](https://tally.so/) exports to `.csv` (see below) and then [create SQLite database](https://alexwlchan.net/notes/2024/use-sqlite-utils-to-convert-csv-to-sqlite/) ...
+
+```terminal
+sqlite memory form.csv "select * from table" | python -m json.tool
+```
+
+### Bruno
 
 > Bruno could be the "high level viewpoint" of your API
 
-Ideally, Bruno can be kept for error checking and logging bugs only. You can load the `../bruno/collection/chapter-*` files into Bruno to test out endpoints for each chapter. For most routes you'll need to generate a JWT token at `Collection settings -> Auth`. It doesn't seem a good idea to re-write documentation in the Bruno endpoint READMEs.
-
-In this repo I'm [_manually_ checking](https://docs.usebruno.com/testing/automate-test/manual-test) endpoints but in production you'd probably want to automate this (either unit testing or a GUI/Ai).
+Ideally, Bruno can be kept for error checking and logging bugs only; using it for other documentation risks code and docs getting out of sync. Load `../bruno/collection/chapter-*` files into Bruno and test endpoints for each chapter. Generate an auth JWT token with the collection admin (`Collection settings -> Auth`). There's also a VS Code [plugin](https://marketplace.visualstudio.com/items?itemName=bruno-api-client.bruno).
 
 
-## 💾 Models
+### Deploying with `UV`
+
+You can `pip install uv` on a live server (like Ubuntu), or `curl` install. You can either `uv run` or `source .venv/bin/activate` to start using the Python virtualenv (for a Github Action that probably doesn't matter, but locally it's definitely better). Deploy with [Github Actions](https://docs.astral.sh/uv/guides/integration/github/)!
+
+```yaml
+steps:
+  - uses: actions/checkout@v4
+
+  - name: Install uv
+    uses: astral-sh/setup-uv@v6
+
+  - name: Set up Python
+    run: uv python install
+
+  - name: Install the project
+    run: uv sync --locked --all-extras --dev
+
+  - name: Run something
+    run: uv run python3 some_script.py
+```
+
+
+## 💾 Models
 
 > As your app evolves, make sure models accurately reflect your needs.
 
@@ -125,7 +199,7 @@ According to _APIs you won't hate_, a `HTTPException` might not be good enough. 
 
 List errors as they come up: errors marked with ✅ should be resolved, and marked **Bold** is a serious problem.
 
-1. ✅ **SQLite database is locked error** (async and concurrent connections)
+1. ✅ **SQLite database is locked error** (concurrent writes are a problem)
 2. [ ] **API timeout** due to (1) (immediately returns a `SQLITE_BUSY` error)
 3. [ ] **`sqlite.IntegrityError` for `null`** and duplicate values (won't insert)
 4. ✅ No DB results for query (`is not None` seems like enough)
@@ -222,7 +296,7 @@ As I've written before, I'm [not a huge fan](https://github.com/badlydrawnrob/py
 - **The [5 finger rule](#the-5-finger-rule)** to choose books, tuts, and packages
 - **Shallow learning is (mostly) ok** as programming knowledge is a gigantic rabbit hole.
 - **Some things can be a [black box](#a-black-box)** that are set and forget (or outsource)
-- **I don't enjoy low-level detail** so will avoid that kind of work[^1]
+- **I don't enjoy low-level detail** so will avoid that kind of work[^2]
 
 
 ## FastAPI pros and cons
@@ -230,8 +304,8 @@ As I've written before, I'm [not a huge fan](https://github.com/badlydrawnrob/py
 > It seems quick, as advertised, but remember it's `async`!
 
 1. **It's `async`, for `async` tools** (this isn't always needed).
-    - PeeWee [does not play nicely](https://github.com/fastapi/fastapi/discussions/8049) with it![^2]
-2. **It works well with SQLite.**[^3]
+    - PeeWee [does not play nicely](https://github.com/fastapi/fastapi/discussions/8049) with it![^3]
+2. **It works well with SQLite.**[^4]
     - SQLite is great as it's easy to migrate and setup. It's just a file!
     - SQLite doesn't default to `async`: you'll need an ORM that supports [`aiosqlite`](https://github.com/omnilib/aiosqlite)
 
@@ -277,47 +351,6 @@ The `pyproject.toml` dependencies file is a mess. It holds all dependencies for 
 
 ## Commands
 
-### Using `uv`
-
-> [Some notes](https://github.com/astral-sh/uv/issues/10543#issuecomment-2587276856) on getting setup with `uv` and `venv`. `uv run` (without `source .venv/bin/activate`) will activate the virtual environment then run the command.
-
-```terminal
--- Create a new project
-uv init
-
--- Run your program (from function)
-uv run uvicorn api:app -- port 8000 --reload
-
--- Run your program (from file)
-uv run main.py
-
--- Test types and errors
-uv run pyright main.py
-
--- Add to your .zshrc or .bash_profile
-alias activate='source .venv/bin/activate'
-```
-
-### Deploying with `uv`
-
-You can `pip install uv` on a live server (like Ubuntu), or `curl` install. You can either `uv run` or `source .venv/bin/activate` to start using the Python virtualenv (for a Github Action that probably doesn't matter, but locally it's definitely better). Deploy with [Github Actions](https://docs.astral.sh/uv/guides/integration/github/)!
-
-```yaml
-steps:
-  - uses: actions/checkout@v4
-
-  - name: Install uv
-    uses: astral-sh/setup-uv@v6
-
-  - name: Set up Python
-    run: uv python install
-
-  - name: Install the project
-    run: uv sync --locked --all-extras --dev
-
-  - name: Run something
-    run: uv run python3 some_script.py
-```
 
 ### API and CURL
 
@@ -364,9 +397,9 @@ pprint(vars(your_object))
 1. **Keep things as simple as possible.**
     - Your models, documentation, tooling, dependencies, etc.
     - Actively remove code and simplify processes where possible.
-    - `.jinja` at scale can get messy, why not try Elm?[^4]
+    - `.jinja` at scale can get messy, why not try Elm?[5]
     - You might want to split your API layer from your DATA layer.
-2. **If things are too complicated for you, hire.**[^1]
+2. **If things are too complicated for you, hire.**[^2]
     - Have a professional look over your code ...
     - Or, have them do it for you, and treat things as a [black box](#a-black-box).
     - Stick to a narrow problem set that suits your capabilities.
@@ -450,14 +483,12 @@ Use the [5 finger rule](#the-5-finger-rule) first, but be aware of things that a
 
 > I'd pick [PeeWee](https://docs.peewee-orm.com/en/latest/peewee/quickstart.html) or [Pony](https://docs.ponyorm.org/) for a non-async framework. The main [problem with `async`](https://fastapi.tiangolo.com/async/#asynchronous-code) is having to [scatter your app](https://charlesleifer.com/blog/asyncio/) with `await` calls.
 
-1. **Picallo** is great but [isn't 100% async](https://piccolo-orm.readthedocs.io/en/1.1.1/piccolo/tutorials/using_sqlite_and_asyncio_effectively.html).
-    - 🚀 **See [the playground](https://piccolo-orm.readthedocs.io/en/latest/piccolo/getting_started/playground.html) before you get started.**
-    - You'll also have to [validate your types](https://github.com/piccolo-orm/piccolo/issues/1187) 
-2. **[Ormar](https://collerek.github.io/ormar/latest/)** with SQLite async, but less mature than Picallo (2025).
+
+1. **[Ormar](https://collerek.github.io/ormar/latest/)** with SQLite async, but less mature than Picallo (2025).
     - Unfortunately it's another abstraction of an abstraction (built on SQLAlchemy)
     - More tightly integrated with FastAPI and Pydantic than [encode orm](https://github.com/encode/orm)
-3. **Tortoise ORM** (feels clunky to me, see [this example](https://tortoise.github.io/examples/fastapi.html))
-5. **[IceAxe](https://github.com/piercefreeman/iceaxe)** looks a really nice option (but very young)
+2. **Tortoise ORM** (feels clunky to me, see [this example](https://tortoise.github.io/examples/fastapi.html))
+3. **[IceAxe](https://github.com/piercefreeman/iceaxe)** looks a really nice option (but very young)
     - I like it's simplicity and similarity to raw SQL, but it's Postgres only ...
     - One to watch for when your app gets past a couple thousand users with SQLite
     
@@ -473,7 +504,7 @@ For read-only code you might want to use raw SQL queries, but you'll still need 
 
 OpenLibrary, for instance, has `List[int]` of images which map to a `/covers` route, with `-S`mall, `-M`edium, and `-L`arge images. Our API is NOT publically consumed, so we likely want to deal with SQL `join`s and serve the full image paths within the `Event` object.
 
-Remember, any data point on your API must be called from the database and maintained. That means anytime a `User` adds/removes an `Event`, you'd have to add/remove from that `List`. Don't do it if it's not needed![^5]
+Remember, any data point on your API must be called from the database and maintained. That means anytime a `User` adds/removes an `Event`, you'd have to add/remove from that `List`. Don't do it if it's not needed![^6]
 
 ### Migrations
 
@@ -485,12 +516,6 @@ The nuclear option is to ditch Python completely, and pick a different language.
 
 Alas, you're looking at 2-3 months to change tools, so just get something out there and worry about that later. Don't over optimise before you've proven your business model! Honestly, getting through this book has been a slow process, so don't take that journey lightly.
 
-
-## Documentation
-
-> I'm using [Bruno](https://usebruno.com) to test and document my API.
-
-FastAPI gives us `localhost:8000/docs` and `/redoc` for documentation, but I like Bruno as a simple way to test your API. You can use `Annotated[]` and `"json_schema_extra"` to format your `/docs`, but it makes for messy and verbose code. Stick to Bruno!
 
 
 ## Tooling
@@ -507,59 +532,9 @@ In your `pyproject.toml`:
 - Your ORM of choice!
     - Take care with [raw SQL](https://www.youtube.com/watch?v=Cp3bXHYp-bY)!
 
-### Bruno
-
-> A great API test kit for Mac.[^6]
-
-For your tooling, you might like to use Bruno. I prefer Bruno's way of writing documentation, but you must write it out manually (whereas `/docs` are automatic). The benefit of Bruno is that we can _easily switch out to another API framework_, and keep all our tests in place!
-
-- **[OAuth2](https://docs.usebruno.com/auth/oauth2/overview)** can be setup in your collection settings.
-- FastApi `/docs` can be saved as `.json` file and added as a new collection to speed things up.
-- Take care with your routes: `:id` (params) must be added to your Bruno path!
-- [VS Code plugin](https://marketplace.visualstudio.com/items?itemName=bruno-api-client.bruno) also available (call endpoints directly in the app)
-
-### SQLite Utils
-
-> Could be really handy for testing/preparing data!
-> Perhaps populate a demo database automatically?
-
-[SQLite Utils](https://sqlite-utils.datasette.io) has a lot of helpful functions for formatting data from `json`, `csv`, and `.db` SQLite files. For example, you have a [Tally Form](https://tally.so/) that exports as `.csv` ...
-
-```terminal
--- Activate the virtual environment
-> activate
-
--- Install the python package and CLI
-> uv add sqlite-utils
-
--- Output a list of `json` dictionaries (one for each entry)
--- Add `| python -m json.tool` to pretty print the `json`
-sqlite-utils memory event.csv "select * from event"
-```
-
-And you could could generate a database from the `json` or [`.csv`](https://alexwlchan.net/til/2024/use-sqlite-utils-to-convert-csv-to-sqlite/)! Or input the values with your own schema design.
-
-### Other tools
-
-- [JQ](https://jqlang.org/) is handy for manipulating `json` data
-    - Eg: convert `{ list: [] }` -> `[]` (similar to Elm's `Decoder.at`)
-[JSON Server](https://marketplace.visualstudio.com/items?itemName=sarthikbhat.json-server) for VS Code (great for mocking)
 
 
-## SQLite
 
-> How to manage database migrations?
-> How to avoid locked database "connection already open"?
-
-SQLite should be set to `STRICT TABLES`, `PRAGMA journal_mode=WAL`, `PRAGMA foreign_keys = ON`. You can also use `user_version` for migrations.
-
-**⚠️ The only problem with Piccolo is there's no PRAGMA settings available** so we have to be extra careful with our Pydantic models and verify data before inserting or updating. Piccolo should respect `NULL` values and foreign keys and you might want to set the timeout for SQLite. In general Piccolo and a lot of ORMs tend to prefer (or have more options for) Postgres.
-
-You could use a tool like [Alembic](https://alembic.sqlalchemy.org) to migrate changes in the database `.schema`, but it's probably a good idea to know how to do this manually. SQLite Utils also has `sqlite-migrate` for simple migrations. I'm sure there's plenty of databse tools too (such as [Enso](https://ensoanalytics.com/) or [Ai](https://medium.com/@timothyjosephcw/enhancing-data-migration-testing-with-ai-in-2024-454537440ab3)). Either way, it seems to be sensible to backup data, create a new (column, table) first; copy data over (from the old column); then drop the old column.
-
-As always, practice with mock data first and be sure to back up! (demo/staging). It's likely better to think in terms of _small, incremental_ changes, rather than big bulk changes.
-
-Database locking is [something to consider](https://piccolo-orm.readthedocs.io/en/1.3.2/piccolo/tutorials/using_sqlite_and_asyncio_effectively.html) with Piccolo but so long as you don't combine read and writes within the same endpoint connection, it shouldn't be something to worry about.
 
 
 ## Hosting
@@ -571,18 +546,18 @@ Database locking is [something to consider](https://piccolo-orm.readthedocs.io/e
 - You'll need to setup `uvicorn` to run with [`https`](https://www.uvicorn.org/deployment/#running-with-https)** (it's not default)
 - You might want parts of your app as `.jinja` html, rather than `json` (such as a login form)[^8]
 
-  
-[^1]: If you're a great programmer, or don't mind suffering through the pain of low-level learning, then do it yourself. My goals are quite distinct and I simply don't have the time to learn everything.
 
-[^2]: Which is a shame, because I like PeeWee's documentation and syntax. It'd be perfect for apps where there's not going to be (any/many) concurrent writes to the database.
+[^1]: Yeah, yeah. I know it's the "correct" way to do things, but once you've worked with a statically typed functional language (where testing feels optional), it's hard to go back. A prototype is supposed to be agile! You can catch serious errors just-in-time, fixing them when they become a problem.
 
-[^3]: I tried and failed to get MongoDB working. I found it an absolute arse to setup (especially for beginners) and more hassle than SQLite (or even Postgres, I imagine). The book's `chapters` from `_06/` or `_07/` onwards uses MongoDB; I decided to part ways with the book and use SQLite instead.
+[^2]: If you're a great programmer, or don't mind suffering through the pain of low-level learning, then do it yourself. My goals are quite distinct and I simply don't have the time to learn everything.
 
-[^4]: With a `json` server, this separation of concerns between frontend and backend could be slightly easier to maintain.
+[^3]: Which is a shame, because I like PeeWee's documentation and syntax. It'd be perfect for apps where there's not going to be (any/many) concurrent writes to the database.
 
-[^5]: Joins are easier to maintain than lists. In the book, the latter chapters use MongoDB, which is unstructured data. Here, we're trying to keep data atomic and [normalised](https://youtube.com/watch?v=GFQaEYEc8_8) with SQLite, so it's easier to search for (and `JOIN user ON event.creator = user.id`) later.
+[^4]: I tried and failed to get MongoDB working. I found it an absolute arse to setup (especially for beginners) and more hassle than SQLite (or even Postgres, I imagine). The book's `chapters` from `_06/` or `_07/` onwards uses MongoDB; I decided to part ways with the book and use SQLite instead.
 
-[^6]: I found Postman to be too complicated for my taste.
+[^5]: With a `json` server, this separation of concerns between frontend and backend could be slightly easier to maintain.
+
+[^6]: Joins are easier to maintain than lists. In the book, the latter chapters use MongoDB, which is unstructured data. Here, we're trying to keep data atomic and [normalised](https://youtube.com/watch?v=GFQaEYEc8_8) with SQLite, so it's easier to search for (and `JOIN user ON event.creator = user.id`) later.
 
 [^7]: See [`WAL`](https://sqlite.org/wal.html) for SQLite: "All processes using a database must be on the same host computer; WAL does not work over a network filesystem"
 

@@ -54,6 +54,8 @@
 #     - Values are stored as basic data types: `Integer`, `Real`, `Text`
 #     - Insertion values are ordered by class field order (not alphabetically) ...
 #     - So be extra careful to validate data with Pydantic before inserting!
+#     - `sqlite3.IntegrityError` is raised for null and distinct values
+#     - Duplicate values are best handled with the DB (not the client)
 #     - PRAGMA settings like `journal_mode=WAL`, `foreign_keys`, `cache_size`,
 #       aren't available in Piccolo yet. You can set `TIMEOUT` however.
 #
