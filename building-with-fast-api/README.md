@@ -213,20 +213,20 @@ According to _APIs you won't hate_, a `HTTPException` might not be good enough. 
 
 List errors as they come up: errors marked with ✅ should be resolved, and marked **Bold** is a serious problem.
 
-1. ✅ **SQLite database is locked error** (concurrent writes are a problem)
+1. [x] **SQLite database is locked error** (concurrent writes are a problem)
 2. [ ] **API timeout** due to (1) (immediately returns a `SQLITE_BUSY` error)
 3. [ ] **`sqlite.IntegrityError` for `null`** and duplicate values (won't insert)
-4. ✅ No DB results for query (`is not None` seems like enough)
+4. [x] No DB results for query (`is not None` seems like enough)
 5. [ ] Response giving away sensitive data (vague is better, not 100% handled)
 6. [ ] `TEXT` contains HTML or other non-plain text values
-7. ✅ User is able to delete data that doesn't belong to them
-8. ✅ Email is not a proper email (handled by Pydantic only, not Piccolo)
+7. [x] User is able to delete data that doesn't belong to them
+8. [x] Email is not a proper email (handled by Pydantic only, not Piccolo)
 9. [ ] Password field is not secure enough (currently `> 6` characters)
 10. [ ] Account not approved by admin (you can handle this internally)
 11. [ ] `POST` values validate when they shouldn't (`{ "creator": null }` passes)
-12. ✅ Endpoint redirects instead of resolving (see `307` redirects below)
-13. ✅ Endpoint gives `422` Unprocessable Content (make sure `-H`eaders are set)
-14. ✅ Type too permissive (e.g: `create_pydantic_model` uses `Any` type)
+12. [x] Endpoint redirects instead of resolving (see `307` redirects below)
+13. [x] Endpoint gives `422` Unprocessable Content (make sure `-H`eaders are set)
+14. [x] Type too permissive (e.g: `create_pydantic_model` uses `Any` type)
 
 ### 🪧 Impossible routes
 
