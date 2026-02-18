@@ -90,35 +90,10 @@
 #
 # Understanding Time
 # ------------------
-# > `time.time()` gives us a POSIX timestamp, also known as UNIX time. This
-# > represents the number of seconds elapsed since the UNIX epoch.
+# > See `/words/time.md` for a detailed explanation of time in programming.
 #
-# 1. `time.time()` gives us a POSIX number which you can add to
-#     - `60` seconds `*` [whatever you want]
-#     - `datetime.timedelta(hours=0, minutes=0, seconds=60)` can also be used
-# 2. You can convert POSIX timestamp to human readable time
-#     - @ https://www.epochconverter.com/
-#     - @ https://www.tech-reader.blog/2025/10/handling-time-zones-in-python-avoiding.html
-#     - `datetime.fromtimestamp(POSIX_TIMESTAMP, tz=timezone.utc)`
-#     - `datetime.now(timezone.utc)` or `datetime.now(tz=ZoneInfo("UTC"))`
-# 3. You can convert POSIX to and from `datetime`
-#     - @ https://note.nkmk.me/en/python-unix-time-datetime/
-# 4. Remember that people use VPNs which could drastically alter the time
-#     - For this reason, consider using a default timezone!
-# 5. Use AWARE datetimes and not naive ones (naive datetimes deprecated)
-#     - Aware datetimes have a timezone attached. If not they could break the app!
-#     - Imagine your users don't live in the same city: a calendar entry gives
-#       different results depending on where you live if it's naive.
-#     - @ https://tinyurl.com/miguel-utcnow-deprecated
-# 6. UTC is the primary time standard for the world to regulate clocks and time
-#     - Using a single timezone assures every entry will sync between users
-# 7. For arithmetic UTC integers are far less error prone, take up less memory,
-#    and are much more efficient than `Iso8601` strings (the values we use for
-#    our `json API`, see (8)).
-# 8. Elm Lang has an `Iso8601` package and a `toTime` (`Time.Posix`) function
-#     - Very handy for regular `String` times and converting to `Hour` etc.
-# 9. If you require a timezone to display to a user, convert UTC timestamp
-#     - `utc_now.astimezone(ZoneInfo("Asia/Tokyo"))`
+# TL;DR: AWARE datetimes with a timezone must be used so JWTs can be verified
+# at their correct expiry time. UTC is used here as the default timezone.
 #
 #
 # WISHLIST
@@ -134,7 +109,7 @@ import time
 
 
 def create_access_token(username: str) -> str:
-    """Base64url-encoded string with three parts
+    """Base64 url-encoded string with three parts
     
     > Encodes user info securely.
     > @ https://datatracker.ietf.org/doc/html/rfc7519
