@@ -151,14 +151,14 @@ Ideally, Bruno can be kept for error checking and logging bugs only; using it fo
 
 ### Deploying with `UV`
 
-You can `pip install uv` on a live server (like Ubuntu), or `curl` install. You can either `uv run` or `source .venv/bin/activate` to start using the Python virtualenv (for a Github Action that probably doesn't matter, but locally it's definitely better). Deploy with [Github Actions](https://docs.astral.sh/uv/guides/integration/github/)!
+You can `pip install uv` on an Ubuntu live server, or use package manager (like Mise), or install the binary with `curl` instead. Initialise the project then `uv run` or `source .venv/bin/activate` to activate Python's virtualenv. It may be easier to setup UV manually, but you can also use [Github Actions](https://docs.astral.sh/uv/guides/integration/github/) (example below).
 
 ```yaml
 steps:
-  - uses: actions/checkout@v4
+  - uses: actions/checkout@v6
 
   - name: Install uv
-    uses: astral-sh/setup-uv@v6
+    uses: astral-sh/setup-uv@v7
 
   - name: Set up Python
     run: uv python install
