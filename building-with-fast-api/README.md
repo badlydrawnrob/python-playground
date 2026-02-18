@@ -2,11 +2,11 @@
 
 > Instructions for Building With Fast API (with many corrections)
 
-The book has errors and I use my personal [coding style]([coding style](https://github.com/badlydrawnrob/python-playground?tab=readme-ov-file#coding-style)) and preferences. Mostly focused on `chapter_08/` but relevant for earlier chapters too!
+**The book has errors and I use my personal [coding style](https://github.com/badlydrawnrob/python-playground?tab=readme-ov-file#coding-style) and preferences.** Mostly focused on `chapter_08/` but relevant for earlier chapters too!
 
-App architecture and APIs have an _insane_ amount to think about, so take it slowly and build incrementally. It might also be worthwhile picking up a [reference book](https://www.oreilly.com/library/view/fastapi/9781098135492/) for FastAPI, as it's documentation could be easier to read. Programming is a massive timesink, but you have less control over 3rd-party tools and Ai-gen. They do speed things up however, so I'm leaning towards prototyping the important part (data) by hand, using [tooling](.pencil.dev) for paper prototyping, and hiring a team later.
+**App architecture and APIs have an _insane_ amount to think about, so take it slowly and build incrementally.** It might also be worthwhile picking up a [reference book](https://www.oreilly.com/library/view/fastapi/9781098135492/) for FastAPI, as it's documentation could be easier to read. Programming is a massive timesink, but you have less control over 3rd-party tools and Ai-gen. They do speed things up however, so I'm leaning towards prototyping the important part (data) by hand, using [tooling](.pencil.dev) for paper prototyping, and hiring a team later.
 
-SQLite is the most widely deployed database in the world. [Turso](https://github.com/tursodatabase/turso) is on the way. ou get a lot of control compared to 3rd-party tooling, if you understand data. Cherry-pick learning as you go.
+**SQLite is the most widely deployed database in the world.** [Turso](https://github.com/tursodatabase/turso) is on the way. ou get a lot of control compared to 3rd-party tooling, if you understand data. Cherry-pick learning as you go.
 
 
 ## 🧞 A wishlist never ends!
@@ -82,7 +82,7 @@ You can use the REPL in early chapters. We're [error checking](https://docs.useb
     - Piccolo (my ORM of choice) (`1.12.16`)
 
 
-## 📝 To do
+## 📝 To do
 
 > Mostly essentials. See `chapter_08/main.py` for a full wishlist.
 
@@ -104,7 +104,7 @@ For this repo I'm [_manually_ testing](https://docs.usebruno.com/testing/automat
 
 Other documentation techniques like `Annotated[]` and `"json_schema_extra"` are available, but I feel they lead to messy code.
 
-### Chapter 8
+### 📖 Chapter 8
 
 > My [final chapter](./chapter_08/) covers quite a bit more than the book, and I've missed out the last two chapters. I'll aim to use this for future API docs.
 
@@ -116,7 +116,7 @@ Other documentation techniques like `Annotated[]` and `"json_schema_extra"` are 
 6. Using `.returning()` instead of a `select()` guard
     - For functions that allow it this is [non-optional](https://github.com/piccolo-orm/piccolo/issues/1319#issuecomment-3705946732)!
 
-### Piccolo
+### 💾 Piccolo
 
 > A [great ORM](https://piccolo-orm.readthedocs.io/en/latest/piccolo/getting_started/playground.html) that doesn't require `open()` and `close()`ing the database.
 
@@ -124,7 +124,7 @@ Piccolo takes a while to get into, but it's very capable. We use SQLite for prot
 
 Piccolo has other plugins, such as [admin](https://piccolo-api.readthedocs.io/en/latest/piccolo_admin/index.html) for your tables. Take care with your inserts as SQLite [isn't set](https://github.com/piccolo-orm/piccolo/issues/1187) to strict mode. Validate your types!
 
-## SQLite
+### 💾 SQLite
 
 > Isn't run in strict mode (currently)
 
@@ -141,7 +141,7 @@ For migrations there are GUI tools available such as [SQLite Browser](https://sq
 
 Always use a separate mock data to test any changes before working on live data. It's best to perform **small, incremental changes** rather than big bulk changes as `planner.tables` model evolves. I'm not a big fan of `piccolo migrations forwards` and it doesn't support SQLite particularly well.
 
-### SQLite Utils
+### 🛠 SQLite Utils
 
 > Very handy for testing, preparing, and backing up data!
 > Use in combination with [JQ](https://jqlang.org/) or [JSON Server](https://marketplace.visualstudio.com/items?itemName=sarthikbhat.json-server) for mocking.
@@ -152,14 +152,14 @@ Always use a separate mock data to test any changes before working on live data.
 sqlite memory form.csv "select * from table" | python -m json.tool
 ```
 
-### Bruno
+### 🐶 Bruno
 
 > Bruno could be the "high level viewpoint" of your API
 
 Ideally, Bruno can be kept for error checking and logging bugs only; using it for other documentation risks code and docs getting out of sync. Load `../bruno/collection/chapter-*` files into Bruno and test endpoints for each chapter. Generate an auth JWT token with the collection admin (`Collection settings -> Auth`). There's also a VS Code [plugin](https://marketplace.visualstudio.com/items?itemName=bruno-api-client.bruno).
 
 
-### Deploying with `UV`
+### 🚢 Deploying with `UV`
 
 You can `pip install uv` on an Ubuntu live server, or use package manager (like Mise), or install the binary with `curl` instead. Initialise the project then `uv run` or `source .venv/bin/activate` to activate Python's virtualenv. It may be easier to setup UV manually, but you can also use [Github Actions](https://docs.astral.sh/uv/guides/integration/github/) (example below).
 
@@ -267,7 +267,7 @@ You can either "catch" or "throw" an error. Think of it like baseball, whereby c
 SQLite `sqlite3.connect()` takes a timeout (in seconds). The query logs were all out of whack and (I don't think) response numbers in order of operation.
 
 
-## Book errata
+## 📝 Book errata
 
 > There are a lot of errors in this book, but technical writing is tough.
 
