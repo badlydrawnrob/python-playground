@@ -1,11 +1,36 @@
 # Bombardier
 
-> ⏱ This gives a rough idea of speed and concurrency ...
-> ❌ `sqlite3.OperationalError: database is locked` is going to be a problem.
+> ⏱ Examples give rough idea of speed and concurrency ...
+> ❌ `sqlite3.OperationalError: database is locked` is going to be a problem!
 
-But running bombardier a few times can have quite different results; running `-c 125` and `-n 10000000` (as in docs) takes a _really_ long time and is very unlikely for a startup prototype. Also worth considering is how likely your endpoint will have concurrent (or bulk) hits: this is a test in theory, but not always in practice.
+This is a test in theory, but not always in practice. Running the same bombardier call can differ in it's results; bombardier with `-c 125` and `-n 10000000` (as in docs) takes a _really_ long time and it's unlikely a startup prototype will need more than `10` concurrent connections.
 
-If results are similar for different setups, prefer the simplest, most consistent, easiest-to-read version.
+1. Do you have enough customers to worry about concurrency?
+2. How likely is it that your endpoint will have bulk concurrent hits?
+3. Which areas of your application are significant bottlenecks?
+4. At what stage is it worth considering performance optimizations?
+
+Given two design routes with similar results, prefer the simplest, most consistent, easiest-to-read version!
+
+
+## To investigate
+
+> ⚠️ Bombardier is NOT designed to hit more than one endpoint at a time
+
+You can use more than one bombardier command in a different terminal, but setting at `-c 10` and `-n 10000` ran very, very slow. Try [scenarios](https://github.com/coding-yogi/bombardier) or [Locust](https://locust.io/) instead.
+
+
+## Async -vs- sync endpoints
+
+> The results weren't as I was expecting! Async wins.
+> Different ORMs and API frameworks may not have the same results!
+
+According to some (old) [sources](https://stackoverflow.com/questions/39803746/peewee-and-peewee-async-why-is-async-slower) synchronous database reads _should_ be faster than async ones, but it doesn't quite play out in practice. With the bombardier settings above for `/event/?q=location` you get: lower Avg Req/sec, slightly higher Max Req/sec (good), higher latency overall (bad), more 5xx and other errors (very bad). Strangely enough `/event/` hit 20890 Max Req/sec which is _much_ better ... but synchronous concurrency doesn't seem very stable.
+
+Sync endpoints with FastAPI seems _potentially_ worthwhile with `~10` concurrent connections. But it's not substantial enough over async (better latency, higher averages) to care. I haven't however, tested multiple users and connections at the same time.
+
+Sync endpoints will be quicker with atomic non-concurrent reads.
+
 
 ## `/event/new`
 
@@ -35,43 +60,12 @@ With `timeout=` set (even to `300`) the first few 1000 return `200` status code 
 
 ### Each branch using full query
 
-> Writing the full SQL statement in each branch
+> Speed difference is negligible between partial query and full query in branches.
+> Stored query has more consistent results; full queries in each branch more Req/sec.
 
-Round 1
+Tests below store `query = data.Event.select()` then extend it in each branch.
 
-```text
-Bombarding http://localhost:8000/event/ with 10000 request(s) using 125 connection(s)
- 10000 / 10000 [=============================================] 100.00% 275/s 36s
-Done!
-Statistics        Avg      Stdev        Max
-  Reqs/sec       277.24     225.03    1808.60
-  Latency      452.03ms    88.78ms      2.52s
-  HTTP codes:
-    1xx - 0, 2xx - 10000, 3xx - 0, 4xx - 0, 5xx - 0
-    others - 0
-  Throughput:   256.33KB/s
-```
-
-Round 2
-
-```text
-Bombarding http://localhost:8000/event/ with 10000 request(s) using 125 connection(s)
- 10000 / 10000 [=============================================] 100.00% 255/s 39s
-Done!
-Statistics        Avg      Stdev        Max
-  Reqs/sec       257.48     244.90    2080.82
-  Latency      486.53ms   123.21ms      2.76s
-  HTTP codes:
-    1xx - 0, 2xx - 9961, 3xx - 0, 4xx - 0, 5xx - 39
-    others - 0
-  Throughput:   237.58KB/s
-```
-
-### Each branch using stored query
-
-> Stored `query = data.Event.select()` then extend in each branch
-
-Round 1
+#### Round 1
 
 ```text
 Bombarding http://localhost:8000/event/ with 10000 request(s) using 125 connection(s)
@@ -86,7 +80,7 @@ Statistics        Avg      Stdev        Max
   Throughput:   249.94KB/s
 ```
 
-Round 2
+#### Round 2
 
 ```text
 Bombarding http://localhost:8000/event/ with 10000 request(s) using 125 connection(s)
@@ -102,11 +96,13 @@ Statistics        Avg      Stdev        Max
 ```
 
 
-## `/event?=location`
+## `/event/?q=location`
 
-### Each branch using full query
+**⚠️ PATH MUST BE EXACT (`/event?q=location` won't work)**
 
-Round 1
+### Each branch running it's own full query
+
+#### Round 1
 
 ```text
 Bombarding http://localhost:8000/event/?q=location with 10000 request(s) using 125 connection(s)
@@ -121,7 +117,7 @@ Statistics        Avg      Stdev        Max
   Throughput:   251.62KB/s
 ```
 
-Round 2
+#### Round 2
 
 ```text
 Bombarding http://localhost:8000/event/?q=location with 10000 request(s) using 125 connection(s)
@@ -136,9 +132,9 @@ Statistics        Avg      Stdev        Max
   Throughput:   217.83KB/s
 ```
 
-### Each branch using stored query
+### Stored query which is extended in each branch
 
-Round 1
+#### Round 1
 
 ```text
 Bombarding http://localhost:8000/event/?q=location with 10000 request(s) using 125 connection(s)
@@ -153,7 +149,7 @@ Statistics        Avg      Stdev        Max
   Throughput:   244.00KB/s
 ```
 
-Round 2
+#### Round 2
 
 ```text
 Bombarding http://localhost:8000/event/?q=location with 10000 request(s) using 125 connection(s)
