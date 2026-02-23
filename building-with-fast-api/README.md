@@ -192,7 +192,7 @@ As your app evolves, you'll need to update the `planner.tables` model. For examp
 
 > **Security is a bitch.** Production API needs to protect itself from all sorts of hacks.
 
-Security is out of scope for this repo, but one thing you **must** change from the book `python-jose`, as it's a security risk. At the very least, use `uv add "python-jose[cryptography] >=3.5.0"` which generally uses `openssl version` [`3.0.0`](https://cryptography.io/en/latest/faq/#installing-cryptography-with-openssl-older-than-3-0-0-fails) or greater (your OS might not support it). FastAPI has recently switched to PyJWT ([issue](https://github.com/fastapi/fastapi/discussions/9587)).
+Security is out of scope for this repo, but one thing you **must** change from the book `python-jose`, as it's a [security risk](https://security.snyk.io/package/pip/python-jose). Use `uv add "python-jose[cryptography] >=3.5.0"` at the very least, which generally uses `openssl version` [`3.0.0`](https://cryptography.io/en/latest/faq/#installing-cryptography-with-openssl-older-than-3-0-0-fails) or greater (⚠️ it doesn't support old MacOS systems). FastAPI recently switched to PyJWT ([issue](https://github.com/fastapi/fastapi/discussions/9587)).
 
 For attacks such as XSS and DDoS, you might also want to use `app.add_middleware()` to disallow any requests made outside your website (such as CURL), and prevent common attacks. Nothing is foolproof, so you might want to _rate limit_, restrict by IP address, create hard-to-guess API keys (`client_id` and `client_secret`). Optimise when it becomes a problem (YAGNI).
 
