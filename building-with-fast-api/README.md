@@ -206,6 +206,8 @@ For attacks such as XSS and DDoS, you might also want to use `app.add_middleware
 
 According to _APIs you won't hate_, a `HTTPException` might not be good enough. You'd have to create your own `Error` Pydantic type, or use a [plugin](https://github.com/NRWLDev/fastapi-problem) for standards like [rfc9457](https://www.rfc-editor.org/rfc/rfc9457.html).
 
+You could handle `String` type errors with Elm's `Json.Decode.oneOf` but it's _far_ better to return specific error codes.
+
 ### ✅ Common errors
 
 > We're currently not handling errors "correctly" but I dislike `try/except` blocks.
@@ -253,10 +255,13 @@ We must fetch `BaseUser.id` from `authenticate()` and that _could_ be a read the
 > It's folly to prematurely optimise! Are you selling? Do you have customers?
 
 1. **SQLite is not very good at _sustained_ high load concurrent writes**
-2. **Catching errors ([`try`/`except`](https://realpython.com/python-exceptions/)) can be time-expensive;** throwing them is cheap and fast
-3. Elm's `OneOf` could catch stringly `detail` types, but that's bad practice
-4. **Python's [`match`](https://www.freecodecamp.org/news/python-switch-statement-switch-case-example/) [doesn't work](https://discuss.python.org/t/python-3-10-match-case-syntax-for-catching-exceptions/11076/22)** in the way you'd expect (unlike Elm's `case`)
-5. Shorthand is `value | Exception` but different status codes may be needed
+    - Async is way faster handling multiple connections for read and write endpoints
+    - Sync should (only) be used for single user applications 
+2. **Catching errors ([`try`/`except`](https://realpython.com/python-exceptions/)) can be time-expensive;**
+    - But throwing them is cheap and fast!
+    - Shorthand is `value | Exception` but different status codes may be needed
+4. **Python's [`match`](https://www.freecodecamp.org/news/python-switch-statement-switch-case-example/) [doesn't work](https://discuss.python.org/t/python-3-10-match-case-syntax-for-catching-exceptions/11076/22)** as I expected
+    - It's not quite the same as Elm's `case` with branch error types
 
 You can either "catch" or "throw" an error. Think of it like baseball, whereby catching the ball allows us to handle or examine an error (`try`/`except`), and a throw sends a helpful error to our user (`raise`). It seems that _throwing_ an error is more performant than _catching_ it first.
 

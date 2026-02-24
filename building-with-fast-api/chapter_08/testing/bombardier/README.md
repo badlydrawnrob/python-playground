@@ -13,30 +13,34 @@ This is a test in theory, but not always in practice. Running the same bombardie
 Given two design routes with similar results, prefer the simplest, most consistent, easiest-to-read version!
 
 
-## To investigate
+## To do
 
-> ⚠️ Bombardier is NOT designed to hit more than one endpoint at a time
+> Bombardier command is not designed to hit more than one endpoint at a time.
+> 2 terminals hitting different endpoints with `-c 10` and `-n 10000` runs very, very, slow.
 
-You can use more than one bombardier command in a different terminal, but setting at `-c 10` and `-n 10000` ran very, very slow. Try [scenarios](https://github.com/coding-yogi/bombardier) or [Locust](https://locust.io/) instead.
+You may need to try [scenarios](https://github.com/coding-yogi/bombardier) or [Locust](https://locust.io/) instead.
+
+1. Run multiple bombardier commands at the same time.
+2. What's the max capacity when running different users?
+3. What's the max capacity for traffic hitting different endpoints?
 
 
-## Async -vs- sync endpoints
+## Is Async faster than Sync?
 
-> The results weren't as I was expecting! Async wins.
-> Different ORMs and API frameworks may not have the same results!
+> Async is about twice as fast when using `125` concurrent `GET` connections.
 
-According to some (old) [sources](https://stackoverflow.com/questions/39803746/peewee-and-peewee-async-why-is-async-slower) synchronous database reads _should_ be faster than async ones, but it doesn't quite play out in practice. With the bombardier settings above for `/event/?q=location` you get: lower Avg Req/sec, slightly higher Max Req/sec (good), higher latency overall (bad), more 5xx and other errors (very bad). Strangely enough `/event/` hit 20890 Max Req/sec which is _much_ better ... but synchronous concurrency doesn't seem very stable.
+For an example, the max read time for concurrent synchronous `/event/` endpoint (`-c 125`) was `10.03s`! An (old) [source](https://stackoverflow.com/questions/39803746/peewee-and-peewee-async-why-is-async-slower) seems say the opposite (faster reads with sync), which might be the case for single requests without concurrency. Max req/sec can be higher with sync concurrency, but all other metrics and throughput are worse, even with `-c 10` connections. Writes almost certainly need async or WAL mode.
 
-Sync endpoints with FastAPI seems _potentially_ worthwhile with `~10` concurrent connections. But it's not substantial enough over async (better latency, higher averages) to care. I haven't however, tested multiple users and connections at the same time.
-
-Sync endpoints will be quicker with atomic non-concurrent reads.
+Piccolo logs get a bit screwy using synchronous with high concurrency.
 
 
 ## `/event/new`
 
 > There's a moderate improvement if you use `id` directly in the SQL (rather than fetching `authenticate()`), but not a whole lot.
 
-`sqlite3.OperationalError: database is locked` error but recovered with 50% success rate. Piccolo SQL query logs stop working properly after a while. Changing to `-c 10` almost resolves the problem (99% success). 
+`sqlite3.OperationalError: database is locked` error but recovered with 50% success rate. Insertion order is not guaranteed and Piccolo query logs stop working properly after a while.
+
+**Changing to `-c 10` connections almost resolves the problem (99% success).**
 
 ```text
 Bombarding http://localhost:8000/event/new with 10000 request(s) using 125 connection(s)

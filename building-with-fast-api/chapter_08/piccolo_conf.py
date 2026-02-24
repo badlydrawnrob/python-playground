@@ -32,7 +32,8 @@
 # WISHLIST
 # ------------------------------------------------------------------------------
 # 1. PRAGMAs for SQLite like previous versions?
-#     - Especially to reduce `database is locked` concurrent errors.
+#     - Especially to reduce `database is locked` concurrent errors
+#     - These can be added within `sqlite3` instead of with Piccolo
 # 2. Logging for bug-checking with a live API:
 #     - @ (article) https://betterstack.com/community/guides/logging/logging-with-fastapi/
 #     - @ (previously) https://docs.peewee-orm.com/en/latest/peewee/database.html#logging-queries
