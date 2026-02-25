@@ -27,11 +27,11 @@ You may need to try [scenarios](https://github.com/coding-yogi/bombardier) or [L
 
 ## Is Async faster than Sync?
 
-> Async is about twice as fast when using `125` concurrent `GET` connections.
+> Async over a network is about twice as fast when using `125` concurrent `GET` connections.
 
 For an example, the max read time for concurrent synchronous `/event/` endpoint was `10.03s`! An (old) [source](https://stackoverflow.com/questions/39803746/peewee-and-peewee-async-why-is-async-slower) seems to say the opposite (faster reads with sync), which might be the case for single requests without concurrency. Max req/sec can be higher with sync concurrency, but all other metrics and throughput are worse, even with `-c 10` connections. Piccolo logs get a bit screwy using synchronous with high concurrency.
 
-A basic test running SQLite in WAL mode with `run_sync()` is also very poor (dog slow) — the _opposite_ of what should happen! Writes almost certainly need async or WAL mode.
+A basic test running SQLite in WAL mode with `run_sync()` is also very poor (dog slow) — the _opposite_ of what should happen! Writes almost certainly need async or WAL mode. These tests may differ from ORM-only (without a network).
 
 
 ## `/event/new`
