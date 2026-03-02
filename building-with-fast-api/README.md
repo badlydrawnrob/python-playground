@@ -3,18 +3,31 @@
 > **Building with Fast API book** (with extras)
 > I've used my personal [coding style](https://github.com/badlydrawnrob/python-playground?tab=readme-ov-file#coding-style) in this repo and the book has errors I've tried to fix.
 
-**App architecture and APIs have an _insane_ amount to think about;** take it slowly and build incrementally. A FastAPI quick [reference book](https://www.oreilly.com/library/view/fastapi/9781098135492/) will help; I find it's documentation style hard to read. Coding is a massive timesink, but (in my opinion) 3rd-party tools give you less control over data, and Ai-gen is best used with popular languages and tools, where context and documentation is properly set up. Ai brain rot is also a serious problem, so it's better to know the basics well.
+**App architecture and APIs have an _insane_ amount to think about;** take it slowly and build incrementally. A FastAPI quick [reference book](https://www.oreilly.com/library/view/fastapi/9781098135492/) will help; I find it's documentation style hard to read. Coding is a massive timesink, but (in my opinion) 3rd-party tools give you less control over data, and Ai-gen is best used with popular languages and tools, where context and documentation is properly set up. Ai brain rot is a serious problem! Here's my current approach:
 
-**It also takes a considerable amount of time to switch ORMs**, so better to learn one well and stick to it. Is the alternative 10x faster/better?[^1] No? Stick to what you know then! Alternatively, ditch the ORM and [just use data](https://gist.github.com/reborg/dc8b0c96c397a56668905e2767fd697f#should-i-use-a-namespace-to-bundle-functions-to-model-a-domain-object-like-a-customer-or-product).
+- Learn the basics well (data structures are important)
+- API by hand with [paper prototyping](https://www.sciencedirect.com/book/monograph/9781558608702/paper-prototyping) (frontend with [tooling](https://www.pencil.dev))
+- Focus on sales to quickly validate an idea (you can rebuild later)
+- Cherry-pick learning and confidently code (just-in-time)
 
-Currently I'm leaning towards working with data structures by hand (the important part) and [paper prototyping](https://www.sciencedirect.com/book/monograph/9781558608702/paper-prototyping) with [tooling](https://www.pencil.dev). Validate your idea quickly, then confidently code. Cherry-pick learning as you go.
+**It takes a considerable amount of time to switch ORMs.** Is the alternative 10x faster/better?[^1] It isn't? So learn one well and stick with it! Alternatively, ditch the ORM and [just use data](https://gist.github.com/reborg/dc8b0c96c397a56668905e2767fd697f#should-i-use-a-namespace-to-bundle-functions-to-model-a-domain-object-like-a-customer-or-product).
+
+
 
 
 ## 🧞 A wishlist never ends!
 
-> At some point you've got to just 🚢 ship it!
+> At some point you've just got to 🚢 ship it!
 
-**Learning is never-ending:** there's always some new feature or bug to squash! Your job is to stick with one idea long enough to validate it. Be brutal. Cut code down. Release!
+**Learning is never-ending:** there's always some new feature or bug to squash! Your job is to stick with one idea long enough to validate it, but don't prematurely optimise. Be brutal. Cut code down. Release!
+
+1. Tidy up naming conventions (`Event`/`Events` and `/event`/`event/`)
+2. Which queries are run with SQL? Which on the client?
+3. What's the easiest way to deal with database migrations?
+4. Consider [changing](https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/) the JWT encoder package ([security risk](https://github.com/fastapi/fastapi/discussions/9587))
+5. Why does Rich Hickey dislike ORMs?
+6. Investigate `BaseUser` and the `Profile` column
+7. Test out [piccolo admin](https://github.com/piccolo-orm/piccolo_admin)
 
 
 ## 🚀 Setup
@@ -66,10 +79,10 @@ git clean -dx -e .env -i
 
 ## 📖 Book chapters
 
-> **This README is mostly focused on `chapter_08` ...**
-> I've missed out the last two chapters as I dislike Docker and unit testing.
+> **Completed up to chapter 8 (the focus of this readme)**
+> Two last chapters removed as I dislike Docker and unit testing.
 
- Other chapters follow similar rules. I'm a fan of _barely testing_ while prototyping (easier to do with statically typed languages) but always type check and [fix errors](#️-errors) as you find them _just-in-time_. [Error checking](https://docs.usebruno.com/testing/automate-test/manual-test) is handled with Bruno (use any GUI or CLI tool you prefer). Previous chapters found in `chapter_` folders and at `#commit`.
+ See `chapter_` folders for comments and `#commit`s. I'm a fan of _barely testing_ while prototyping (easier with statically typed languages) but always [fix errors](#️-errors) as you find them, check your types, and use _just-in-time_ learning. Bruno handles [error checking](https://docs.usebruno.com/testing/automate-test/manual-test) manually (or use any GUI or CLI tool you prefer).
 
 1. ~~Hello World~~
 2. Routing (`1.6.0` — `1.6.6`)
@@ -85,7 +98,7 @@ git clean -dx -e .env -i
     - Generating JWT tokens
     - Securing routes (with authentication)
     - CORS policy (middleware)
-8. **Planner app with testing** (`1.12.0` - `1.12.14`)
+8. Planner app with testing (`1.12.0` - `1.12.14`)
     - Authentication, cherry-picking ORMs, error checking, refined JWT
     - ~~SQLModel (original version)~~ (`1.12.4`)
     - ~~Peewee (modified version)~~ (`1.12.11`)
@@ -95,13 +108,13 @@ git clean -dx -e .env -i
 ### 📖 Chapter 8 (with extras)
 
 > **My version of the [final chapter](./chapter_08/) covers more than the book.**
-> Chapter 8 can be used as a base for other APIs and kept up-to-date.
+> Can be used as a base for other APIs and will try to keep up-to-date.
 
 1. API testing with Bruno app (documents bugs)
 2. `BaseUser.login()` to handle sign-in and hashing 
-3. Tidying up errors, data entry, and JWT claims (security upgrade)
+3. Better error checking, with data entry and JWT claims (security upgrade)
 4. Piccolo-friendly folder structure with helpful comments
-5. A `/user/me` endpoint (a specific user's events)
+5. `/user/me` endpoint (a specific user's events)
 6. `.returning()` instead of `select()` guards
     - `Event.creator` with `ID` of current user
     - [Non-optional](https://github.com/piccolo-orm/piccolo/issues/1319#issuecomment-3705946732) for update functions that allow it!
@@ -109,47 +122,33 @@ git clean -dx -e .env -i
 
 ### 📝 Book errata
 
-> There are a lot of errors in this book, but technical writing is tough.
+> Technical writing is tough, but there's lots of errors in this book!
 
 1. `NewUser` model is mentioned but not created
 2. `User` fields are not yet used (`List Int`)
 3. `users.py` referred to as `user.py`
 4. Dependencies are sometimes not properly introduced
-    - `python-jose` [security risk](https://github.com/fastapi/fastapi/discussions/9587) (at the very least, use [`[cryptography]`](https://github.com/mpdavis/python-jose#cryptographic-backends))
-5. Some packages and syntax are outdated (needs updated copy)
+5. `python-jose` [security risk](https://github.com/fastapi/fastapi/discussions/9587) (at the very least, use [`[cryptography]`](https://github.com/mpdavis/python-jose#cryptographic-backends))
+5. Outdated packages and syntax, for example:
     - ~~`@app.on_event("startup")`~~ is now app lifecycle ...
-    - Which requires an understanding of `contextlib` and is tricky to learn!
+    - which requires understanding `contextlib` and is tricky to learn!
 6. `grant_type=` missing the `password` keyword in the authentication `curl` call
 7. Double check your routes are properly formatted
-8. More unlisted errata ...
+8. More errata not listed ...
 
 
 ## 🔍 Documentation
 
 > See comments and `localhost:8000/docs` for full documentation.
 
-**Docs should live in one place and be kept up-to-date.** API instructions, errors, types, and so on, can be found in file comments, and Bruno ([manually](https://docs.usebruno.com/testing/automate-test/manual-test)) tests the API and documents some bugs. _[APIs you won't hate](https://leanpub.com/build-apis-you-wont-hate-2)_ is a great book which covers errors, design, schema, and documentation guides.
+**Docs should live in one place and be kept up-to-date.** See file comments for API instructions, errors, types, and so on; Bruno ([manually](https://docs.usebruno.com/testing/automate-test/manual-test)) tests the API and documents some bugs. A helpful book, _[APIs you won't hate](https://leanpub.com/build-apis-you-wont-hate-2)_, goes into more detail on errors, design, schema, and documentation guides.
 
-Other documentation techniques like `Annotated[]` and `"json_schema_extra"` are available, but they make for messy code. [Bombardier](https://github.com/codesenberg/bombardier) and [Locust](https://locust.io/) can be used to test for speed. In production you may prefer unit testing.
+[Bombardier](https://github.com/codesenberg/bombardier) and [Locust](https://locust.io/) can be used to test for speed, and you may prefer unit testing for a production app. I've avoided documentation techniques such as `Annotated[]` and `"json_schema_extra"`, as they make for messy code.
 
 
 ## 🐍 Dependencies
 
-The `pyproject.toml` is a bit of a mess; `dependencies` group is for `chapter_08` app. For a live production app you'll want as few dependencies as possible!
-
-
-## 📝 Wishlist (to do)
-
-> **Never prematurely optimise!**
-> More wishlists can be found in chapter files.
-
-1. Tidy up naming conventions (`Event`/`Events` and `/event`/`event/`)
-2. Which queries are run with SQL? Which on the client?
-3. What's the easiest way to deal with database migrations?
-4. Consider [changing](https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/) the JWT encoder package ([security risk](https://github.com/fastapi/fastapi/discussions/9587))
-5. Why does Rich Hickey dislike ORMs?
-6. Investigate `BaseUser` and the `Profile` column
-7. Test out [piccolo admin](https://github.com/piccolo-orm/piccolo_admin)
+The `pyproject.toml` is a bit messy: see `dependencies` group for `chapter_08` app. For a live production app you'll want as few dependencies as possible!
 
 
 ## ⚙️ Tooling
@@ -159,37 +158,36 @@ The `pyproject.toml` is a bit of a mess; `dependencies` group is for `chapter_08
 
 > A great [little ORM](https://piccolo-orm.readthedocs.io/en/latest/piccolo/getting_started/playground.html) that doesn't require `open()` and `close()`ing the database.
 
-Piccolo takes a while to get into, but it's very capable. SQLite async is problematic for [concurrent writes](https://piccolo-orm.readthedocs.io/en/1.1.1/piccolo/tutorials/using_sqlite_and_asyncio_effectively.html) (`> 10` people inserting is a struggle); make sure you [don't read/write](https://github.com/piccolo-orm/piccolo/issues/1319) in the same endpoint! Write-ahead logging mode (`WAL`) helps a bit, and take care with inserts (remember, SQLite [isn't type safe](https://github.com/piccolo-orm/piccolo/issues/1187) without strict mode).
+Piccolo takes a while to get into, but it's very capable. SQLite async is problematic for [concurrent writes](https://piccolo-orm.readthedocs.io/en/1.1.1/piccolo/tutorials/using_sqlite_and_asyncio_effectively.html), so try not to [read/write](https://github.com/piccolo-orm/piccolo/issues/1319) in the same endpoint (`> 10` people inserting is a struggle)! Write-ahead logging mode (`WAL`) helps a bit, and take care with inserts (remember, SQLite [isn't type safe](https://github.com/piccolo-orm/piccolo/issues/1187) without strict mode).
 
 
 ### 💾 SQLite
 
-> 🌎 **SQLite is the most widely deployed database in the world!**
-> ⚠️ Always validate your types with Pydantic as SQLite isn't running in strict mode, it's not type-safe.
+> 🌎 The most widely deployed database in the world!
 
-It does however, give great control over our data and easy to backup or manipulate with [`sqlite-utils`](#-sqlite-utils). We let Piccolo handle column types (which are stricter with Postgres) which we'd lose in strict mode ... so make sure you have a `EventDataIn` Pydantic class for the API layer at least. For heavy concurrent writes, [Turso](https://github.com/tursodatabase/turso) is on the way.
+**Gives great control over data and easy to backup or manipulate with [`sqlite-utils`](#-sqlite-utils).** SQLite is not running in strict mode, as this limits column types that Piccolo handles for us. To make sure `Any` types can't infect our database, be sure to add _at least_ an `EventDataIn` Pydantic class for the API layer! Need strict types in the database? Use Postgres. Heavy concurrent writes? [Turso](https://github.com/tursodatabase/turso) is on the way as a drop-in replacement.
 
 - Pragmas can be added directly once the app is running
     - E.g: set [`PRAGMA journal_mode=WAL`](https://sqlite.org/wal.html)[^3] inside the `sqlite3` repl
 - Piccolo defaults to `not null` columns, and `distinct` primary keys
     - SQLite _does_ check these and will throw an error
 
-I'm not a big fan of migrations (support for these are limited anyway), and prefer GUI tools ([SQLite Browser](https://sqlitebrowser.org/), [Enso](https://ensoanalytics.com/), etc). The aforementioned `sqlite-utils` comes in very handy, and [`piccolo-admin`](https://piccolo-admin.readthedocs.io/en/latest/) is another option. For a safe way to manually update a column, you can:
+I'm not a big fan of migrations (support for these are limited anyway), and prefer GUI tools ([SQLite Browser](https://sqlitebrowser.org/), [Enso](https://ensoanalytics.com/), etc). The aforementioned `sqlite-utils` comes in very handy, and [`piccolo-admin`](https://piccolo-admin.readthedocs.io/en/latest/) is another option.
+
+### 💾 Models
+
+> See `tables.py`. Make sure models accurately reflect your needs.
+
+**As your app evolves, `planner.tables` and `planner.db` will need updating.** To change a column, such as adding `null` or `unique` constraints, the original table and data must be migrated. I'll be  doing this manually, and JQ and `sqlite-utils` come in handy. For a safe way to manually update a column, you could:
 
 1. Backup all data
-2. Create a new column
-3. Copy data over from old column
-4. `DROP` the old column
+2. Create a new column (with SQL or Piccolo)
+3. Copy data over from old column to the new one
+4. `DROP` the old column (and remove from `tables.py`)
 
-Small, incremental changes to `planner.tables` are better than big bulk ones. It's also wise to mock a local database and test any changes before pushing live.
+Small, incremental changes to `planner.tables` are better than big bulk ones. It's also wise to mock a local database and test any changes before pushing them live.
 
-### 💾 Models (`tables.py`)
-
-> As your app evolves, make sure models accurately reflect your needs.
-
-The `planner.tables` model will need to be regularly maintained. If, for example, you add `null` or `unique` constraints to certain fields, the original tables must be updated or replaced. This can be helped along with JQ and `sqlite-utils`.
-
-Some aspects of the model are not very well designed; it may be preferrable to have a many-to-many `Tags` table, rather than `List[string]`, for example, as each user's tags would be independent of each other with this data structure. Look up "database normalization" for more info.[^4]
+Other aspects of the model could be better designed; a many-to-many `Tags` table might be preferrable to `List[string]` for example (each user's tags are currently independent of each other), making them easier to share between different `Event`s. Look up "database normalization" for more info.[^4]
 
 Raw SQL is an option with Piccolo, but you'll need to map the data to your own Pydantic classes.
 
@@ -213,10 +211,9 @@ Bruno is not suited for documentation, but it's great for manual testing! `../br
 
 ### 💣 Bombardier
 
-> **⚠️ Never prematurely optimise your prototype!** Wait for bottlenecks to appear.
-> Handy for checking which design routes are more performant (and which slow us down).
+> ⚠️ Never prematurely optimise your prototype! Wait for bottlenecks to appear.
 
-**All things being (more or less) equal, prefer the easiest-to-read, most consistent, simplest design route.**
+**All things being (more or less) equal, prefer the easiest-to-read, most consistent, simplest design route.** Bombardier is handy for checking which design routes are more performant (and which slow us down).
 
 It's more important that code is understood and easy to maintain, over a [few `ms` bump](https://www.reddit.com/r/dotnet/comments/1hgmwvj/what_would_you_considered_a_good_api_response_time/) in speed. See the file `chapter_08/testing/bombardier` for results; we've stress tested our API with Bombardier.
 
@@ -256,15 +253,16 @@ You'll also need to setup `uvicorn` to run with HTTPS secure connection.
 
 **Out of scope for this repo, but here's some suggestions.** What are the major threats?
 
-1. `python-jose` version in the book is [unsafe](https://security.snyk.io/package/pip/python-jose): use `python-jose[cryptography]`
-    - Older MacOS [doesn't support](https://cryptography.io/en/latest/faq/#installing-cryptography-with-openssl-older-than-3-0-0-fails) OpenSSL 3.0.0 but your server should
+1. Use `python-jose[cryptography]` latest version
+    - `python-jose` version in the book is [unsafe](https://security.snyk.io/package/pip/python-jose)
+    - OpenSSL 3.0.0 [doesn't support](https://cryptography.io/en/latest/faq/#installing-cryptography-with-openssl-older-than-3-0-0-fails) Older MacOS, but your server should
 2. Prevent common attacks such as XSS and DDoS
     - Exclude off-domain requests to the API with `app.add_middleware()`
     - Restrict headers (such as CURL) or by IP address
     - Rate limit or create hard-to-guess `client_id` and `client_secret`s
 3. Never allow anyone else to [inject SQL](https://security.berkeley.edu/education-awareness/how-protect-against-sql-injection-attacks) into your queries
 
-Have a professional check over your code, or research thoroughly.[^5] Nothing is foolproof, and you'll want to watch your server logs and database for signs of tampering.
+Have a professional check over your code, or research thoroughly.[^5] Nothing is foolproof; you'll want to watch your server logs and database for signs of tampering.
 
 
 
@@ -272,7 +270,7 @@ Have a professional check over your code, or research thoroughly.[^5] Nothing is
 
 > FastAPI errors generally use a `HTTPException`.
 
-According to _[APIs you won't hate](https://leanpub.com/build-apis-you-wont-hate-2)_ a `HTTPException` might not be good enough. You'd have to create your own `Error` Pydantic type, or use a [plugin](https://github.com/NRWLDev/fastapi-problem) for standards like [rfc9457](https://www.rfc-editor.org/rfc/rfc9457.html). `String`ly typed errors (especially if variable in a single endpoint) are a bad idea, but can be used with Elm's `Json.Decode.oneOf` as a temporary measure.
+**According to _[APIs you won't hate](https://leanpub.com/build-apis-you-wont-hate-2)_ a `HTTPException` might not be good enough.** You'd have to create your own `Error` Pydantic type, or use a [plugin](https://github.com/NRWLDev/fastapi-problem) for standards like [rfc9457](https://www.rfc-editor.org/rfc/rfc9457.html). `String`ly typed errors (especially if variable in a single endpoint) are a bad idea, but can be used with Elm's `Json.Decode.oneOf` as a temporary measure.
 
 ### ✅ Common errors
 
