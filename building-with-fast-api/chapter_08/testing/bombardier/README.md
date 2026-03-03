@@ -13,13 +13,17 @@ Given two design routes with similar results, prefer the simplest, most consiste
 > Don't optimise too early and keep concurrency reasonable.
 > Migrate data to Postgres or Turso if the server errors too often.
 
+Writes are the big problem as they can block reads.
+
 1. **Do you have enough customers to worry about concurrency?**
 2. No? Then try to never go over `-c 30` concurrent connections!
 3. You can't handle `Exception`s within the endpoint (Bombardier ignores them)
 4. If you've reached the point where concurrency and traffic is getting high:
     - Check where the bottlenecks are and calculate the risk
     - Hire a network professional or outsource the problem
+    - Use a connection pool with Postgres
 5. Other options for handling load:
+    - SQLite-specific like [Forq](https://forq.sh)
     - Use a [queue handler](https://fastapi.tiangolo.com/tutorial/background-tasks/#caveat) to fix the problem
     - 3rd party service like [Cloudflare](https://www.cloudflare.com/en-gb/application-services/products/waiting-room/) or [Queue It](https://www.queue-it.com)
 
