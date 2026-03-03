@@ -21,11 +21,21 @@
 # and concurrent write requests are also problematic at scale (see `app.py` and
 # `tables.py` notes for more on this).
 #
-# Setting `timeout=60` doesn't seem to help much, and anything over this number
-# can actually make our timeouts WORSE. I'm unsure why. `SQLiteEngine(timeout=60)`
-# is a wrapper for `sqlite3_busy_timeout()`.
-#
 # SQLite `PRAGMA` settings aren't currently available in Piccolo.
+# 
+# 
+# Timeout
+# -------
+# > Only worry about this if your getting > 30 concurrent users!
+# 
+# Time set in milliseconds. Contrary to what you'd think would happen, setting a 
+# timeout seems to make the database locked issue worse! It goes from 50% of
+# requests failing to 80%.`SQLiteEngine(timeout=60)` is a wrapper for
+# `sqlite3_busy_timeout()`. You'll also need to set `main.py` to the following:
+#
+# ```
+# uvicorn.run(..., timeout_keep_alive=60) -- seconds (not milliseconds)
+# ```
 #
 #
 # ------------------------------------------------------------------------------

@@ -58,6 +58,7 @@ Query 29815 response:
   'location': 'Glastonbury',
   'tags': ['music', 'adults', 'event'],
   'title': 'Pyramid Stage'}]
+
 ERROR:    Exception in ASGI application
 Traceback (most recent call last):
   File "/Users/rob/Sites/GitHub/python-playground/building-with-fast-api/.venv/lib/python3.13/site-packages/uvicorn/protocols/http/httptools_impl.py", line 416, in run_asgi
@@ -112,7 +113,7 @@ Traceback (most recent call last):
   File "/Users/rob/Sites/GitHub/python-playground/building-with-fast-api/.venv/lib/python3.13/site-packages/fastapi/routing.py", line 243, in run_endpoint_function
     return await dependant.call(**values)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/rob/Sites/GitHub/python-playground/building-with-fast-api/chapter_08/planner/routes/events.py", line 217, in create_event
+  File "/Users/rob/Sites/GitHub/python-playground/building-with-fast-api/chapter_08/planner/routes/events.py", line 237, in create_event
     query = await (
             ^^^^^^^
     ...<4 lines>...
