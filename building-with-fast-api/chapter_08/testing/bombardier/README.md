@@ -17,9 +17,10 @@ Given two design routes with similar results, prefer the simplest, most consiste
 2. No? Then try to never go over `-c 30` concurrent connections!
 3. You can't handle `Exception`s within the endpoint (Bombardier ignores them)
 4. If you've reached the point where concurrency and traffic is getting high:
-    - Check where the bottlenecks are and calculate risk
+    - Check where the bottlenecks are and calculate the risk
     - Hire a network professional or outsource the problem
-    - Use a [queue handler](https://fastapi.tiangolo.com/tutorial/background-tasks/#caveat) to fix the problem 
+    - Use a [queue handler](https://fastapi.tiangolo.com/tutorial/background-tasks/#caveat) to fix the problem
+    - 3rd party service like [Cloudflare](https://www.cloudflare.com/en-gb/application-services/products/waiting-room/) or [Queue It](https://www.queue-it.com)
 
 
 ## To do
