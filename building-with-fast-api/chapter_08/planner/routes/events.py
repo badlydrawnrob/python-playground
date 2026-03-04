@@ -224,9 +224,13 @@ async def create_event(
     --------
     - ⚠️ Never expose sensitive information like `ID` in responses (security)
 
-    Errors
-    ------
-    > Possible things that can go wrong ...
+    Error handling
+    --------------
+    > ⚠️ `try`/`except` blocks basically do fuck all here!
+    
+    I've tried to handle `sqlite.OperationalError` (or parent `sqlite3.DatabaseError`),
+    as well generic `Exception as e`. Returning a status code `400` here rarely
+    shows up when bombarding the API endpoint.
 
     1. ❌ User enters text that isn't a plain string (strip HTML before insert)
     2. ❌ Event already exists (we're not properly checking duplicate values)
@@ -234,12 +238,18 @@ async def create_event(
     """
     event = body.model_dump(exclude_none=True) # Event -> dict
 
-    query = await (
-        data.Event.insert(
-            data.Event(creator=user,**event)
+    try:
+        query = await (
+            data.Event.insert(
+                data.Event(creator=user,**event)
+            )
+            .returning(*data.Event.all_columns()) # Return full record
         )
-        .returning(*data.Event.all_columns()) # Return full record
-    )
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Error creating event: {e}"
+        )
 
     return query[0] #! Is there a more graceful way to do this?
 
