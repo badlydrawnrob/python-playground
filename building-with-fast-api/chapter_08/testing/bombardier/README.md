@@ -1,31 +1,21 @@
 # Bombardier
 
 > ⏱ Examples give rough idea of speed and concurrency ...
-> ❌ `sqlite3.OperationalError: database is locked` is going to be a problem!
+> ❌ `sqlite3.OperationalError: database is locked` is a big problem at scale!
 
 This is a test in theory, but not always in practice. Running the same bombardier call can differ in it's results; bombardier with `-c 125` and `-n 10000000` (as in docs) takes a _really_ long time and it's unlikely a startup prototype will need more than `10` concurrent connections.
-
-Given two design routes with similar results, prefer the simplest, most consistent, easiest-to-read version!
 
 
 ## TL;DR
 
 > Don't optimise too early and keep concurrency reasonable.
-> Migrate data to Postgres or Turso if the server errors too often.
 
-Writes are the big problem as they can block reads.
-
-1. **Do you have enough customers to worry about concurrency?**
-2. No? Then try to never go over `-c 30` concurrent connections!
-3. You can't handle `Exception`s within the endpoint (Bombardier ignores them)
-4. If you've reached the point where concurrency and traffic is getting high:
-    - Check where the bottlenecks are and calculate the risk
-    - Hire a network professional or outsource the problem
-    - Use a connection pool with Postgres
-5. Other options for handling load:
-    - SQLite-specific like [Forq](https://forq.sh)
-    - Use a [queue handler](https://fastapi.tiangolo.com/tutorial/background-tasks/#caveat) to fix the problem
-    - 3rd party service like [Cloudflare](https://www.cloudflare.com/en-gb/application-services/products/waiting-room/) or [Queue It](https://www.queue-it.com)
+1. See scaling SQLite in [performance](../../../PERFORMANCE.md) doc
+2. Exceptions seem to be difficult to handle (such as database is locked)
+    - `sqlite3.DatabaseError` (parent class) might work
+3. Sometimes failures are higher than other times (with same request)
+    - E.g: home -vs- library when it shouldn't make a difference!
+4. Migrate data to Postgres or Turso if the server errors too often.
 
 
 ## To do
@@ -35,7 +25,7 @@ Writes are the big problem as they can block reads.
 
 What's the max capacity for SQLite?
 
-1. Write endpoints are blocking. Read endpoints are not.
+1. Make sure that write endpoints are not blocking (use `WAL` mode)
 2. Running two Bombardier commands (one write, one read) is VERY slow (15mins+).
     - `bombardier -c 10 -n 5000 http://localhost:8000/event/`
     - `bombardier -c 10 -n 5000` with `http://localhost:8000/event/new` POST
@@ -43,21 +33,14 @@ What's the max capacity for SQLite?
     - How many users can it handle?
 
 
-## Is Async faster than Sync?
-
-> Async over a network is about twice as fast when using `125` concurrent `GET` connections.
-
-For an example, the max read time for concurrent synchronous `/event/` endpoint was `10.03s`! An (old) [source](https://stackoverflow.com/questions/39803746/peewee-and-peewee-async-why-is-async-slower) seems to say the opposite (faster reads with sync), which might be the case for single requests without concurrency. Max req/sec can be higher with sync concurrency, but all other metrics and throughput are worse, even with `-c 10` connections. Piccolo logs get a bit screwy using synchronous with high concurrency.
-
-A basic test running SQLite in WAL mode with `run_sync()` is also very poor (dog slow) — the _opposite_ of what should happen! Writes almost certainly need async or WAL mode. These tests may differ from ORM-only (without a network).
-
-
 ## `/event/new`
 
 > TL;DR: high concurrent connections with lots of traffic is very unpredictable (`-c 125`). 
 > It fails A LOT at that scale. Depending on circumstances 50%-95% failure rate!
 
-**✅ Concurrent connections of `-c 10`—`-c 30` gets around 99% success (resolves issue).** After that, best case scenario is 50% success with a bunch of "other: timeout" errors that I can't figure out how to properly handle (and send failure back to the client). There's a very slight improvement inserting with an `id` directly, rather than using the `authenticate()` function to get it.
+**✅ Concurrent connections of `-c 10`—`-c 30` gets around 99% success (resolves issue).**
+
+I'm not sure why but sometimes `-c 125` fails badly (network?); best case scenario is 50% success with a bunch of "other: timeout" errors that I can't figure out how to properly handle (and send failure back to the client). Inserting with `id` directly (rather `authenticate()` to get it) improves things slightly.
 
 - **⛔️ Exceptions are NOT caught** with a `try/except` block
     - I've tried `sqlite3.OperationalError` (database locked)
@@ -65,7 +48,7 @@ A basic test running SQLite in WAL mode with `run_sync()` is also very poor (dog
 - **⛔️ Timeouts seem unavoidable at scale**
     - The most reliable error is `ERROR: Exception in ASGI application` with a long stack trace `sqlite3.OperationalError: database is locked`
     - My _hunch_ is that FastAPI returns the timeout error (not Piccolo)
-    - I can't find a way to handle it properly and return a `4xx` failure.
+    - I can't find a way to reliably handle it and return a `4xx` failure.
 - **⛔️ Insertion order is not guaranteed** with SQLite when database locked
     - Piccolo query logs stop working properly after a while too
 - **⛔️ SQLite `timeout=` setting has proved unsuccsessful in tests**

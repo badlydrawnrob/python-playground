@@ -168,7 +168,7 @@ Piccolo takes a while to get into, but it's very capable. SQLite async is proble
 **Gives great control over data and easy to backup or manipulate with [`sqlite-utils`](#-sqlite-utils).** SQLite is not running in strict mode, as this limits column types that Piccolo handles for us. To make sure `Any` types can't infect our database, be sure to add _at least_ an `EventDataIn` Pydantic class for the API layer! Need strict types in the database? Use Postgres. Heavy concurrent writes? [Turso](https://github.com/tursodatabase/turso) is on the way as a drop-in replacement.
 
 - Pragmas can be added directly once the app is running
-    - E.g: set [`PRAGMA journal_mode=WAL`](https://sqlite.org/wal.html)[^3] inside the `sqlite3` repl
+    - E.g: [`PRAGMA journal_mode=WAL`](https://sqlite.org/wal.html)[^3]
 - Piccolo defaults to `not null` columns, and `distinct` primary keys
     - SQLite _does_ check these and will throw an error
 
@@ -326,21 +326,8 @@ We must fetch `BaseUser.id` from `authenticate()` and that _could_ be a read the
 
 > It's folly to prematurely optimise! Do you have customers? Are you selling?
 
-1. **⚠️ SQLite is bad at _sustained_ high load concurrent writes**
-    - But async is faster than sync when handling multiple connections
-    - Only use sync if it's a single user application (no concurrency)
-2. **Catching errors ([`try`/`except`](https://realpython.com/python-exceptions/)) can be time-expensive;**
-    - But throwing them (like `HTTPException`) is cheap and fast!
-    - A shorthand is `value | Exception`; you may need to return different status codes
-4. **Python's [`match`](https://www.freecodecamp.org/news/python-switch-statement-switch-case-example/) [doesn't work](https://discuss.python.org/t/python-3-10-match-case-syntax-for-catching-exceptions/11076/22)** as I expected
-    - It's not quite the same as Elm's `case` with branch error types
+See the [performance](./PERFORMANCE.md) documentation.
 
-### ⏱ Timeout and broken pipe
-
-> ⛔️ Contrary to what I expected, `timeout=200` does NOT improve things.
-
-
-SQLite `sqlite3.connect()` takes a timeout (in seconds). SQLite does not guarantee the order of insertion, so query log numbers were out of whack (out of order).
 
 
 

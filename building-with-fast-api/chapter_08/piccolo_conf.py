@@ -30,8 +30,13 @@
 # 
 # Time set in milliseconds. Contrary to what you'd think would happen, setting a 
 # timeout seems to make the database locked issue worse! It goes from 50% of
-# requests failing to 80%.`SQLiteEngine(timeout=60)` is a wrapper for
-# `sqlite3_busy_timeout()`. You'll also need to set `main.py` to the following:
+# requests failing to 80%. I think `SQLiteEngine(timeout=60)` is a wrapper for
+# `sqlite3_busy_timeout()`, which seems to expect milliseconds, but link below
+# expects seconds:
+# 
+#     @ https://docs.python.org/3/library/sqlite3.html#sqlite3.connect
+# 
+# You'll also need to set `main.py` to the following:
 #
 # ```
 # uvicorn.run(..., timeout_keep_alive=60) -- seconds (not milliseconds)
