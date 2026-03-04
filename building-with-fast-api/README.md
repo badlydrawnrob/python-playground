@@ -28,6 +28,12 @@
 5. Why does Rich Hickey dislike ORMs?
 6. Investigate `BaseUser` and the `Profile` column
 7. Test out [piccolo admin](https://github.com/piccolo-orm/piccolo_admin)
+8. Make sure that write endpoints are not blocking (use `WAL` mode)
+9. Running two Bombardier commands (one write, one read) is VERY slow (15mins+).
+    - `bombardier -c 10 -n 5000 http://localhost:8000/event/`
+    - `bombardier -c 10 -n 5000` with `http://localhost:8000/event/new` POST
+10. Test with [Locust](https://locust.io/) for concurrency with same [scenarios](https://github.com/coding-yogi/bombardier)
+    - How many users can it handle?
 
 
 ## 🚀 Setup
@@ -59,8 +65,8 @@ curl --request POST \
 -H 'content-type: application/json' \
 -d '{"creator": null, "title": "Pyramid Stage", "image": "https://tinyurl.com/ed-sheeran-with-shakira", "description": "Ed Sheeran sings with Shakira at Glastonbury!", "location": "Glastonbury", "tags": [ "music", "adults", "event" ]}'
 
-# Stress test your API (should be 99% successful)
-bombardier -c 10 -n 10000 \
+# Stress test a single API endpoint (should be 96% successful)
+bombardier -c 100 -n 10000 -t 10s \
 -H "Authorization: Bearer [Generate a JWT token with Bruno]" \
 -H 'accept: application/json' -H 'content-type: application/json' --method=POST \
 -b '{"creator": null,"title": "Pyramid Stage","image": "https://tinyurl.com/ed-sheeran-with-shakira","description": "Ed Sheeran sings with Shakira at Glastonbury!","location": "Glastonbury","tags": ["music","adults","event"]}' \

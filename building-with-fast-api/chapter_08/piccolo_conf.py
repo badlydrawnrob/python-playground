@@ -26,21 +26,28 @@
 # 
 # Timeout
 # -------
+# > Defaults to `timeout=5` seconds ...
 # > Only worry about this if your getting > 30 concurrent users!
 # 
-# Time set in milliseconds. Contrary to what you'd think would happen, setting a 
-# timeout seems to make the database locked issue worse! It goes from 50% of
-# requests failing to 80%. I think `SQLiteEngine(timeout=60)` is a wrapper for
-# `sqlite3_busy_timeout()`, which seems to expect milliseconds, but link below
-# expects seconds:
+# Up to 100 concurrent users with timeout set on ALL THE THINGS helps. Anything
+# over 100 users and 10 seconds, you'll get more failures and diminishing returns!
+# 10 seconds is also a long time for your users to wait, and it's not going to
+# solve the blocking nature of SQLite writes (1 at a time).
+# 
+# 95% success rate at `-c 100` for `-n 10000` on a single endpoint with the
+# timeout set to 10 seconds on all the things. Fewer concurrent users will need
+# a shorter timeout:
+# 
+# - `-t 10s` for Bombardier
+# - `timeout=10` for SQLiteEngine()`
+# - `timeout_keep_alive=10` for `uvicorn.run`
+#
+# At this point though, it's better to seek out a professional database or network
+# programmer, figure out where your bottlenecks are, and nd a better solution. Failure
+# rates can rise to 95%. See the `PERFORMANCE.md` file for more on this. I think
+# `SQLiteEngine(timeout=60)` is a wrapper for `sqlite3_busy_timeout()`.
 # 
 #     @ https://docs.python.org/3/library/sqlite3.html#sqlite3.connect
-# 
-# You'll also need to set `main.py` to the following:
-#
-# ```
-# uvicorn.run(..., timeout_keep_alive=60) -- seconds (not milliseconds)
-# ```
 #
 #
 # ------------------------------------------------------------------------------
@@ -64,7 +71,7 @@ DATABASE = config("SQLITE_DATABASE", default="planner.db")
 LOG_QUERIES = config("SQLITE_LOG_QUERIES", default=False, cast=bool)
 LOG_RESPONSES = config("SQLITE_LOG_RESPONSES", default=False, cast=bool)
 
-DB = SQLiteEngine(path=DATABASE, log_queries=LOG_QUERIES, log_responses=LOG_RESPONSES)
+DB = SQLiteEngine(path=DATABASE, log_queries=LOG_QUERIES, log_responses=LOG_RESPONSES, timeout=10)
 
 APP_REGISTRY = AppRegistry(
     apps=["planner.piccolo_app", "piccolo.apps.user.piccolo_app"]

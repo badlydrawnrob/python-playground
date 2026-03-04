@@ -5,6 +5,8 @@
 
 This is a test in theory, but not always in practice. Running the same bombardier call can differ in it's results; bombardier with `-c 125` and `-n 10000000` (as in docs) takes a _really_ long time and it's unlikely a startup prototype will need more than `10` concurrent connections.
 
+Bombardier can only run one endpoint at a time, but you can run two Bombardier commands in different terminals.
+
 
 ## TL;DR
 
@@ -12,35 +14,16 @@ This is a test in theory, but not always in practice. Running the same bombardie
 
 1. See scaling SQLite in [performance](../../../PERFORMANCE.md) doc
 2. Exceptions seem to be difficult to handle (such as database is locked)
-    - `sqlite3.DatabaseError` (parent class) might work
 3. Sometimes failures are higher than other times (with same request)
     - E.g: home -vs- library when it shouldn't make a difference!
 4. Migrate data to Postgres or Turso if the server errors too often.
 
 
-## To do
-
-> Bombardier can only run one endpoint at a time.
-> You can run two Bombardier commands in different terminals.
-
-What's the max capacity for SQLite?
-
-1. Make sure that write endpoints are not blocking (use `WAL` mode)
-2. Running two Bombardier commands (one write, one read) is VERY slow (15mins+).
-    - `bombardier -c 10 -n 5000 http://localhost:8000/event/`
-    - `bombardier -c 10 -n 5000` with `http://localhost:8000/event/new` POST
-3. Test with [Locust](https://locust.io/) for concurrency with same [scenarios](https://github.com/coding-yogi/bombardier)
-    - How many users can it handle?
-
-
 ## `/event/new`
 
-> TL;DR: high concurrent connections with lots of traffic is very unpredictable (`-c 125`). 
-> It fails A LOT at that scale. Depending on circumstances 50%-95% failure rate!
+> TL;DR: high concurrent connections with lots of traffic is very unpredictable (`-c 125`) without all timeouts set. After 100 concurrency expect it to fail A LOT (like 50%-95%).
 
-**✅ Concurrent connections of `-c 10`—`-c 30` gets around 99% success (resolves issue).**
-
-I'm not sure why but sometimes `-c 125` fails badly (network?); best case scenario is 50% success with a bunch of "other: timeout" errors that I can't figure out how to properly handle (and send failure back to the client). Inserting with `id` directly (rather `authenticate()` to get it) improves things slightly.
+**✅ Concurrent connections of `-c 10`—`-c 30` without timeouts set gets around 99% success.** Much over that and timeouts are necessary (see `PERFORMANCE.md`). Inserting with `id` directly (rather `authenticate()` to get it) improves things slightly. See below for list of potential errors, depending on setup.
 
 - **⛔️ Exceptions are NOT caught** with a `try/except` block
     - I've tried `sqlite3.OperationalError` (database locked)
@@ -57,6 +40,7 @@ I'm not sure why but sometimes `-c 125` fails badly (network?); best case scenar
     - E.g: `2xx - 5901` and error `others - 4099` but `6524` rows created.
 - Other errors that happen at scale:
     - At my local library connected to open wifi many `5xx` errors
+        - `sqlite3.OperationalError: unable to open database file`
     - At home (and my local library)
         - "the server closed connection before returning the first response byte. Make sure the server returns 'Connection: close' response header before closing the connection"
         - dial tcp 127.0.0.1:8000: connect: connection reset by peer - 326

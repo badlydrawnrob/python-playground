@@ -1,17 +1,41 @@
 # Performance
 
-> ⚠️ Sustained high concurrent writes are a big problem
+> SQLite excels at high reads, low writes.
+> ⚠️ Sustained high concurrent writes are a big problem!
 
-Given two design routes with similar results, prefer the simplest, most consistent, easiest-to-read version! Consider also using Tally forms and bulk writes, to assure all reads happen correctly.
+Testing on a single endpoint with a small atomic POST query: this is not a fully fledged API load test. It's a fine balance getting all the parts working well using `aiosqlite`. Given two design routes with similar results, prefer the simplest, most consistent, easiest-to-read version!
 
-- Async SQLite is more than 50% faster handling multiple connections[^1]
-- If you've got heavy writes, reads will get blocked by default
+For prototyping, consider 3rd-party tools like Tally and perform bulk writes; your database could be read-only for the most part.
+
+## Testing results
+
+> **⏱ Timeouts only required when more than 10 concurrent writers.**
+
+| Command         | Result |
+| --------------- | ------ |
+| `-c 10`         | 100% success |
+| `-c 10 -t 5s`   | 99.9% success |
+| `-c 75 -t 5s`   | 95% success |
+| `-c 100 -t 10s` | 99% failure (with WAL mode) |
+| `-c 100 -t 10s` | 99% success (without WAL mode) |
+
+1. SQLite is great at high concurrent reads!
+2. SQLite writes one at a time and is blocking
+    - If a write is currently active, reads must wait (a problem at scale)
+    - `WAL` mode helps unblock writes (but at scale can make things worse)
+3. SQLite struggles with sustained high concurrent writes (over `75`)
+    - Higher concurrency generally requires a bigger timeout
+    - Anything over `-c 75` and `-t 10s` becomes volatile and inconsistent
+        - Failures happen between 50% to 90% at that scale (depending on setup)
     - Using two Bombardier commands at the same time is slow as hell
-    - Using [`WAL` mode](https://sqlite.org/wal.html) should help a little
-    - Go to  SQLite repl and enter `PRAGMA journal_mode=WAL`
-- `Exception` when handled does not raise a `400` (or rarely does)
-    - Endpoints with `try`/`except` blocks seem to get ignored
-    - Both `Exception` and `sqlite3.OperationalError` don't get catched
+4. Writes fail more if you increase `timeout=` but not on the client request
+    - Make sure all timeouts are the same
+    - Over 10 seconds gets diminishing returns and failures
+5. Exceptions are NOT reliably caught (basically do nothing, e.g: `sqlite3.OperationalError`)
+    - So we cannot `try`/`except` to cancel the query and ask client to retry
+    - It's better to raise the timeout or potentially rollback transaction
+    - Even though `5xx` and `other` errors are returned, inserts can still happen
+6. Postgres defaults to 100 concurrent connections (more can harm performance)
 
 
 ## 🙋‍♀️ Do you have customers yet?
@@ -23,30 +47,26 @@ No? Worry about it when you've got more than `-c 30` concurrent connections!
 
 ## 👆 Performance upgrades
 
-> ⏱ If you've reached the point where concurrency and traffic is getting high ...
+> ⏱ If you've reached the point where concurrency and traffic is getting high ... this is generally a good sign and it might be time to hire!
+
+[Turso](https://github.com/tursodatabase/turso) is coming and might be a drop-in replacement.
 
 1. Check where bottlenecks are and calculate the risk
 2. Hire a network professional or outsource the problem
-3. SQLite plugin like [Litestream](https://litestream.io/how-it-works/) or [queue handler](https://codeandcortex.medium.com/the-surprising-way-i-used-sqlite-to-scale-a-side-project-to-100k-users-1295dccf1212)
-4. SQLite [Remote copy](https://sqlite.org/rsync.html) or [LiteFS](https://fly.io/docs/litefs/) for 2nd read-only database
+3. SQLite [Remote copy](https://sqlite.org/rsync.html) to create a read-only file
+4. FastAPI [queue handling](https://fastapi.tiangolo.com/tutorial/background-tasks/#caveat)
 5. Postgres using a connection pool (max 100 concurrent writes)
 
-### Other options for handling load
-
-- FastAPI [queue handling](https://fastapi.tiangolo.com/tutorial/background-tasks/#caveat)
-- [Remote copy](https://sqlite.org/rsync.html) for 2nd read-only database
-- SQLite-specific like [Forq](https://forq.sh)
-- 3rd party service like [Cloudflare](https://www.cloudflare.com/en-gb/application-services/products/waiting-room/) or [Queue It](https://www.queue-it.com)
-- More [unusual ways](https://www.reddit.com/r/programming/comments/gpibz8/scaling_sqlite_to_4m_qps_on_a_single_server_ec2/) to scale with SQLite (requires a good server, also on Y Combinator)
+See also [when to use SQLite](https://sqlite.org/whentouse.html). Solutions when high load becomes a problem include Litestream (backup and treat one database as read-only), [queuing](https://codeandcortex.medium.com/the-surprising-way-i-used-sqlite-to-scale-a-side-project-to-100k-users-1295dccf1212), or other 3rd-party tools ([LiteFS](https://fly.io/docs/litefs/), [Forq](https://forq.sh), [Cloudflare](https://www.cloudflare.com/en-gb/application-services/products/waiting-room/), [Queue It](https://www.queue-it.com)). More [unusual ways](https://www.reddit.com/r/programming/comments/gpibz8/scaling_sqlite_to_4m_qps_on_a_single_server_ec2/) with your own server setup have been done before.
 
 
 ## ⛔️ Timeout and broken pipe
 
-> `timeout=1000` does not help in the way you'd expect!
+> Timeouts occur because either the client or the server timeout is too little.
 
-SQLite `sqlite3.connect()` takes a timeout (in seconds). I'm not sure if this is a FastAPI, Piccolo, or SQLite problem. In tests `2xx` responses go _down_ in success rates, not up.
+Timeouts have diminishing returns and more failures `> 10s`.
 
-SQLite does not guarantee the order of insertion, so expect query log numbers to be out of sync (out of order).
+SQLite `sqlite3.connect()` takes a timeout (in seconds) and you must assure that all network connections that require a timeout have one set. SQLite does not guarantee the order of insertion, so expect query log numbers to be out of sync (out of order).
 
 
 ## Catching and throwing `Exception`s
@@ -60,7 +80,7 @@ A shorthand is `value | Exception`, but you'll probably want to throw different 
 
 ## Is Async faster than Sync?
 
-> Async over a network is 2x faster running `125` concurrent `GET` connections.
+> Async over a network is 2x faster running `125` concurrent `GET` connections.[^1]
 
 For an example, the max read time for concurrent synchronous `/event/` endpoint was `10.03s`! An (old) [source](https://stackoverflow.com/questions/39803746/peewee-and-peewee-async-why-is-async-slower) seems to say the opposite (faster reads with sync), which might be the case for single requests without concurrency. Max req/sec can be higher with sync concurrency, but all other metrics and throughput are worse, even with `-c 10` connections. Piccolo logs get a bit screwy using synchronous with high concurrency.
 

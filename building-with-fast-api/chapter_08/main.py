@@ -244,7 +244,10 @@ app.add_middleware(
 # ------------------------------------------------------------------------------
 # Run app
 # ==============================================================================
+# > The timeout is not strictly necessary but it's the same as `SQLiteEngine().
+# > See `../../PERFORMANCE.md` for more on this.
+#
 # Slightly different from the book code which errors (see chapter_07)
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="localhost", port=8000, reload=True)
+    uvicorn.run("main:app", host="localhost", port=8000, reload=True, timeout_keep_alive=10)
