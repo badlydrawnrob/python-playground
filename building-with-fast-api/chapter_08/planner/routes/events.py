@@ -238,18 +238,12 @@ async def create_event(
     """
     event = body.model_dump(exclude_none=True) # Event -> dict
 
-    try:
-        query = await (
-            data.Event.insert(
-                data.Event(creator=user,**event)
-            )
-            .returning(*data.Event.all_columns()) # Return full record
+    query = await (
+        data.Event.insert(
+            data.Event(creator=user,**event)
         )
-    except Exception as e:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Error creating event: {e}"
-        )
+        .returning(*data.Event.all_columns()) # Return full record
+    )
 
     return query[0] #! Is there a more graceful way to do this?
 
