@@ -108,7 +108,7 @@ git clean -dx -e .env -i
     - Authentication, cherry-picking ORMs, error checking, refined JWT
     - ~~SQLModel (original version)~~ (`1.12.4`)
     - ~~Peewee (modified version)~~ (`1.12.11`)
-    - Piccolo (my ORM of choice) (`1.12.16`)
+    - Piccolo (my ORM of choice) (`1.12.17`)
 
 
 ### 📖 Chapter 8 (with extras)
