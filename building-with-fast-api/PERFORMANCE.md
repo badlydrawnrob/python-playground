@@ -3,7 +3,7 @@
 > ✅ SQLite excels at high reads, low writes.<br>
 > ⚠️ Sustained high concurrent writes are a big problem!
 
-**SQLite is great for concurrent reads; sustained concurrent writes at scale has some big problems.** When you're nearing `-c 30` back-to-back writes, you may want to consider [other options](#-performance-upgrades). One option is using one database for inserts, then backing up and syncing changes to a read-only database.
+**SQLite is great for concurrent reads; sustained concurrent writes at scale has some big problems.** When you're nearing `-c 30` back-to-back writes, you may want to consider [other options](#-performance-upgrades). One option is using a database for inserts, then backing up and syncing changes to a separate read-only database.
 
 
 ## 🙋‍♀️ Do you have customers yet?
