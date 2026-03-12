@@ -52,7 +52,7 @@ Consider first 3rd-party tools like [Tally](https://tally.so) and [n8n](https://
     - We cannot `try`/`except` to cancel the query and ask client to retry
     - Safer to just raise the timeout or potentially rollback a transaction
     - **Inserts can still happen, even if `5xx` and `other` errors are returned**
-8. Postgres defaults to 100 concurrent connections (more can harm performance) 
+8. Postgres defaults to 100 concurrent connections (more can harm performance)
 
 
 ## 👆 Performance upgrades
