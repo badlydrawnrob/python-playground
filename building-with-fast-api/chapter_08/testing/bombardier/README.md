@@ -10,9 +10,10 @@ Bombardier can only run one endpoint at a time, but you can run two Bombardier c
 
 ## TL;DR
 
-> Don't optimise too early and keep concurrency reasonable.
+> **Don't optimise too early** and keep concurrency reasonable.
 
-1. See scaling SQLite in [performance](../../../PERFORMANCE.md) doc
+1. **See scaling SQLite in [performance](../../../PERFORMANCE.md) doc**
+    - Start scaling with a `timeout=` for FastAPI, SQLiteEngine, and Bombardier.
 2. Exceptions seem to be difficult to handle (such as database is locked)
 3. Sometimes failures are higher than other times (with same request)
     - E.g: home -vs- library when it shouldn't make a difference!
@@ -23,32 +24,12 @@ Bombardier can only run one endpoint at a time, but you can run two Bombardier c
 
 > TL;DR: high concurrent connections with lots of traffic is very unpredictable (`-c 125`) without all timeouts set. After 100 concurrency expect it to fail A LOT (like 50%-95%).
 
-**✅ Concurrent connections of `-c 10`—`-c 30` without timeouts set gets around 99% success.** Much over that and timeouts are necessary (see `PERFORMANCE.md`). Inserting with `id` directly (rather `authenticate()` to get it) improves things slightly. See below for list of potential errors, depending on setup.
+1. When `timeout=` _is_ set you get ~99% success with up to `-c 100` connections
+2. When `timeout=` _is not_ you get ~99% success with `-c 30` connections and less only
 
-- **⛔️ Exceptions are NOT caught** with a `try/except` block
-    - I've tried `sqlite3.OperationalError` (database locked)
-    - I've tried `Exception` master type (still no joy)
-- **⛔️ Timeouts seem unavoidable at scale**
-    - The most reliable error is `ERROR: Exception in ASGI application` with a long stack trace `sqlite3.OperationalError: database is locked`
-    - My _hunch_ is that FastAPI returns the timeout error (not Piccolo)
-    - I can't find a way to reliably handle it and return a `4xx` failure.
-- **⛔️ Insertion order is not guaranteed** with SQLite when database locked
-    - Piccolo query logs stop working properly after a while too
-- **⛔️ SQLite `timeout=` setting has proved unsuccsessful in tests**
-    - Drops performance from 50% success (`-c 125`) to 80%+ failure
-- **⛔️ Timeouts do not stop some inserts from happening!**
-    - E.g: `2xx - 5901` and error `others - 4099` but `6524` rows created.
-- Other errors that happen at scale:
-    - At my local library connected to open wifi many `5xx` errors
-        - `sqlite3.OperationalError: unable to open database file`
-    - At home (and my local library)
-        - "the server closed connection before returning the first response byte. Make sure the server returns 'Connection: close' response header before closing the connection"
-        - dial tcp 127.0.0.1:8000: connect: connection reset by peer - 326
-        - write tcp 127.0.0.1:60723->127.0.0.1:8000: write: broken pipe
-    - When trying two Bombardier commands at the same time
-        - dial tcp 127.0.0.1:8000: i/o timeout
-        - dial tcp 127.0.0.1:8000: connect: connection reset by peer
+Bombarding your endpoint with back to back writes will fuck up your reads and run very slowly. Enabling `WAL` mode with very high concurrency (`-c 100`) can result in _worse_ results and more errors. See [`PERFORMANCE.md`](../../../PERFORMANCE.md) for more info.
 
+Here's an example with no `timeout=` and 125 concurrent connections.
 
 ```text
 Bombarding http://localhost:8000/event/new with 10000 request(s) using 125 connection(s)
@@ -65,7 +46,32 @@ Statistics        Avg      Stdev        Max
   Throughput:    83.73KB/s
 ```
 
-With `timeout=` set (even to `300`) the first few 1000 return `200` status code but then problems start with Bombardier broken pipe or closed connection errors, even though rows are still being added.
+A list of potential errors, depending on setup:
+
+- **⛔️ Exceptions are NOT caught** with a `try/except` block
+    - I've tried `sqlite3.OperationalError` (database locked)
+    - I've tried `Exception` master type (still no joy)
+- **⛔️ Timeouts seem unavoidable at scale**
+    - The most reliable error is `ERROR: Exception in ASGI application` with a long stack trace `sqlite3.OperationalError: database is locked`
+    - My _hunch_ is that FastAPI returns the timeout error (not Piccolo)
+    - I can't find a way to reliably handle it and return a `4xx` failure.
+- **⛔️ Insertion order is not guaranteed** with SQLite when database locked
+    - Piccolo query logs stop working properly after a while too
+- **⛔️ SQLite database locked or API timeout is unavoidable if ...**
+    - More than `timeout=60` (make sure to set all timeouts)
+    - Concurrency of `-c 101` or more (50% and more failure)
+- **⛔️ Inserts can still happen even if database locked or timeout errors!**
+    - E.g: `2xx - 5901` and error `others - 4099` but `6524` rows created.
+- Other errors that happen at scale:
+    - At my local library connected to open wifi many `5xx` errors
+        - `sqlite3.OperationalError: unable to open database file`
+    - At home (and my local library)
+        - "the server closed connection before returning the first response byte. Make sure the server returns 'Connection: close' response header before closing the connection"
+        - dial tcp 127.0.0.1:8000: connect: connection reset by peer - 326
+        - write tcp 127.0.0.1:60723->127.0.0.1:8000: write: broken pipe
+    - When trying two Bombardier commands at the same time
+        - dial tcp 127.0.0.1:8000: i/o timeout
+        - dial tcp 127.0.0.1:8000: connect: connection reset by peer
 
 
 ## `/event/`

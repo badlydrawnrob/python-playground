@@ -3,9 +3,17 @@
 > SQLite excels at high reads, low writes.
 > ⚠️ Sustained high concurrent writes are a big problem!
 
-Testing on a single endpoint with a small atomic POST query: this is not a fully fledged API load test. It's a fine balance getting all the parts working well using `aiosqlite`. Given two design routes with similar results, prefer the simplest, most consistent, easiest-to-read version!
+**SQLite is great for concurrent reads; sustained concurrent writes at scale has some big problems.** When you're nearing `-c 30` back-to-back writes, you may want to consider [other options](#-performance-upgrades). One option is using one database for inserts, then backing up and syncing changes to a read-only database.
 
-For prototyping, consider 3rd-party tools like Tally and perform bulk writes; your database could be read-only for the most part.
+
+## 🙋‍♀️ Do you have customers yet?
+
+> ⚠️ Don't optimise too early and keep concurrency reasonable.
+
+You don't? Well then, worry about it when you're getting `-c 30` concurrent connections!
+
+Consider first 3rd-party tools like [Tally](https://tally.so) and [n8n](https://tally.so/help/n8n-integration) for prototyping and perform bulk writes (automatically or manually); your database could be read-only for the most part.
+
 
 ## Testing results
 
@@ -19,10 +27,13 @@ For prototyping, consider 3rd-party tools like Tally and perform bulk writes; yo
 | `-c 100 -t 10s` | 99% failure (with WAL mode) |
 | `-c 100 -t 10s` | 99% success (without WAL mode) |
 
-1. SQLite is great at high concurrent reads!
+A small atomic POST query on a single endpoint: not a fully fledged API load test! It's a fine balance to get all parts working well with `aiosqlite`. If you have two design routes with similar results, always prefer the simplest, most consistent, easiest-to-read version!
+
+1. SQLite is great for high concurrent reads!
 2. SQLite writes one at a time and is blocking
     - If a write is currently active, reads must wait (a problem at scale)
-    - `WAL` mode helps unblock writes (but at scale can make things worse)
+    - `WAL` mode helps unblock writes (with less than `-c 75`) but ...
+    - `WAL` mode at scale (`-c 100`) can make success rates a lot worse!
 3. SQLite struggles with sustained high concurrent writes (over `75`)
     - Higher concurrency generally requires a bigger timeout
     - Anything over `-c 75` and `-t 10s` becomes volatile and inconsistent
@@ -31,23 +42,18 @@ For prototyping, consider 3rd-party tools like Tally and perform bulk writes; yo
 4. Writes fail more if you increase `timeout=` but not on the client request
     - Make sure all timeouts are the same
     - Over 10 seconds gets diminishing returns and failures
-5. Exceptions are NOT reliably caught (basically do nothing, e.g: `sqlite3.OperationalError`)
-    - So we cannot `try`/`except` to cancel the query and ask client to retry
-    - It's better to raise the timeout or potentially rollback transaction
-    - Even though `5xx` and `other` errors are returned, inserts can still happen
-6. Postgres defaults to 100 concurrent connections (more can harm performance)
-
-
-## 🙋‍♀️ Do you have customers yet?
-
-> ⚠️ Don't optimise too early and keep concurrency reasonable.
-
-No? Worry about it when you've got more than `-c 30` concurrent connections!
+5. Using more efficient queries will help a little
+    - For example, insert with user `id` directly (instead of `authenticate()`)
+6. Exceptions are NOT reliably caught (basically do nothing, e.g: `sqlite3.OperationalError`)
+    - We cannot `try`/`except` to cancel the query and ask client to retry
+    - Safer to just raise the timeout or potentially rollback a transaction
+    - Inserts can still happen, even if `5xx` and `other` errors are returned
+7. Postgres defaults to 100 concurrent connections (more can harm performance)
 
 
 ## 👆 Performance upgrades
 
-> ⏱ If you've reached the point where concurrency and traffic is getting high ... this is generally a good sign and it might be time to hire!
+> ⏱ It's generally a good sign if you've reached a point where concurrency and traffic is becoming a problem. You've got customers! It could be a good time to hire!
 
 [Turso](https://github.com/tursodatabase/turso) is coming and might be a drop-in replacement.
 
