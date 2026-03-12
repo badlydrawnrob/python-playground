@@ -5,6 +5,8 @@
 
 **SQLite is great for concurrent reads; sustained concurrent writes at scale has some big problems.** When you're nearing `-c 30` back-to-back writes, you may want to consider [other options](#-performance-upgrades). One option is using a database for inserts, then backing up and syncing changes to a separate read-only database.
 
+If you have two design routes with similar results, always prefer the simplest, most consistent, easiest-to-read version!
+
 
 ## 🙋‍♀️ Do you have customers yet?
 
@@ -27,7 +29,7 @@ Consider first 3rd-party tools like [Tally](https://tally.so) and [n8n](https://
 | `-c 100 -t 10s` | 99% failure (with WAL mode) |
 | `-c 100 -t 10s` | 99% success (without WAL mode) |
 
-A small atomic POST query on a single endpoint: not a fully fledged API load test! It's a fine balance to get all parts working well with `aiosqlite`. If you have two design routes with similar results, always prefer the simplest, most consistent, easiest-to-read version!
+**A small atomic POST query on a single endpoint: not a fully fledged API load test!** It's a fine balance to get all parts working well with `aiosqlite`.
 
 1. SQLite is great for high concurrent reads!
 2. SQLite writes one at a time and is blocking
@@ -36,19 +38,21 @@ A small atomic POST query on a single endpoint: not a fully fledged API load tes
     - `WAL` mode at scale (`-c 100`) can make success rates a lot worse!
 3. SQLite struggles with sustained high concurrent writes (over `75`)
     - Higher concurrency generally requires a bigger timeout
-    - Anything over `-c 75` and `-t 10s` becomes volatile and inconsistent
+    - Beware of concurrency over `-c 75` and `-t 10s`
+        - It can start to become volatile and inconsistent
         - Failures happen between 50% to 90% at that scale (depending on setup)
-    - Using two Bombardier commands at the same time is slow as hell
-4. Writes fail more if you increase `timeout=` but not on the client request
-    - Make sure all timeouts are the same
-    - Over 10 seconds gets diminishing returns and failures
-5. Using more efficient queries will help a little
+4. Bombardier with 2 commands running (one of which back-to-back writes) ...
+    - Both commands start running very slowly; further load testing is needed!
+5. Both client and server _must_ use `timeout=`s at scale, or writes fail badly
+    - Timeouts should be set on Bombardier requests, FastAPI, and SQLiteEngine!
+    - Over 10 seconds gets diminishing returns and failures (keep all timeouts same)
+6. Using more efficient queries will help a little bit
     - For example, insert with user `id` directly (instead of `authenticate()`)
-6. Exceptions are NOT reliably caught (basically do nothing, e.g: `sqlite3.OperationalError`)
+7. Exceptions are NOT reliably caught (basically do nothing, e.g: `sqlite3.OperationalError`)
     - We cannot `try`/`except` to cancel the query and ask client to retry
     - Safer to just raise the timeout or potentially rollback a transaction
     - Inserts can still happen, even if `5xx` and `other` errors are returned
-7. Postgres defaults to 100 concurrent connections (more can harm performance)
+8. Postgres defaults to 100 concurrent connections (more can harm performance)
 
 
 ## 👆 Performance upgrades
