@@ -52,7 +52,7 @@ Consider first 3rd-party tools like [Tally](https://tally.so) and [n8n](https://
     - We cannot `try`/`except` to cancel the query and ask client to retry
     - Safer to just raise the timeout or potentially rollback a transaction
     - Inserts can still happen, even if `5xx` and `other` errors are returned
-8. Postgres defaults to 100 concurrent connections (more can harm performance)
+8. Postgres defaults to 100 concurrent connections (more can harm performance) 
 
 
 ## 👆 Performance upgrades
@@ -67,7 +67,7 @@ Consider first 3rd-party tools like [Tally](https://tally.so) and [n8n](https://
 4. FastAPI [queue handling](https://fastapi.tiangolo.com/tutorial/background-tasks/#caveat)
 5. Postgres using a connection pool (max 100 concurrent writes)
 
-See also [when to use SQLite](https://sqlite.org/whentouse.html). Solutions when high load becomes a problem include Litestream (backup and treat one database as read-only), [queuing](https://codeandcortex.medium.com/the-surprising-way-i-used-sqlite-to-scale-a-side-project-to-100k-users-1295dccf1212), or other 3rd-party tools ([LiteFS](https://fly.io/docs/litefs/), [Forq](https://forq.sh), [Cloudflare](https://www.cloudflare.com/en-gb/application-services/products/waiting-room/), [Queue It](https://www.queue-it.com)). More [unusual ways](https://www.reddit.com/r/programming/comments/gpibz8/scaling_sqlite_to_4m_qps_on_a_single_server_ec2/) with your own server setup have been done before.
+See also [when to use SQLite](https://sqlite.org/whentouse.html). Solutions when high load becomes a problem include [Litestream](https://litestream.io/how-it-works/) (backup and treat one database as read-only), [queuing](https://codeandcortex.medium.com/the-surprising-way-i-used-sqlite-to-scale-a-side-project-to-100k-users-1295dccf1212), or other 3rd-party tools ([LiteFS](https://fly.io/docs/litefs/), [Forq](https://forq.sh), [Cloudflare](https://www.cloudflare.com/en-gb/application-services/products/waiting-room/), [Queue It](https://www.queue-it.com)). More [unusual ways](https://www.reddit.com/r/programming/comments/gpibz8/scaling_sqlite_to_4m_qps_on_a_single_server_ec2/) with your own server setup have been done before.
 
 
 ## ⛔️ Timeout and broken pipe
