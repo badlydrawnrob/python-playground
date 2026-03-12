@@ -41,17 +41,17 @@ Consider first 3rd-party tools like [Tally](https://tally.so) and [n8n](https://
     - Beware of concurrency over `-c 75` and `-t 10s`
         - It can start to become volatile and inconsistent
         - Failures happen between 50% to 90% at that scale (depending on setup)
-4. **Bombardier with 2 commands running (one of which back-to-back writes) ...**
+4. **Bombardier with 2 commands running** (one of which back-to-back writes) ...
     - Both commands start running very slowly; further load testing is needed!
 5. **Both client and server _must_ use `timeout=`s at scale, or writes fail badly**
     - Timeouts should be set on Bombardier requests, FastAPI, and SQLiteEngine!
     - Over 10 seconds gets diminishing returns and failures (keep all timeouts same)
 6. Using more efficient queries will help a little bit
     - For example, insert with user `id` directly (instead of `authenticate()`)
-7. **Exceptions are NOT reliably caught (basically do nothing, e.g: `sqlite3.OperationalError`)**
+7. **Exceptions are NOT reliably caught** (basically do nothing, e.g: `sqlite3.OperationalError`)
     - We cannot `try`/`except` to cancel the query and ask client to retry
     - Safer to just raise the timeout or potentially rollback a transaction
-    - Inserts can still happen, even if `5xx` and `other` errors are returned
+    - **Inserts can still happen, even if `5xx` and `other` errors are returned**
 8. Postgres defaults to 100 concurrent connections (more can harm performance) 
 
 
