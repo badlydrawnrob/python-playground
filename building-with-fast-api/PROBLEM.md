@@ -16,7 +16,7 @@ You could replace "events" here with a lot of things: restaurants, hotels, etc.
 
 > Finding patterns to create a small language.
 
-What if we looked at [the problem](#-the-problem) in a way that narrows down the [actions](#-what-actions-are-available) for a hyper-focused [solution](#-solution)? What if we built everything around a very particular customer job? Perhaps you pick two:
+What if we looked at **the problem** in a way that **narrows down the [actions](#-what-actions-are-available)** for a **hyper-focused [solution](#-solution)**? What if we built everything around a very particular customer job? Perhaps you pick two:
 
 - User is in a hotel with solid wifi
 - User is out on the road in the city
