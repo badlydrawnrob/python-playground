@@ -2,21 +2,21 @@
 
 > What are the key areas of concern?
 
-- Client -vs- backend work (E.g: local-first)
-- Costs (E.g: running multiple databases)
-- Customer job (E.g: this person's job, this time)
-- Internet speed (E.g: slow city 4G)
-- Packet transfer size (E.g: single -vs- bulk)
-- Web obesity problem (E.g: Facebook)
+- **Client -vs- backend work** (E.g: local-first)
+- **Costs** (E.g: running multiple databases)
+- **Customer job** (E.g: this person's job, this time)
+- **Internet speed** (E.g: slow city 4G)
+- **Packet transfer size** (E.g: single -vs- bulk)
+- **Web obesity** problem (E.g: Facebook)
 
 You could replace "events" here with a lot of things: restaurants, hotels, etc.
 
 
-## What if?
+## 🙋 What if?
 
 > Finding patterns to create a small language.
 
-What if we looked at [the problem](#the-problem) in a way that narrows down the [actions](#what-actions-are-available) for a hyper-focused [solution](#solution)? What if we built everything around a very particular customer job? Perhaps you pick two:
+What if we looked at [the problem](#-the-problem) in a way that narrows down the [actions](#-what-actions-are-available) for a hyper-focused [solution](#-solution)? What if we built everything around a very particular customer job? Perhaps you pick two:
 
 - User is in a hotel with solid wifi
 - User is out on the road in the city
@@ -24,7 +24,7 @@ What if we looked at [the problem](#the-problem) in a way that narrows down the 
 If we thought from 1st principles _only_ for this particular customer job, this time, in this situation, removing everything that isn't needed, how might the solution look?
 
 
-## The problem
+## ⛔️ The problem
 
 > What is the exact problem?
 
@@ -38,7 +38,7 @@ Take for example, a user looking for an event in a Google Maps style app, for ex
 None of these account for specific user actions, which also may not work, depending on the internet connection. Actions like "add review" or "add to my map" might only work if the internet is up. Which job situations can you guarantee everything will load correctly? Which situations can you not? Which jobs do you serve?
 
 
-## What actions are available?
+## 🪧 What actions are available?
 
 1. Read all `/event`s
 2. Select one `/event/id`
@@ -50,7 +50,7 @@ None of these account for specific user actions, which also may not work, depend
 Ideally you'd have the minimal amount of actions and data to get a customer job done. Here the main data would be a `.jpg` image of the venue and `json` data for specifics. Let's take one operation, "Read all `/meal`s" as an example.
 
 
-## Reading all events
+## 📆 Reading all events
 
 > Take into account the customer job AND your vision!
 
@@ -59,7 +59,7 @@ Ideally you'd have the minimal amount of actions and data to get a customer job 
 - User can view as: list or map
 - Radius is: wide or narrow
 
-### Web obesity (too much data)
+### 🍔 Web obesity (too much data)
 
 > Google Maps shows A LOT of data!
 
@@ -78,14 +78,14 @@ To be fair, it's pretty small at 5.43kb for the initial map launch, BUT ...
 Multiply that by the average number of events a user might view in one sitting, and we're talking about **_impossible transfer sizes_ on a shitty 4G connection**.
 
 
-### Customer job specifics
+### ☝️ Customer job specifics
 
 1. 5Ws of this particular job
 2. How does it fit into their day?
 3. Is it the same or similar to other jobs?
 4. And so on ...
 
-### Solution
+### ✅ Solution
 
 > Total app speed for 5Ws in this location?
 > Reduce it down to 1st principles for the win!<br>
