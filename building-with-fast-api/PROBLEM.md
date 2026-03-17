@@ -108,12 +108,12 @@ The situation would be _very_ different if the user was at home or in the office
 Well, the solution might look very different:
 
 1. **3 results only** are provided so internet speed no longer matters
-2. **Actions for user** ("favourite" etc) **performed with wifi connection** only
+2. **Actions for user performed with wifi connection** only ("favourite" etc)
 3. **Caching is no longer needed** but you can gzip the assets on server
 4. **Event phone number** is available for reliable cellular directions
 5. **File size is absolutely tiny** with `json` and (optional) 1x `.jpg`[^4]
 6. **Location radius narrows down results** even more (10mins walk)
-7. **Location directions in text format** are written down for locals
+7. ~~**Location directions in text format** are written down for locals~~
     - Perhaps you don't need directions at all and open Google Maps?
 8. **Packet size is small enough** to let backend do all the work
 9. **Text-only search** now means website obesity is negligible
@@ -143,4 +143,4 @@ What else can you think of? The experience could be hyper-narrowed only for that
  
 [^4]: Perhaps we disable any clickable event view, only display a few images even with wifi connectivity, and stick to a very specific photo style guide (the subject, the formats, etc).
 
-[^5] Hunting for brunch for the girls is very different: maybe we serve this job, and maybe we don't!
+[^5]: Hunting for brunch for the girls is very different: maybe we serve this job, and maybe we don't!
