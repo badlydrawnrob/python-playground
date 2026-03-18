@@ -94,7 +94,7 @@ Let's take one particular customer job I assume is popular:
 5. What `time` is the event starting? When does it `end`?
 6. I've decided on a place. Show me `directions`!
 
-Do I really need the map upfront? Maybe. But task number (5) is _possibly_ the very last thing I do. First and foremost, I'm looking for something I feel like doing, with a particular picking criteria (radius, price, wifi, etc). I'm not ready for directions just yet, so a rough walking distance might be all I need!
+**Do I really need the map upfront? Maybe. But task number (5) is _possibly_ the very last thing I do.** First and foremost, I'm looking for something I feel like doing, with a particular picking criteria (radius, price, wifi, etc). I'm not ready for directions just yet, so a rough walking distance might be all I need!
 
 Perhaps with a different customer job, I'm seeking out a new area to explore, which changes things!
 
