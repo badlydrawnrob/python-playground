@@ -63,11 +63,11 @@ Ideally you'd have the minimal amount of actions and data to get a customer job 
 
 > Google Maps shows A LOT of data!
 
-Google shows a map regardless of what the user is doing, or what they may want. Is this truly necessary? When you think about it in terms of customer job specifics, and if 4G is your biggest concern, priorities could be vastly different from searching at home with solid WiFi.
+**Google shows a map regardless of what the user is doing, or what they may want.** Is this truly necessary? When you think about it in terms of customer job specifics, and if 4G is your biggest concern, priorities could be vastly different from searching at home with solid WiFi.
 
 Maps does speed up things a lot with vector-based tiles and assets (lines, curves, polygons), by rendering locally on the user's device. For example, they may cache offline results when using the app (-vs- the browser). 
 
-It's still working from the assumption that "maps are good" for every occasion, however. This means large assets sizes, a complex UI, and many search results, are built-in without (seemingly) a critical eye.
+It's still working from the assumption that "maps are good" for every occasion, however. This means large assets sizes, a complex UI, and many search results, are built-in without (seemingly) a critical eye. Generally all I want to do is:
 
 To be fair, it's pretty small at 5.43kb for the initial map launch, BUT ...
 
@@ -84,6 +84,19 @@ Multiply that by the average number of events a user might view in one sitting, 
 2. How does it fit into their day?
 3. Is it the same or similar to other jobs?
 4. And so on ...
+
+Let's take one particular customer job I assume is popular:
+
+1. I'm currently in the `city` in the park
+2. Show me `electronic dance music` events tonight
+3. Which `part` of the city are they in? This matters to me.
+4. What are the `reviews` like for the venue with `[picking criteria]`?
+5. What `time` is the event starting? When does it `end`?
+6. I've decided on a place. Show me `directions`!
+
+Do I really need the map upfront? Maybe. But task number (5) is _possibly_ the very last thing I do. First and foremost, I'm looking for something I feel like doing, with a particular picking criteria (radius, price, wifi, etc). I'm not ready for directions just yet, so a rough walking distance might be all I need!
+
+Perhaps with a different customer job, I'm seeking out a new area to explore, which changes things!
 
 ### ✅ Solution
 
