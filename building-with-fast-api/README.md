@@ -21,20 +21,25 @@
 
 **Learning is never-ending:** there's always some new feature or bug to squash! Your job is to stick with one idea long enough to validate it, but don't prematurely optimise. Be brutal. Cut code down. Release!
 
-1. Tidy up naming conventions (`Event`/`Events` and `/event`/`event/`)
-2. Which queries are run with SQL? Which on the client?
-3. What's the easiest way to deal with database migrations?
-4. Consider [changing](https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/) the JWT encoder package ([security risk](https://github.com/fastapi/fastapi/discussions/9587))
-5. Do we need `client_id` and `client_secret`? (I think just the former)
-    - If it's locked to the same domain, are these necessary?
-6. Why does Rich Hickey dislike ORMs?
-7. Investigate `BaseUser` and the `Profile` column
-8. Test out [piccolo admin](https://github.com/piccolo-orm/piccolo_admin)
-9. Make sure that write endpoints are not blocking (use `WAL` mode)
-10. Running two Bombardier commands (one write, one read) is VERY slow (15mins+).
+1. Tidy up naming conventions (singluar -vs- plural)
+2. Decide which queries are backend? Which on the client?
+3. Cursory check of [security](#-security) and [errors](#️-errors)
+4. Look up database normalisation (e.g: 1-2-Many tags)
+5. What's the easiest way to deal with database migrations?
+6. Look up [FastAPI's current JWT](https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/) setup and consider using it (for [security risk](https://github.com/fastapi/fastapi/discussions/9587))
+7. Research `auth:oauth2` for secured routes.
+    - I don't think we need `client_secret` for a self-owned API
+    - Might want to add rate limit, `client_id`, IP limit, etc.
+8. Why does Rich Hickey dislike ORMs?
+    - Are there any routes we can use plain SQL?
+9. Consider adding more user details, such as a [`Profile`](https://piccolo-orm.readthedocs.io/en/latest/piccolo/authentication/baseuser.html#extending-baseuser) column
+10. `WAL` mode is fine to use up to around `-c 75` concurrent connections
+    - Do we bother using it? Does it actually help to non-block reads?
+11. Running two Bombardier commands (one write, one read) is VERY slow (15mins+).
     - `bombardier -c 10 -n 5000 http://localhost:8000/event/`
     - `bombardier -c 10 -n 5000` with `http://localhost:8000/event/new` POST
-11. Test with [Locust](https://locust.io/) for concurrency with same [scenarios](https://github.com/coding-yogi/bombardier)
+12. Test out [piccolo admin](https://github.com/piccolo-orm/piccolo_admin)
+13. Test with [Locust](https://locust.io/) for concurrency with same [scenarios](https://github.com/coding-yogi/bombardier)
     - How many users can it handle?
 
 
@@ -282,8 +287,7 @@ Have a professional check over your code, or research thoroughly.[^5] Nothing is
 
 ### ✅ Common errors
 
-> Errors ain't currently handled "correctly"; I dislike `try/except` blocks.
-> You can add logging to a file in production and catch errors there as well.
+> ⚠️ SQLite errors are difficult to catch with `try`/`except` blocks. Your best bet is to [add logging](https://betterstack.com/community/guides/logging/logging-with-fastapi/) to a file in production to view bottlenecks and errors. Some errors have been handled properly.
 
 Tick should be resolved / serious problem in bold. List errors as they come up! 
 
@@ -334,7 +338,7 @@ We must fetch `BaseUser.id` from `authenticate()` and that _could_ be a read the
 
 > It's folly to prematurely optimise! Do you have customers? Are you selling?
 
-See the [performance](./PERFORMANCE.md) documentation.
+See the [performance](./PERFORMANCE.md) documentation for tips on managing API with SQLite.
 
 
 
