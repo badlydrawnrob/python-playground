@@ -69,8 +69,9 @@ Python is not at all type safe by default! Almost anything goes. Type annotation
 
 ### Python
 
-> [Declaration order](https://stackoverflow.com/a/758197) matters in Python!
-> Types can be managed with Pydantic ([strongly typed](https://talks.jackleow.com/strongly-typed) Python is a hassle).
+> Python types are [not enforced](https://talks.jackleow.com/strongly-typed#slide-17) by default! [Declaration order](https://stackoverflow.com/a/758197) matters!
+
+Python uses type hints, but they're [not enforced](https://talks.jackleow.com/strongly-typed#slide-17) by default! You must enforce them with Pydantic and Pyright. Elm's type annotations are generally easier to read.
 
 ```python
 

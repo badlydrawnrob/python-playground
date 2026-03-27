@@ -25,14 +25,16 @@
 2. Which queries are run with SQL? Which on the client?
 3. What's the easiest way to deal with database migrations?
 4. Consider [changing](https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/) the JWT encoder package ([security risk](https://github.com/fastapi/fastapi/discussions/9587))
-5. Why does Rich Hickey dislike ORMs?
-6. Investigate `BaseUser` and the `Profile` column
-7. Test out [piccolo admin](https://github.com/piccolo-orm/piccolo_admin)
-8. Make sure that write endpoints are not blocking (use `WAL` mode)
-9. Running two Bombardier commands (one write, one read) is VERY slow (15mins+).
+5. Do we need `client_id` and `client_secret`? (I think just the former)
+    - If it's locked to the same domain, are these necessary?
+6. Why does Rich Hickey dislike ORMs?
+7. Investigate `BaseUser` and the `Profile` column
+8. Test out [piccolo admin](https://github.com/piccolo-orm/piccolo_admin)
+9. Make sure that write endpoints are not blocking (use `WAL` mode)
+10. Running two Bombardier commands (one write, one read) is VERY slow (15mins+).
     - `bombardier -c 10 -n 5000 http://localhost:8000/event/`
     - `bombardier -c 10 -n 5000` with `http://localhost:8000/event/new` POST
-10. Test with [Locust](https://locust.io/) for concurrency with same [scenarios](https://github.com/coding-yogi/bombardier)
+11. Test with [Locust](https://locust.io/) for concurrency with same [scenarios](https://github.com/coding-yogi/bombardier)
     - How many users can it handle?
 
 
