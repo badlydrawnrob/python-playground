@@ -117,11 +117,11 @@ git clean -dx -e .env -i
     - Generating JWT tokens
     - Securing routes (with authentication)
     - CORS policy (middleware)
-8. Planner app with testing (`1.12.0` - `1.12.14`)
+8. Planner app with testing (`1.12.0` - `1.12.18`)
     - Authentication, cherry-picking ORMs, error checking, refined JWT
     - ~~SQLModel (original version)~~ (`1.12.4`)
     - ~~Peewee (modified version)~~ (`1.12.11`)
-    - Piccolo (my ORM of choice) (`1.12.17`)
+    - Piccolo (my ORM of choice) (`1.12.18`)
 
 
 ### 📖 Chapter 8 (with extras)
