@@ -17,6 +17,19 @@ You don't? Well then, worry about it when you're getting `-c 30` concurrent conn
 Consider first 3rd-party tools like [Tally](https://tally.so) and [n8n](https://tally.so/help/n8n-integration) for prototyping and perform bulk writes (automatically or manually); your database could be read-only for the most part.
 
 
+## TL;DR
+
+1. Async is faster than sync on a network
+2. Add the number of `-c`oncurrent connections (add to logs)
+3. Add a timer to your response headers (add to logs)
+4. Avoid database locks with a timeout (on all the things)
+5. Don't mix read and write transactions in an endpoint
+6. Exceptions can't be reliably caught (with this setup)[^1]
+7. Try to avoid too many back-to-back writes (it blocks reads)
+8. Write efficient queries (but don't prematurely optimise)
+9. Worry about performance later (when bottlenecks appear)
+
+
 ## Testing results
 
 > **⏱ Timeouts only required when more than 10 concurrent writers.**
@@ -90,11 +103,13 @@ A shorthand is `value | Exception`, but you'll probably want to throw different 
 
 ## Is Async faster than Sync?
 
-> Async over a network is 2x faster running `125` concurrent `GET` connections.[^1]
+> Async over a network is 2x faster running `125` concurrent `GET` connections.[^2]
 
 For an example, the max read time for concurrent synchronous `/event/` endpoint was `10.03s`! An (old) [source](https://stackoverflow.com/questions/39803746/peewee-and-peewee-async-why-is-async-slower) seems to say the opposite (faster reads with sync), which might be the case for single requests without concurrency. Max req/sec can be higher with sync concurrency, but all other metrics and throughput are worse, even with `-c 10` connections. Piccolo logs get a bit screwy using synchronous with high concurrency.
 
 A basic test running SQLite in WAL mode with `run_sync()` is also very poor (dog slow) — the _opposite_ of what should happen! Writes almost certainly need async or WAL mode. These tests may differ from ORM-only (without a network).
 
 
-[^1]: For a single-user application synchronous mode is probably fine. 
+
+[^1]: Inserts can happen even when exceptions should be thrown. Your client has to do more work, such as double-check if an insert failed/succeded (at least when over `-c 75`).
+[^2]: For a single-user application synchronous mode is probably fine. 
