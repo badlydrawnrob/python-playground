@@ -174,7 +174,7 @@
 
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 
@@ -183,6 +183,8 @@ from piccolo.table import create_db_tables
 from planner.routes.users import user_router
 from planner.routes.events import event_router
 from planner.tables import Event
+
+import time #! See `README.md#-performance`
 
 import uvicorn
 
@@ -227,6 +229,13 @@ app.include_router(event_router, prefix="/event") # prefixes the `/event` url
 # Middleware
 # ==============================================================================
 # Tightens up security: @ https://fastapi.tiangolo.com/tutorial/cors/
+#
+# 1. ⚠️ Can slow performance! Not essential but very handy for client. Changed
+#    header from `X-Process-Time` to `Server-Timing` to follow best practice,
+#    where you could communicate one or more performance metrics.
+#    - @ https://fastapi.tiangolo.com/tutorial/middleware/#create-a-middleware
+#    - @ https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Server-Timing
+#    - ⚠️ See `README.md#-performance` for a better way!
 
 origins = [
     "http://localhost:8000"
@@ -239,6 +248,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"]
 )
+
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.perf_counter()
+    response = await call_next(request)
+    process_time = time.perf_counter() - start_time
+    response.headers["Server-Timing"] = f"app;dur={process_time}" # {process_time * 1000:.2f}
+    return response
 
 
 # ------------------------------------------------------------------------------

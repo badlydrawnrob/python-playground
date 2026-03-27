@@ -25,21 +25,23 @@
 2. Decide which queries are backend? Which on the client?
 3. Cursory check of [security](#-security) and [errors](#️-errors)
 4. Look up database normalisation (e.g: 1-2-Many tags)
-5. What's the easiest way to deal with database migrations?
-6. Look up [FastAPI's current JWT](https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/) setup and consider using it (for [security risk](https://github.com/fastapi/fastapi/discussions/9587))
-7. Research `auth:oauth2` for secured routes.
+5. Understand lookup and query speeds for different types
+    - Are lookups on text columns slow even if indexed?
+6. What's the easiest way to deal with database migrations?
+7. Look up [FastAPI's current JWT](https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/) setup and consider using it (for [security risk](https://github.com/fastapi/fastapi/discussions/9587))
+8. Research `auth:oauth2` for secured routes.
     - I don't think we need `client_secret` for a self-owned API
     - Might want to add rate limit, `client_id`, IP limit, etc.
-8. Why does Rich Hickey dislike ORMs?
+9. Why does Rich Hickey dislike ORMs?
     - Are there any routes we can use plain SQL?
-9. Consider adding more user details, such as a [`Profile`](https://piccolo-orm.readthedocs.io/en/latest/piccolo/authentication/baseuser.html#extending-baseuser) column
-10. `WAL` mode is fine to use up to around `-c 75` concurrent connections
+10. Consider adding more user details, such as a [`Profile`](https://piccolo-orm.readthedocs.io/en/latest/piccolo/authentication/baseuser.html#extending-baseuser) column
+11. `WAL` mode is fine to use up to around `-c 75` concurrent connections
     - Do we bother using it? Does it actually help to non-block reads?
-11. Running two Bombardier commands (one write, one read) is VERY slow (15mins+).
+12. Running two Bombardier commands (one write, one read) is VERY slow (15mins+).
     - `bombardier -c 10 -n 5000 http://localhost:8000/event/`
     - `bombardier -c 10 -n 5000` with `http://localhost:8000/event/new` POST
-12. Test out [piccolo admin](https://github.com/piccolo-orm/piccolo_admin)
-13. Test with [Locust](https://locust.io/) for concurrency with same [scenarios](https://github.com/coding-yogi/bombardier)
+13. Test out [piccolo admin](https://github.com/piccolo-orm/piccolo_admin)
+14. Test with [Locust](https://locust.io/) for concurrency with same [scenarios](https://github.com/coding-yogi/bombardier)
     - How many users can it handle?
 
 
@@ -62,9 +64,13 @@ piccolo user create
 # Populate the database in sqlite3
 open -a TextEdit /sqlite.md
 
-# CURL commands for `GET` and `POST` #!
+# Command for `GET`
 curl http://localhost:8000/event/
 
+# Compare `X-Process-Time` to actual response time
+curl -kv -w '\n* Response time: %{time_total}s\n' http://localhost:8000/event/
+
+# Command for `POST`
 curl --request POST \
 'http://localhost:8000/event/new' \
 -H 'accept: application/json' \
@@ -279,6 +285,28 @@ Have a professional check over your code, or research thoroughly.[^5] Nothing is
 
 
 
+## ⏱ Performance
+
+> It's folly to prematurely optimise! Do you have customers? Are you selling?
+
+Worry when you have reproducable and sustained bottlenecks. See the [performance](./PERFORMANCE.md) documentation for tips on managing API with SQLite.
+
+### Middleware
+
+> 🔍 Middleware effect on performance (compare and check!)
+
+I've added an example timer header, which is very handy for the client! I think Bruno's response times have some latency; CURL is quite similar. It's a CPU clock speed.
+
+Beware! Middleware can significantly degrade FastAPI performance, with standard BaseHTTPMiddleware reducing throughput by 26.81% to 41.64% and increasing request latency by approximately 19ms to 37ms per layer. This performance impact can be virtually eliminated by using a Pure ASGI middleware (Starlette-style) instead of `BaseHTTPMiddleware` (using FastAPI's decorator).
+
+### Number of rows
+
+> Lookup is done on `UUID` which is stored as text!
+
+⚠️ I've had poor performance on 300+ rows of events at 2.16s. Remember `Int` has faster lookups than text! 
+
+
+
 ## ⛔️ Errors
 
 > FastAPI errors generally use a `HTTPException`.
@@ -333,12 +361,6 @@ This stumped me for ages. Testing endpoints was returning a `307` because my end
 > I'm not 100% sure if `/user/signup` is free from "database locked" error.
 
 We must fetch `BaseUser.id` from `authenticate()` and that _could_ be a read then a write. See "SQLite and Async problems" in `planner/tables.py`. There's a lot of debate over which value should be stored in a JWT (the less user info revealed the better), but ideally we'd have `id` at hand.
-
-### ⏱ Performance
-
-> It's folly to prematurely optimise! Do you have customers? Are you selling?
-
-See the [performance](./PERFORMANCE.md) documentation for tips on managing API with SQLite.
 
 
 
