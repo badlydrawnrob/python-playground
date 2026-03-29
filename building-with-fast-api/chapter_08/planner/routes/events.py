@@ -18,6 +18,14 @@
 # Python PEP8 styleguide (unlike Elm).
 #
 #
+# Naming conventions
+# ------------------
+# > Tables are singular, but routes are plural
+#
+# Plural nouns represent collections of resources; Singular nouns represent a
+# single resource. Actions should be nested under the resource.
+#
+#
 # Async only
 # ----------
 # > ⚠️ Avoid endpoints that contain both read and write functions! If we do this,
@@ -205,7 +213,7 @@ async def retrieve_event(id: str) -> api.Event:
 # Write routes
 # ==============================================================================
 
-@event_router.post("/new")
+@event_router.post("/")
 async def create_event(
     body: api.Event,
     user: int = Depends(authenticate)) -> api.Event:

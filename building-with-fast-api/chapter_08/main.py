@@ -214,15 +214,16 @@ app = FastAPI(lifespan=lifespan)
 
 @app.get("/")
 def home():
-    return RedirectResponse(url="/event/")
+    return RedirectResponse(url="/events/")
 
 
 # ------------------------------------------------------------------------------
 # Routers (register)
 # ==============================================================================
+# > Use plural nouns for collections and singluar for single resources.
 
-app.include_router(user_router, prefix="/user") # prefixes the `/user` url
-app.include_router(event_router, prefix="/event") # prefixes the `/event` url
+app.include_router(user_router, prefix="/users") # prefixes the `/users` url
+app.include_router(event_router, prefix="/events") # prefixes the `/events` url
 
 
 # ------------------------------------------------------------------------------
