@@ -21,27 +21,27 @@
 
 **Learning is never-ending:** there's always some new feature or bug to squash! Your job is to stick with one idea long enough to validate it, but don't prematurely optimise. Be brutal. Cut code down. Release!
 
-1. Tidy up naming conventions (singluar -vs- plural)
-2. Decide which queries are backend? Which on the client?
-3. Cursory check of [security](#-security) and [errors](#️-errors)
-4. Look up database normalisation (e.g: 1-2-Many tags)
-5. Understand lookup and query speeds for different types
+1. **🐌 Queries with a few hundred rows run really slow (2-3secs)**
+    - **`Serial` + Text `UUID` might be the better combination**
     - Are lookups on text columns slow even if indexed?
-6. What's the easiest way to deal with database migrations?
-7. Look up [FastAPI's current JWT](https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/) setup and consider using it (for [security risk](https://github.com/fastapi/fastapi/discussions/9587))
-8. Research `auth:oauth2` for secured routes.
+    - Better understand lookup and query speed for different types
+2. When should filtering or query-like lookups be done on the client?
+    - SQL is quicker for most data tasks? What about for text columns?
+3. Cursory check of [security](#-security) and [errors](#️-errors)
+4. Look up [FastAPI's current JWT](https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/) setup and consider using it (for [security risk](https://github.com/fastapi/fastapi/discussions/9587))
+5. Research `auth:oauth2` for secured routes.
     - I don't think we need `client_secret` for a self-owned API
     - Might want to add rate limit, `client_id`, IP limit, etc.
-9. Why does Rich Hickey dislike ORMs?
+6. Why does Rich Hickey dislike ORMs?
     - Are there any routes we can use plain SQL?
-10. Consider adding more user details, such as a [`Profile`](https://piccolo-orm.readthedocs.io/en/latest/piccolo/authentication/baseuser.html#extending-baseuser) column
-11. `WAL` mode is fine to use up to around `-c 75` concurrent connections
+7. Consider adding more user details, such as a [`Profile`](https://piccolo-orm.readthedocs.io/en/latest/piccolo/authentication/baseuser.html#extending-baseuser) column
+8. `WAL` mode is fine to use up to around `-c 75` concurrent connections
     - Do we bother using it? Does it actually help to non-block reads?
-12. Running two Bombardier commands (one write, one read) is VERY slow (15mins+).
-    - `bombardier -c 10 -n 5000 http://localhost:8000/event/`
-    - `bombardier -c 10 -n 5000` with `http://localhost:8000/event/new` POST
-13. Test out [piccolo admin](https://github.com/piccolo-orm/piccolo_admin)
-14. Test with [Locust](https://locust.io/) for concurrency with same [scenarios](https://github.com/coding-yogi/bombardier)
+9. Running two Bombardier commands (one write, one read) is VERY slow (15mins+).
+    - `bombardier -c 10 -n 5000 http://localhost:8000/events/`
+    - `bombardier -c 10 -n 5000` with `http://localhost:8000/events/` POST
+10. Test out [piccolo admin](https://github.com/piccolo-orm/piccolo_admin)
+11. Test with [Locust](https://locust.io/) for concurrency with same [scenarios](https://github.com/coding-yogi/bombardier)
     - How many users can it handle?
 
 
@@ -65,14 +65,14 @@ piccolo user create
 open -a TextEdit /sqlite.md
 
 # Command for `GET`
-curl http://localhost:8000/event/
+curl http://localhost:8000/events/
 
 # Compare `X-Process-Time` to actual response time
-curl -kv -w '\n* Response time: %{time_total}s\n' http://localhost:8000/event/
+curl -kv -w '\n* Response time: %{time_total}s\n' http://localhost:8000/events/
 
 # Command for `POST`
 curl --request POST \
-'http://localhost:8000/event/new' \
+'http://localhost:8000/events/new' \
 -H 'accept: application/json' \
 -H 'authorization: Bearer [Generate a JWT token with Bruno]' \
 -H 'content-type: application/json' \
@@ -83,7 +83,7 @@ bombardier -c 100 -n 10000 -t 10s \
 -H "Authorization: Bearer [Generate a JWT token with Bruno]" \
 -H 'accept: application/json' -H 'content-type: application/json' --method=POST \
 -b '{"creator": null,"title": "Pyramid Stage","image": "https://tinyurl.com/ed-sheeran-with-shakira","description": "Ed Sheeran sings with Shakira at Glastonbury!","location": "Glastonbury","tags": ["music","adults","event"]}' \
-http://localhost:8000/event/new
+http://localhost:8000/events/
 
 # Optionally stress test multi-users
 https://locust.io/
@@ -170,99 +170,28 @@ git clean -dx -e .env -i
 The `pyproject.toml` is a bit messy: see `dependencies` group for `chapter_08` app. For a live production app you'll want as few dependencies as possible!
 
 
-## ⚙️ Tooling
 
+## ⏱ Performance
 
-### 💾 Piccolo
+> It's folly to prematurely optimise! Do you have customers? Are you selling?
 
-> A great [little ORM](https://piccolo-orm.readthedocs.io/en/latest/piccolo/getting_started/playground.html) that doesn't require `open()` and `close()`ing the database.
+Worry when you have reproducable and sustained bottlenecks. See the [performance](./PERFORMANCE.md) documentation for tips on managing API with SQLite.
 
-Piccolo takes a while to get into, but it's very capable. SQLite async is problematic for [concurrent writes](https://piccolo-orm.readthedocs.io/en/1.1.1/piccolo/tutorials/using_sqlite_and_asyncio_effectively.html), so try not to [read/write](https://github.com/piccolo-orm/piccolo/issues/1319) in the same endpoint (`> 10` people inserting is a struggle)! Write-ahead logging mode (`WAL`) helps a bit, and take care with inserts (remember, SQLite [isn't type safe](https://github.com/piccolo-orm/piccolo/issues/1187) without strict mode).
+### Middleware
 
+> 🔍 Middleware effect on performance (compare and check!)
 
-### 💾 SQLite
+I've added an example timer header, which is very handy for the client! I think Bruno's response times have some latency; CURL is quite similar. It's a CPU clock speed.
 
-> 🌎 The most widely deployed database in the world!
+Beware! Middleware can significantly degrade FastAPI performance, with standard BaseHTTPMiddleware reducing throughput by 26.81% to 41.64% and increasing request latency by approximately 19ms to 37ms per layer. This performance impact can be virtually eliminated by using a Pure ASGI middleware (Starlette-style) instead of `BaseHTTPMiddleware` (using FastAPI's decorator).
 
-**Gives great control over data and easy to backup or manipulate with [`sqlite-utils`](#-sqlite-utils).** SQLite is not running in strict mode, as this limits column types that Piccolo handles for us. To make sure `Any` types can't infect our database, be sure to add _at least_ an `EventDataIn` Pydantic class for the API layer! Need strict types in the database? Use Postgres. Heavy concurrent writes? [Turso](https://github.com/tursodatabase/turso) is on the way as a drop-in replacement.
+### Number of rows
 
-- Pragmas can be added directly once the app is running
-    - E.g: [`PRAGMA journal_mode=WAL`](https://sqlite.org/wal.html)[^3]
-- Piccolo defaults to `not null` columns, and `distinct` primary keys
-    - SQLite _does_ check these and will throw an error
+> Lookup is currently done on `UUID` which is stored as text!
 
-I'm not a big fan of migrations (support for these are limited anyway), and prefer GUI tools ([SQLite Browser](https://sqlitebrowser.org/), [Enso](https://ensoanalytics.com/), etc). The aforementioned `sqlite-utils` comes in very handy, and [`piccolo-admin`](https://piccolo-admin.readthedocs.io/en/latest/) is another option.
+Unlike our example, it's probably best to use BOTH Serial `ID` and Text `UUID` due to `Int` having faster lookups than text! Use `ID` internally for things like joins, with `UUID` being a separate column for all user facing operations. You might also prefer to use [shorter UUIDs](./testing/uuid/shortcodes.py) which could speed up lookups (but greater chance of collisions).
 
-### 💾 Models
-
-> See `tables.py`. Make sure models accurately reflect your needs.
-
-**As your app evolves, `planner.tables` and `planner.db` will need updating.** To change a column, such as adding `null` or `unique` constraints, the original table and data must be migrated. I'll be  doing this manually, and JQ and `sqlite-utils` come in handy. For a safe way to manually update a column, you could:
-
-1. Backup all data
-2. Create a new column (with SQL or Piccolo)
-3. Copy data over from old column to the new one
-4. `DROP` the old column (and remove from `tables.py`)
-
-Small, incremental changes to `planner.tables` are better than big bulk ones. It's also wise to mock a local database and test any changes before pushing them live.
-
-Other aspects of the model could be better designed; a many-to-many `Tags` table might be preferrable to `List[string]` for example (each user's tags are currently independent of each other), making them easier to share between different `Event`s. Look up "database normalization" for more info.[^4]
-
-Raw SQL is an option with Piccolo, but you'll need to map the data to your own Pydantic classes.
-
-### 🛠 SQLite Utils
-
-> **Very handy for testing, preparing, and backing up data!**
-> Can be used in combination with [JQ](https://jqlang.org/) or [JSON Server](https://marketplace.visualstudio.com/items?itemName=sarthikbhat.json-server) for mocking.
-
-[SQLite Utils](https://sqlite-utils.datasette.io) can format data from `json`, `csv` files in memory, or from/to `.sqlite` files. You could take a 3rd-party Tally Form → export to `.csv` → then [create a SQLite database](https://alexwlchan.net/notes/2024/use-sqlite-utils-to-convert-csv-to-sqlite/) ...
-
-```terminal
-sqlite memory form.csv "select * from form" | python -m json.tool
-```
-
-
-### 🐶 Bruno
-
-> Bruno could be the "high level viewpoint" of your API
-
-Bruno is not suited for documentation, but it's great for manual testing! `../bruno/collection/chapter-*` files can be loaded into Bruno to test endpoints for each chapter. Go to `Collection settings -> Auth` to generate an authentication JWT token. There's also a VS Code [plugin](https://marketplace.visualstudio.com/items?itemName=bruno-api-client.bruno). Errors and bugs _could_ be logged with Bruno (with QA), but it's easy for docs to get out of sync. 
-
-### 💣 Bombardier
-
-> ⚠️ Never prematurely optimise your prototype! Wait for bottlenecks to appear.
-
-**All things being (more or less) equal, prefer the easiest-to-read, most consistent, simplest design route.** Bombardier is handy for checking which design routes are more performant (and which slow us down).
-
-It's more important that code is understood and easy to maintain, over a [few `ms` bump](https://www.reddit.com/r/dotnet/comments/1hgmwvj/what_would_you_considered_a_good_api_response_time/) in speed. See the file `chapter_08/testing/bombardier` for results; we've stress tested our API with Bombardier.
-
-
-
-## 🚢 Deploy with `UV`
-
-> Server must be compatible with Async FastAPI.
-> Hosting options include Hostinger VPS and Python Anywhere.
-
-You can `pip install uv` on an Ubuntu live server, use a package manager (like Mise), or install the binary with `curl` instead. Initialise the project with `uv sync`, activate Python's virtualenv  `source .venv/bin/activate`, then run the app. It's possibly easier to setup UV manually, but [Github Actions](https://docs.astral.sh/uv/guides/integration/github/) is also an option (example below).
-
-```yaml
-steps:
-  - uses: actions/checkout@v6
-
-  - name: Install uv
-    uses: astral-sh/setup-uv@v7
-
-  - name: Set up Python
-    run: uv python install
-
-  - name: Install the project
-    run: uv sync --locked --all-extras --dev
-
-  - name: Run something
-    run: uv run python3 some_script.py
-```
-
-You'll also need to setup `uvicorn` to run with HTTPS secure connection.
+⚠️ 300+ rows has poor performance with current setup at 2.16s or more!
 
 
 
@@ -281,29 +210,7 @@ You'll also need to setup `uvicorn` to run with HTTPS secure connection.
     - Rate limit or create hard-to-guess `client_id` and `client_secret`s
 3. Never allow anyone else to [inject SQL](https://security.berkeley.edu/education-awareness/how-protect-against-sql-injection-attacks) into your queries
 
-Have a professional check over your code, or research thoroughly.[^5] Nothing is foolproof; you'll want to watch your server logs and database for signs of tampering.
-
-
-
-## ⏱ Performance
-
-> It's folly to prematurely optimise! Do you have customers? Are you selling?
-
-Worry when you have reproducable and sustained bottlenecks. See the [performance](./PERFORMANCE.md) documentation for tips on managing API with SQLite.
-
-### Middleware
-
-> 🔍 Middleware effect on performance (compare and check!)
-
-I've added an example timer header, which is very handy for the client! I think Bruno's response times have some latency; CURL is quite similar. It's a CPU clock speed.
-
-Beware! Middleware can significantly degrade FastAPI performance, with standard BaseHTTPMiddleware reducing throughput by 26.81% to 41.64% and increasing request latency by approximately 19ms to 37ms per layer. This performance impact can be virtually eliminated by using a Pure ASGI middleware (Starlette-style) instead of `BaseHTTPMiddleware` (using FastAPI's decorator).
-
-### Number of rows
-
-> Lookup is done on `UUID` which is stored as text!
-
-⚠️ I've had poor performance on 300+ rows of events at 2.16s. Remember `Int` has faster lookups than text! 
+Have a professional check over your code, or research thoroughly.[^3] Nothing is foolproof; you'll want to watch your server logs and database for signs of tampering.
 
 
 
@@ -364,13 +271,113 @@ We must fetch `BaseUser.id` from `authenticate()` and that _could_ be a read the
 
 
 
+## ⚙️ Tooling
+
+
+### 💾 Piccolo
+
+> A great [little ORM](https://piccolo-orm.readthedocs.io/en/latest/piccolo/getting_started/playground.html) that doesn't require `open()` and `close()`ing the database.
+
+Piccolo takes a while to get into, but it's very capable. SQLite async is problematic for [concurrent writes](https://piccolo-orm.readthedocs.io/en/1.1.1/piccolo/tutorials/using_sqlite_and_asyncio_effectively.html), so try not to [read/write](https://github.com/piccolo-orm/piccolo/issues/1319) in the same endpoint (`> 10` people inserting is a struggle)! Write-ahead logging mode (`WAL`) helps a bit, and take care with inserts (remember, SQLite [isn't type safe](https://github.com/piccolo-orm/piccolo/issues/1187) without strict mode).
+
+
+### 💾 SQLite
+
+> 🌎 The most widely deployed database in the world!
+
+**Gives great control over data and easy to backup or manipulate with [`sqlite-utils`](#-sqlite-utils).** SQLite is not running in strict mode, as this limits column types that Piccolo handles for us. To make sure `Any` types can't infect our database, be sure to add _at least_ an `EventDataIn` Pydantic class for the API layer! Need strict types in the database? Use Postgres. Heavy concurrent writes? [Turso](https://github.com/tursodatabase/turso) is on the way as a drop-in replacement.
+
+- Pragmas can be added directly once the app is running
+    - E.g: [`PRAGMA journal_mode=WAL`](https://sqlite.org/wal.html)[^4]
+- Piccolo defaults to `not null` columns, and `distinct` primary keys
+    - SQLite _does_ check these and will throw an error
+
+I'm not a big fan of migrations (support for these are limited anyway), and prefer GUI tools ([SQLite Browser](https://sqlitebrowser.org/), [Enso](https://ensoanalytics.com/), etc). The aforementioned `sqlite-utils` comes in very handy, and [`piccolo-admin`](https://piccolo-admin.readthedocs.io/en/latest/) is another option.
+
+### 💾 Models
+
+> See `tables.py`. Make sure models accurately reflect your needs.
+
+**As your app evolves, `planner.tables` and `planner.db` will need updating.** To change a column, such as adding `null` or `unique` constraints, the original table and data must be migrated. I'll be  doing this manually, and JQ and `sqlite-utils` come in handy. For a safe way to manually update a column, you could:
+
+1. Backup all data
+2. Create a new column (with SQL or Piccolo)
+3. Copy data over from old column to the new one
+4. `DROP` the old column (and remove from `tables.py`)
+
+Small, incremental changes to `planner.tables` are better than big bulk ones. It's also wise to mock a local database and test any changes before pushing them live.
+
+Other aspects of the model could be better designed; a many-to-many `Tags` table might be preferrable to `List[string]` for example (each user's tags are currently independent of each other), making them easier to share between different `Event`s. Look up "database normalization" for more info.[^5]
+
+Raw SQL is an option with Piccolo, but you'll need to map the data to your own Pydantic classes.
+
+### 🛠 SQLite Utils
+
+> **Very handy for testing, preparing, and backing up data!**
+> Can be used in combination with [JQ](https://jqlang.org/) or [JSON Server](https://marketplace.visualstudio.com/items?itemName=sarthikbhat.json-server) for mocking.
+
+[SQLite Utils](https://sqlite-utils.datasette.io) can format data from `json`, `csv` files in memory, or from/to `.sqlite` files. You could take a 3rd-party Tally Form → export to `.csv` → then [create a SQLite database](https://alexwlchan.net/notes/2024/use-sqlite-utils-to-convert-csv-to-sqlite/) ...
+
+```terminal
+sqlite memory form.csv "select * from form" | python -m json.tool
+```
+
+
+### 🐶 Bruno
+
+> Bruno could be the "high level viewpoint" of your API
+
+Bruno is not suited for documentation, but it's great for manual testing! `../bruno/collection/chapter-*` files can be loaded into Bruno to test endpoints for each chapter. Go to `Collection settings -> Auth` to generate an authentication JWT token. There's also a VS Code [plugin](https://marketplace.visualstudio.com/items?itemName=bruno-api-client.bruno). Errors and bugs _could_ be logged with Bruno (with QA), but it's easy for docs to get out of sync. 
+
+### 💣 Bombardier
+
+> ⚠️ Never prematurely optimise your prototype! Wait for bottlenecks to appear.
+
+**All things being (more or less) equal, prefer the easiest-to-read, most consistent, simplest design route.** Bombardier is handy for checking which design routes are more performant (and which slow us down).
+
+It's more important that code is understood and easy to maintain, over a [few `ms` bump](https://www.reddit.com/r/dotnet/comments/1hgmwvj/what_would_you_considered_a_good_api_response_time/) in speed. See the file `chapter_08/testing/bombardier` for results; we've stress tested our API with Bombardier.
+
+
+
+## 🚢 Deploy with `UV`
+
+> Server must be compatible with Async FastAPI.
+> Hosting options include Hostinger VPS and Python Anywhere.
+
+You can `pip install uv` on an Ubuntu live server, use a package manager (like Mise), or install the binary with `curl` instead. Initialise the project with `uv sync`, activate Python's virtualenv  `source .venv/bin/activate`, then run the app. It's possibly easier to setup UV manually, but [Github Actions](https://docs.astral.sh/uv/guides/integration/github/) is also an option (example below).
+
+```yaml
+steps:
+  - uses: actions/checkout@v6
+
+  - name: Install uv
+    uses: astral-sh/setup-uv@v7
+
+  - name: Set up Python
+    run: uv python install
+
+  - name: Install the project
+    run: uv sync --locked --all-extras --dev
+
+  - name: Run something
+    run: uv run python3 some_script.py
+```
+
+You'll also need to setup `uvicorn` to run with HTTPS secure connection.
+
+
+
+
+
+
+
 
 [^1]: Choosing an ORM was particularly difficult with FastAPI as it's async. No every ORM supports this and I tried both SQLModel (didn't like the documentation) and [PeeWee](http://docs.peewee-orm.com/en/latest/) (great but no async). [IceAxe](https://github.com/piercefreeman/iceaxe) is another nice looking option (very young and Postgres only), and there's a ton of synchronous ORMs like [Pony](https://ponyorm.org). To be honest though, I'd probably choose a better designed language ([Roc](https://www.roc-lang.org) looks interesting) for a big speed bump. Python is a handy scripting language, but it's errors and style ain't the best.
 
 [^2]: I tried and failed to get MongoDB working. I found it an absolute arse to setup (especially for beginners) and more hassle than SQLite (or even Postgres, I imagine). The book's `chapters` from `_06/` or `_07/` onwards uses MongoDB; I decided to part ways with the book and use SQLite instead.
 
-[^3]: All processes using a database must be on the same host computer; WAL does not work over a network filesystem.
+[^3]: If you're a great programmer, or don't mind suffering through the pain of low-level learning, then do it yourself. My goals are quite distinct and I simply don't have the time to learn everything.
 
-[^4]: Joins are easier to maintain than lists. In the book, the latter chapters use MongoDB, which is unstructured data. Here, we're trying to keep data atomic and [normalised](https://youtube.com/watch?v=GFQaEYEc8_8) with SQLite, so it's easier to search for (and `JOIN user ON event.creator = user.id`) later.
+[^4]: All processes using a database must be on the same host computer; WAL does not work over a network filesystem.
 
-[^5]: If you're a great programmer, or don't mind suffering through the pain of low-level learning, then do it yourself. My goals are quite distinct and I simply don't have the time to learn everything.
+[^5]: Joins are easier to maintain than lists. In the book, the latter chapters use MongoDB, which is unstructured data. Here, we're trying to keep data atomic and [normalised](https://youtube.com/watch?v=GFQaEYEc8_8) with SQLite, so it's easier to search for (and `JOIN user ON event.creator = user.id`) later.
