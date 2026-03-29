@@ -80,6 +80,9 @@
 # > I generally find it best to be explicit with `json` values. PUT forces us to
 # > include all fields in the request body, whether they're required or not (`null`).
 #
+# `PUT` is idempotent, meaning multiple identical PUT requests always
+# has the same result.
+#
 # This prevents any conflicts, accidentally changing a field, or leaving two `PATCH`
 # requests in an impossible state. As a general rule, be explicit and set ALL
 # data for an endpoint with `PUT`. For something like `user` and `user.settings`,
@@ -91,9 +94,6 @@
 # full data in the request body, you can be sure data is up-to-date; with `null`
 # values present, you can use @lydell's suggestion of `Json.Decode.nullable`
 # (rather than the vague and error-prone `Json.Decode.maybe`).
-#
-# **TL;DR:** `PUT` is idempotent, meaning multiple identical PUT requests always
-# has the same result.
 #
 #
 # ⚠️ The `.returning()` function

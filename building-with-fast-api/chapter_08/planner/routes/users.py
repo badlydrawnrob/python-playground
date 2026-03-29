@@ -158,7 +158,8 @@ async def sign_in_user(data: OAuth2PasswordRequestForm = Depends()):
 async def retrieve_user_profile(user: int = Depends(authenticate)):
     """Retrieve user profile and all their events
     
-    > ⚠️ Only current user events should be returned (no sensitive details)
+    > ⚠️ Extra care should be taken to ensure only current user events
+    > are returned (and no sensitive details!).
 
     This isn't in the book, but it's a useful (and necessary) addition.
     You're definitely going to allow the user to view and edit their profile!

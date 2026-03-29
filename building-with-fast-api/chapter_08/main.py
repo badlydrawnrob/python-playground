@@ -116,61 +116,45 @@
 #     - How is UI architecture affected by endpoint design? (easier/harder?)
 #     - How are others handling this and their endpoints?
 #     - Elm code be made easier? (e.g: don't check UNIQUE values on client)
-# 2. 🔐 Make sure all routes that require a logged in user are secured.
-#     - ⭐️ Understand `aud`ience and `client_id` in auth better:
-#       @ https://stackoverflow.com/a/28503265
-#     - Users can only view their own events for `/user/me` endpoint:
-#       `user.email == events.creator` guards (or `WHERE`)
-#     - Any actions on an event (like, delete) should check user "owns" it.
-#     - Any unecessary destructive routes should be removed (will it torpedo the app?)
-# 3. Create different `include_router` packages for authentication routes?
-#    - @ https://fastapi.tiangolo.com/tutorial/bigger-applications/
-#    - @ https://stackoverflow.com/a/67318405
-# 4. Can we tighten up security any more? (low hanging fruit)
-#     - XSS attacks and SQL injections
-#     - Error messages that give away too much info
-#     - Destructive endpoints that aren't necessary
-# 5. ⚠️ Are our TYPES strong enough? (we've only got API layer models)
+# 2. Use Serial `ID` and shorter `UUID` for prettier URLs (and speed)
+#     - Likely faster to have Serial `ID` for internal lookups
+#     - You could convert `UUID` to `ShortUUID` on the frontend, but a short
+#       uuid may also be quicker for lookups.
+#     - @ https://github.com/piccolo-orm/piccolo/issues/1271
+# 3. ⚠️ Are our TYPES strong enough? (we've only got API layer models)
 #     - `int` is probably fine for `BaseUser.id`
 #     - 💾 Try to insert bad data (does SQLite allow it?)
 #     - 💾 Does SQLite always error on unique constraints? Any holes?
 #     - Is there any need for `DataIn` types to verify insert/update?
-# 6. Consider using some GUI to aid "birds eye view" of schema/data
-#     - I think Piccolo has some rudimentary version of this, and Admin
-#     - See "APIs you won't hate" for more ideas (error codes, etc)
-# 7. Are the essential errors handled? (response codes, error messages, status codes)
-#     - ❌ `sqlite3.OperationalError: database is locked` is a BIG problem at scale.
-#       I tried `PRAGMA journal_mode=WAL;` but not sure it helped much. Setting the
-#       `timeout` actually made it a little _worse_!
-#     - Don't prematurely optimise, but make sure there's a reasonable `HTTPException`
-# 8. Use short `UUID` for `BaseUser` and prettier URLs
-#     - This can be done after the fact (`UUID` -> `ShortUUID`)
-#     - @ https://github.com/piccolo-orm/piccolo/issues/1271
-#     - This might be hard to retrofit and may require custom user table
-# 9. `BaseUser` could contain a `UUID` and `User.role`?
-#     - @ https://tinyurl.com/piccolo-extending-base-user
-#     - @ https://fastapi.tiangolo.com/advanced/security/oauth2-scopes
-# 10. ✏️ Write down the reason to prefer `PUT` over `PATCH`
-#     - Patch is harder to predict which optional values are present
-#     - Similar to the Elm `Decode.maybe` problem
-#     - @ https://sqlmodel.tianglo.com/tutorial/fastapi/update
-# 11. Understand middleware a little better
-#     - @ https://fastapi.tiangolo.com/tutorial/middleware/
-# 12. 🔍 Logging for FastApi live server to prepare for launch:
+# 4. ❌ Essential errors should be handled somewhere (but don't prematurely optimise)
+#     - Response codes, error messages, status codes, etc.
+#     - ❌ `try`/`except` doesn't work for `sqlite3.OperationalError: database is locked`
+#       etc, so will need to be handled by the client or fixed somehow.
+# 5. 🔍 Logging for FastApi live server to prepare for launch:
 #     - @ Search Brave "fastapi logging production"
 #     - @ https://betterstack.com/community/guides/logging/logging-with-fastapi/
 #     - @ https://tinyurl.com/prep-fastapi-for-production (hire a professional!)
-# 13. Disallow some email addresses if we're not in control of signup
+# 6. Can we tighten up security any more? (low hanging fruit)
+#     - XSS attacks and SQL injections
+#     - Error messages that give away too much info
+#     - Destructive endpoints that aren't necessary
+# 7. Create different `include_router` packages for authentication routes?
+#    - @ https://fastapi.tiangolo.com/tutorial/bigger-applications/
+#    - @ https://stackoverflow.com/a/67318405
+# 8. Consider using some GUI to aid "birds eye view" of schema/data
+#     - I think Piccolo has some rudimentary version of this, and Admin
+#     - See "APIs you won't hate" for more ideas (error codes, etc)
+# 9. `BaseUser` could contain a `UUID` and `User.role`?
+#     - @ https://tinyurl.com/piccolo-extending-base-user
+#     - @ https://fastapi.tiangolo.com/advanced/security/oauth2-scopes
+#     - This might be hard to retrofit and may require custom user table
+# 10. Understand middleware a little better
+#     - @ https://fastapi.tiangolo.com/tutorial/middleware/
+# 11. Disallow some email addresses if we're not in control of signup
 #     - For example `user+test@gmail` which allows multiple accounts.
-# 14. ⏰ Speed optimisations with Bombardier and SQLite PRAGMA optimizations
-#     - ⚠️ "Premature optimization is the devil’s volleyball!"
-#     - Check if using `BaseUser.id` directly is faster than retrieval?
-#     - Order of speed for lookup/joins: `Int` > `Bytes` > `String` (see 8)
-#     - `-wal` and `-shm` modes and other pragmas for SQLite
-#         - @ https://github.com/piccolo-orm/piccolo/discussions/1247
-#     - Do we need any caching? (on the server or with SQlite)
-#         - @ https://github.com/long2ice/fastapi-cache
-#         - @ https://www.powersync.com/blog/sqlite-optimizations-for-ultra-high-performance
+# 12. ⏰ Do we need any other speed optimisations like caching?
+#     - @ https://github.com/long2ice/fastapi-cache
+#     - @ https://www.powersync.com/blog/sqlite-optimizations-for-ultra-high-performance
 
 from contextlib import asynccontextmanager
 

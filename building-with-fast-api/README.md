@@ -30,6 +30,7 @@
 3. Cursory check of [security](#-security) and [errors](#️-errors)
 4. Look up [FastAPI's current JWT](https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/) setup and consider using it (for [security risk](https://github.com/fastapi/fastapi/discussions/9587))
 5. Research `auth:oauth2` for secured routes.
+    - https://stackoverflow.com/a/28503265
     - I don't think we need `client_secret` for a self-owned API
     - Might want to add rate limit, `client_id`, IP limit, etc.
 6. Why does Rich Hickey dislike ORMs?
@@ -156,6 +157,7 @@ git clean -dx -e .env -i
 8. More errata not listed ...
 
 
+
 ## 🔍 Documentation
 
 > See comments and `localhost:8000/docs` for full documentation.
@@ -163,6 +165,7 @@ git clean -dx -e .env -i
 **Docs should live in one place and be kept up-to-date.** See file comments for API instructions, errors, types, and so on; Bruno ([manually](https://docs.usebruno.com/testing/automate-test/manual-test)) tests the API and documents some bugs. A helpful book, _[APIs you won't hate](https://leanpub.com/build-apis-you-wont-hate-2)_, goes into more detail on errors, design, schema, and documentation guides.
 
 [Bombardier](https://github.com/codesenberg/bombardier) and [Locust](https://locust.io/) can be used to test for speed, and you may prefer unit testing for a production app. I've avoided documentation techniques such as `Annotated[]` and `"json_schema_extra"`, as they make for messy code.
+
 
 
 ## 🐍 Dependencies
@@ -175,7 +178,7 @@ The `pyproject.toml` is a bit messy: see `dependencies` group for `chapter_08` a
 
 > It's folly to prematurely optimise! Do you have customers? Are you selling?
 
-Worry when you have reproducable and sustained bottlenecks. See the [performance](./PERFORMANCE.md) documentation for tips on managing API with SQLite.
+Premature optimization is the devil’s volleyball! Worry when you have reproducable and sustained bottlenecks. See the [performance](./PERFORMANCE.md) documentation for tips on managing API with SQLite.
 
 ### Middleware
 
@@ -199,16 +202,21 @@ Unlike our example, it's probably best to use BOTH Serial `ID` and Text `UUID` d
 
 > **Security is a bitch.** Production API needs to protect itself from all sorts of hacks.
 
-**Out of scope for this repo, but here's some suggestions.** What are the major threats?
+Out of scope for this repo, but here's some suggestions. What are the major threats?
 
-1. Use `python-jose[cryptography]` latest version
+1. **Assure that all routes that should be protected _are_ protected**
+    - A user should never be able to edit or delete another user's items
+    - A users sensitive information should never be exposed
+    - Destructive actions (especially bulk) should be removed unless they're
+      absolutely essential.
+2. Use `python-jose[cryptography]` latest version
     - `python-jose` version in the book is [unsafe](https://security.snyk.io/package/pip/python-jose)
     - OpenSSL 3.0.0 [doesn't support](https://cryptography.io/en/latest/faq/#installing-cryptography-with-openssl-older-than-3-0-0-fails) Older MacOS, but your server should
-2. Prevent common attacks such as XSS and DDoS
+3. Prevent common attacks such as XSS and DDoS
     - Exclude off-domain requests to the API with `app.add_middleware()`
     - Restrict headers (such as CURL) or by IP address
     - Rate limit or create hard-to-guess `client_id` and `client_secret`s
-3. Never allow anyone else to [inject SQL](https://security.berkeley.edu/education-awareness/how-protect-against-sql-injection-attacks) into your queries
+4. Never allow anyone else to [inject SQL](https://security.berkeley.edu/education-awareness/how-protect-against-sql-injection-attacks) into your queries
 
 Have a professional check over your code, or research thoroughly.[^3] Nothing is foolproof; you'll want to watch your server logs and database for signs of tampering.
 
