@@ -184,14 +184,16 @@
 # ------------------------------------------------------------------------------
 # WISHLIST
 # ------------------------------------------------------------------------------
-# 1. Which fields should be `unique=True`?
+# 1. `Array()`/`JSONField` should be a many-to-many endpoint
+#     - It's a better type for centralised tags, categories, etc)
+#     - Only use many-to-many if absolutely essential!
+#     - `Array()` or one-to-many only works if tags are per-user or per-event.
+# 2. Which fields should be `unique=True`?
 #     - Duplicate `Event.title`s are currently possible
-# 2. Which field should be the `ForeignKey` reference?
+# 3. Which field should be the `ForeignKey` reference?
 #     - Ideally you'd set this to `null=False` (it's `True` by default)
 #     - `ID` is fastest at lookup as it's indexed automatically
 #     - Currently we must ping `authenticate()` to get `BaseUser.id`
-# 2. Many-to-many relationships (tags, categories, etc)
-#     - Previous versions this was a `JSONField`
 
 from piccolo.apps.user.tables import BaseUser
 from piccolo.table import Table
