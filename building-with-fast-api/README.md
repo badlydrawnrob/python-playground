@@ -178,7 +178,7 @@ The `pyproject.toml` is a bit messy: see `dependencies` group for `chapter_08` a
 
 > It's folly to prematurely optimise! Do you have customers? Are you selling?
 
-Premature optimization is the devil’s volleyball! Worry when you have reproducable and sustained bottlenecks. See the [performance](./PERFORMANCE.md) documentation for tips on managing API with SQLite. [Response size](-response-size) is also very important (large responses take longer in Bruno than Curl, for example)!
+Premature optimization is the devil’s volleyball! Worry when you have reproducable and sustained bottlenecks. See the [performance](./PERFORMANCE.md) documentation for tips on managing API with SQLite. [Response size](#-response-size) is also very important (large responses take longer in Bruno than Curl, for example)!
 
 ### Middleware
 
