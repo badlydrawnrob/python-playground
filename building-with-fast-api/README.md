@@ -190,13 +190,13 @@ Beware! Middleware can significantly degrade FastAPI performance, with standard 
 
 ### 🐌 Response size
 
-### 🚀 Return less data!
+#### 🚀 Return less data!
 
 > **Only return the essential data:** limit rows and columns.
 
 Returning less data (e.g: all `Event.title`s) reduces the speed to `673ms` (Bruno)! This might mean on your `/events/` url you display partial `Event`s and clicking through to `/events/{id}` shows full details.
 
-### ⚠️ Lots of rows and columns = slow performance
+#### ⚠️ Lots of rows and columns = slow performance
 
 > Lookup for lots of rows can have slow performance! Clients have latency!
 
