@@ -168,7 +168,7 @@ git clean -dx -e .env -i
 
 
 
-## 🐍 Dependencies
+## 🐍 Dependencies
 
 The `pyproject.toml` is a bit messy: see `dependencies` group for `chapter_08` app. For a live production app you'll want as few dependencies as possible!
 
@@ -178,17 +178,25 @@ The `pyproject.toml` is a bit messy: see `dependencies` group for `chapter_08` a
 
 > It's folly to prematurely optimise! Do you have customers? Are you selling?
 
-Premature optimization is the devil’s volleyball! Worry when you have reproducable and sustained bottlenecks. See the [performance](./PERFORMANCE.md) documentation for tips on managing API with SQLite.
+Premature optimization is the devil’s volleyball! Worry when you have reproducable and sustained bottlenecks. See the [performance](./PERFORMANCE.md) documentation for tips on managing API with SQLite. [Response size](-response-size) is also very important (large responses take longer in Bruno than Curl, for example)!
 
-### Middleware
+### Middleware
 
 > 🔍 Middleware effect on performance (compare and check!)
 
 I've added an example timer header, which is very handy for the client! I think Bruno's response times have some latency; CURL is quite similar. It's a CPU clock speed.
 
-Beware! Middleware can significantly degrade FastAPI performance, with standard BaseHTTPMiddleware reducing throughput by 26.81% to 41.64% and increasing request latency by approximately 19ms to 37ms per layer. This performance impact can be virtually eliminated by using a Pure ASGI middleware (Starlette-style) instead of `BaseHTTPMiddleware` (using FastAPI's decorator).
+Beware! Middleware can significantly degrade FastAPI performance, with standard `BaseHTTPMiddleware` reducing throughput by `26.81%` to `41.64%` and increasing request latency by approximately `19ms` to `37ms` per layer. This performance impact can be virtually eliminated by using a Pure ASGI middleware (Starlette-style) instead of `BaseHTTPMiddleware` (using FastAPI's decorator).
 
-### ⚠️ Response size (amount of data)
+### 🐌 Response size
+
+### 🚀 Return less data!
+
+> **Only return the essential data:** limit rows and columns.
+
+Returning less data (e.g: all `Event.title`s) reduces the speed to `673ms` (Bruno)! This might mean on your `/events/` url you display partial `Event`s and clicking through to `/events/{id}` shows full details.
+
+### ⚠️ Lots of rows and columns = slow performance
 
 > Lookup for lots of rows can have slow performance! Clients have latency!
 
@@ -205,12 +213,6 @@ Tests so far show similar performance for `Serial` and `UUID` (Bruno, 10003 rows
 3. `Event.raw` doesn't seem to make any difference?
 
 It may be better to use _both_ `Serial` and `UUID` for private and public facing. Joins should be faster with an `Int` type. Shorter `UUID`s might also be [advisable](./testing/uuid/shortcodes.py) as shorter text may speed up lookups (at expense of more potential collisions).
-
-#### 🚀 Return less data!
-
-> ⚠️ Only return the essential data: limit rows and columns.
-
-Returning less data (e.g: all `Event.title`s) reduces the speed to `673ms` (Bruno)!
 
 
 
@@ -270,24 +272,24 @@ Tick should be resolved / serious problem in bold. List errors as they come up!
     - [ ] Account not approved by admin (you can handle this internally)
     - [x] User is able to delete data that doesn't belong to them
 
-### ⚾️ Catch and throw
+#### ⚾️ Catch and throw
 
 **You can either "catch" or "throw" an error.** Think of it like baseball, whereby catching the ball allows us to handle or examine an error (`try`/`except`), and a throw sends a helpful error to our user (`raise`). It seems that _throwing_ an error is more performant than _catching_ it first.
 
-### 🔐 Impossible routes
+#### 🔐 Impossible routes
 
 > If it's destructive or hackable, consider leaving it out!
 
 Rather than having a live `piccolo-admin`, `DELETE` all endpoint, or user roles, do it locally on a secure device; same goes for `piccolo user create` while you're prototyping. There's no need to do bulk destructive actions early on. Hire a professional to build out a secure platform.
 
-### `307` redirects (trailing slash error)
+#### `307` redirects (trailing slash error)
 
 > FastAPI treats `/events` and `/events/` as two distinct endpoints.
 > You'll need to do a reverse proxy with your server setup with [`/` redirects](https://fastapi.tiangolo.com/advanced/behind-a-proxy/#redirects-with-https).
 
 This stumped me for ages. Testing endpoints was returning a `307` because my endpoint was setup _without_ a trailing slash and I'm including it (or vice-versa). For some reason Bruno didn't seem to have this problem! Also make sure you're calling the API with the correct method (e.g: `POST`).
 
-### 🤩 Authenticated routes
+#### 🤩 Authenticated routes
 
 > I'm not 100% sure if `/user/signup` is free from "database locked" error.
 
@@ -318,7 +320,7 @@ Piccolo takes a while to get into, but it's very capable. SQLite async is proble
 
 I'm not a big fan of migrations (support for these are limited anyway), and prefer GUI tools ([SQLite Browser](https://sqlitebrowser.org/), [Enso](https://ensoanalytics.com/), etc). The aforementioned `sqlite-utils` comes in very handy, and [`piccolo-admin`](https://piccolo-admin.readthedocs.io/en/latest/) is another option.
 
-### 💾 Models
+#### 💾 Models
 
 > See `tables.py`. Make sure models accurately reflect your needs.
 
@@ -335,7 +337,7 @@ Other aspects of the model could be better designed; a many-to-many `Tags` table
 
 Raw SQL is an option with Piccolo, but you'll need to map the data to your own Pydantic classes.
 
-### 🛠 SQLite Utils
+#### 🛠 SQLite Utils
 
 > **Very handy for testing, preparing, and backing up data!**
 > Can be used in combination with [JQ](https://jqlang.org/) or [JSON Server](https://marketplace.visualstudio.com/items?itemName=sarthikbhat.json-server) for mocking.
@@ -347,13 +349,15 @@ sqlite memory form.csv "select * from form" | python -m json.tool
 ```
 
 
-### 🐶 Bruno
+### 🤝 API testing
+
+#### 🐶 Bruno
 
 > Bruno could be the "high level viewpoint" of your API
 
 Bruno is not suited for documentation, but it's great for manual testing! `../bruno/collection/chapter-*` files can be loaded into Bruno to test endpoints for each chapter. Go to `Collection settings -> Auth` to generate an authentication JWT token. There's also a VS Code [plugin](https://marketplace.visualstudio.com/items?itemName=bruno-api-client.bruno). Errors and bugs _could_ be logged with Bruno (with QA), but it's easy for docs to get out of sync. 
 
-### 💣 Bombardier
+#### 💣 Bombardier
 
 > ⚠️ Never prematurely optimise your prototype! Wait for bottlenecks to appear.
 
