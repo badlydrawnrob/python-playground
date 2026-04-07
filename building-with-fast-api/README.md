@@ -188,13 +188,29 @@ I've added an example timer header, which is very handy for the client! I think 
 
 Beware! Middleware can significantly degrade FastAPI performance, with standard BaseHTTPMiddleware reducing throughput by 26.81% to 41.64% and increasing request latency by approximately 19ms to 37ms per layer. This performance impact can be virtually eliminated by using a Pure ASGI middleware (Starlette-style) instead of `BaseHTTPMiddleware` (using FastAPI's decorator).
 
-### Number of rows
+### ⚠️ Response size (amount of data)
 
-> Lookup is currently done on `UUID` which is stored as text!
+> Lookup for lots of rows can have slow performance! Clients have latency!
 
-Unlike our example, it's probably best to use BOTH Serial `ID` and Text `UUID` due to `Int` having faster lookups than text! Use `ID` internally for things like joins, with `UUID` being a separate column for all user facing operations. You might also prefer to use [shorter UUIDs](./testing/uuid/shortcodes.py) which could speed up lookups (but greater chance of collisions).
+1000+ rows with current Piccolo + SQLite setup (all columns):
 
-⚠️ 300+ rows has poor performance with current setup at 2.16s or more!
+- ~2.16s+ (Bruno)
+- ~1.651628s (Curl)
+- ~0.153s (sqlite3 real)
+
+Tests so far show similar performance for `Serial` and `UUID` (Bruno, 10003 rows).
+
+1. `UUID` is stored as text (may have slow performance)
+2. `Serial` integer _should_ be faster ...
+3. `Event.raw` doesn't seem to make any difference?
+
+It may be better to use _both_ `Serial` and `UUID` for private and public facing. Joins should be faster with an `Int` type. Shorter `UUID`s might also be [advisable](./testing/uuid/shortcodes.py) as shorter text may speed up lookups (at expense of more potential collisions).
+
+#### 🚀 Return less data!
+
+> ⚠️ Only return the essential data: limit rows and columns.
+
+Returning less data (e.g: all `Event.title`s) reduces the speed to `673ms` (Bruno)!
 
 
 
