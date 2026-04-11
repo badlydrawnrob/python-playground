@@ -50,7 +50,7 @@ Consider first 3rd-party tools like [Tally](https://tally.so) and [n8n](https://
     - If a write is currently active, reads must wait (a problem at scale)
     - `WAL` mode helps unblock writes (with less than `-c 75`) but ...
     - `WAL` mode at scale (`-c 100`) can make success rates a lot worse!
-3. **SQLite struggles with sustained high concurrent writes** (over `75`)
+3. **SQLite [struggles](https://blog.skypilot.co/abusing-sqlite-to-handle-concurrency/) with sustained high concurrent writes** (over `75`)
     - Higher concurrency generally requires a bigger timeout
     - Beware of concurrency over `-c 75` and `-t 10s`
         - It can start to become volatile and inconsistent

@@ -40,14 +40,14 @@ None of these account for specific user actions, which also may not work, depend
 
 ## 🪧 What actions are available?
 
-1. Read all `/event`s
-2. Select one `/event/id`
-3. Get a `/event/id` address
-4. Get a `/event/id` direction
-5. Post a single `/event`
+1. Read all `/events`
+2. Select one `/events/id`
+3. Get a `/events/id` address
+4. Get a `/events/id` direction
+5. Post a single `/events`
 6. And so on ...
 
-Ideally you'd have the minimal amount of actions and data to get a customer job done. Here the main data would be a `.jpg` image of the venue and `json` data for specifics. Let's take one operation, "Read all `/meal`s" as an example.
+Ideally you'd have the minimal amount of actions and data to get a customer job done. Here the main data would be a `.jpg` image of the venue and `json` data for specifics. Let's take one operation, "Read all `/meals`" as an example.
 
 
 ## 📆 Reading all events
