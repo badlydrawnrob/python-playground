@@ -5,7 +5,7 @@
 # > Column types: @ https://github.com/piccolo-orm/piccolo/issues/1257
 # > SQL guide: @ https://www.dofactory.com/sql
 #
-# For full documentation see the `mocking/fruits` example here:
+# For another example of database setup, see `mocking/fruits`:
 #
 #    @ https://github.com/badlydrawnrob/data-playground/tree/master/mocking/fruits
 #
@@ -73,8 +73,8 @@
 #     - PRAGMA settings like `journal_mode=WAL`, `foreign_keys`, `cache_size`,
 #       aren't available in Piccolo yet. You can set `TIMEOUT` however.
 #
-# 2. Column types are required (`null=False`) by default, but ...
-#     - `null=True` must be used for required inputs (even foreign keys!)
+# 2. Column types are optional (`null=False`) by default, but ...
+#     - `null=False` must be used for required inputs (even foreign keys!)
 #     - `null` values not considered equal (so use NOT NULL if distinct)
 #     - `unique=True` must be used to enforce uniqueness
 #     - `Serial` primary key auto-increments, unique, `secret=` by default
